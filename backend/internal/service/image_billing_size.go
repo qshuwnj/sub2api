@@ -116,6 +116,16 @@ func ApplyOpenAIImageBillingResolution(result *OpenAIForwardResult) {
 	if result == nil || result.ImageCount <= 0 {
 		return
 	}
+	// Seedream bills by its preset class, not by the longest pixel edge.
+	if result.UpstreamModel == "bytedance/seedream-v4.5" &&
+		result.UpstreamEndpoint == "/api/v1"+atlasCloudImagesPath {
+		if _, tier := atlasCloudImagePreset(result.ImageInputSize); tier != "" {
+			result.ImageSize = tier
+			result.ImageSizeSource = ImageSizeSourceInput
+			result.ImageSizeBreakdown = map[string]int{tier: result.ImageCount}
+			return
+		}
+	}
 	inputSize := strings.TrimSpace(result.ImageInputSize)
 	if inputSize == "" && strings.TrimSpace(result.ImageSize) != ImageBillingSize2K {
 		inputSize = strings.TrimSpace(result.ImageSize)
