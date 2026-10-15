@@ -1616,6 +1616,9 @@ func upstreamModelEntryID(entry upstreamModelEntry) string {
 	if modelID == "" {
 		modelID = strings.TrimSpace(entry.Name)
 	}
+	if modelID == "" {
+		modelID = strings.TrimSpace(entry.Model)
+	}
 	return strings.TrimPrefix(modelID, "models/")
 }
 

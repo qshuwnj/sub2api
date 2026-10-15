@@ -164,6 +164,26 @@ func TestExtractUpstreamModelIDs(t *testing.T) {
 			want: []string{"canonical-id"},
 		},
 		{
+			name: "atlascloud data array uses model field",
+			body: `{"code":"200","data":[{"uuid":"image-model","model":"openai/gpt-image-2/text-to-image","displayName":"GPT Image 2"},{"uuid":"video-model","model":"xai/grok-imagine-video/text-to-video","displayName":"Grok Imagine Video"},{"model":"openai/gpt-image-2/text-to-image"},{"model":" "}]}`,
+			want: []string{"openai/gpt-image-2/text-to-image", "xai/grok-imagine-video/text-to-video"},
+		},
+		{
+			name: "model fallback preserves existing field precedence",
+			body: `{"data":[{"id":"id-model","slug":"ignored-slug","name":"ignored-name","model":"ignored-model"},{"slug":"slug-model","name":"ignored-name","model":"ignored-model"},{"name":"name-model","model":"ignored-model"},{"id":" ","slug":" ","name":" ","model":" fallback-model "}]}`,
+			want: []string{"fallback-model", "id-model", "name-model", "slug-model"},
+		},
+		{
+			name: "models array supports model field",
+			body: `{"models":[{"model":"models/gemini-2.5-pro"},{"model":"gemini-2.5-flash"}]}`,
+			want: []string{"gemini-2.5-flash", "gemini-2.5-pro"},
+		},
+		{
+			name: "top level array supports model field",
+			body: `[{"model":" z-model "},{"model":"models/a-model"},{"model":""}]`,
+			want: []string{"a-model", "z-model"},
+		},
+		{
 			name: "codex manifest uses slug",
 			body: `{"models":[{"slug":"gpt-5.6-sol"},{"slug":"gpt-5.5-codex"}]}`,
 			want: []string{"gpt-5.5-codex", "gpt-5.6-sol"},
@@ -415,6 +435,48 @@ func TestFetchUpstreamSupportedModelsParsesOpenAIResponse(t *testing.T) {
 	require.Equal(t, []string{"gpt-5", "o3"}, models)
 	require.Equal(t, "https://openai.example.com/v1/models", upstream.lastReq.URL.String())
 	require.Equal(t, "Bearer openai-key", upstream.lastReq.Header.Get("Authorization"))
+}
+
+func TestFetchUpstreamSupportedModelsParsesAtlasCloudResponse(t *testing.T) {
+	t.Parallel()
+
+	upstream := &httpUpstreamRecorder{resp: &http.Response{
+		StatusCode: http.StatusOK,
+		Header:     http.Header{"Content-Type": []string{"application/json"}},
+		Body: io.NopCloser(strings.NewReader(`{"code":"200","data":[
+			{"model":"openai/gpt-image-2.5-flare/text-to-image","displayName":"GPT Image 2.5 Flare"},
+			{"model":"google/gemini-omni-1.1-flash/text-to-video","displayName":"Gemini Omni 1.1 Flash"},
+			{"model":"minimax/h3-developer/text-to-video","displayName":"H3 Developer"},
+			{"model":"xai/grok-imagine-image-2.0-developer/text-to-image","displayName":"Grok Imagine Image 2.0 Developer"},
+			{"model":"xai/grok-imagine-video/text-to-video","displayName":"Grok Imagine Video"},
+			{"model":"openai/gpt-image-2/text-to-image","displayName":"GPT Image 2"}
+		]}`)),
+	}}
+	svc := &AccountTestService{
+		httpUpstream: upstream,
+		cfg:          upstreamModelSyncTestConfig(),
+	}
+
+	models, err := svc.FetchUpstreamSupportedModels(context.Background(), &Account{
+		ID:       21,
+		Platform: PlatformOpenAI,
+		Type:     AccountTypeAPIKey,
+		Credentials: map[string]any{
+			"api_key":  "atlascloud-test-key",
+			"base_url": "https://api.atlascloud.ai/api/v1",
+		},
+	})
+	require.NoError(t, err)
+	require.Equal(t, []string{
+		"google/gemini-omni-1.1-flash/text-to-video",
+		"minimax/h3-developer/text-to-video",
+		"openai/gpt-image-2.5-flare/text-to-image",
+		"openai/gpt-image-2/text-to-image",
+		"xai/grok-imagine-image-2.0-developer/text-to-image",
+		"xai/grok-imagine-video/text-to-video",
+	}, models)
+	require.Equal(t, "https://api.atlascloud.ai/api/v1/models", upstream.lastReq.URL.String())
+	require.Equal(t, "Bearer atlascloud-test-key", upstream.lastReq.Header.Get("Authorization"))
 }
 
 // Scenario: ID-only 模型列表从 Models.dev 补齐能力。
