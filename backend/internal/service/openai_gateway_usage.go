@@ -414,7 +414,7 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	isVideoUsage := isGrokVideoUsageResult(result, billingModels)
 	if isVideoUsage {
 		usageLog.VideoCount = result.VideoCount
-		usageLog.VideoResolution = optionalTrimmedStringPtr(NormalizeVideoBillingResolutionOrDefault(result.VideoResolution))
+		usageLog.VideoResolution = optionalTrimmedStringPtr(NormalizeVideoBillingResolutionForModel(result.BillingModel, result.VideoResolution))
 		videoDurationSeconds := NormalizeVideoBillingDurationSecondsOrDefault(result.VideoDurationSeconds)
 		usageLog.VideoDurationSeconds = &videoDurationSeconds
 	}
@@ -599,6 +599,9 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageCost(
 		return s.billingService.CalculateWebSearchCost(result.WebSearchCalls, webSearchPricePerCallFromAPIKey(apiKey), webSearchMultiplier), nil
 	}
 	if isGrokVideoUsageResult(result, billingModels) {
+		if IsAtlasCloudVideoModel(billingModel) {
+			return s.calculateOpenAIVideoCost(ctx, billingModel, apiKey, result, videoMultiplier), nil
+		}
 		if resolved := s.resolveOpenAIChannelPricing(ctx, billingModel, apiKey); resolved == nil || resolved.Mode != BillingModeToken {
 			return s.calculateOpenAIVideoCost(ctx, billingModel, apiKey, result, videoMultiplier), nil
 		}
@@ -769,6 +772,18 @@ func (s *OpenAIGatewayService) calculateOpenAIImageCost(
 ) *CostBreakdown {
 	sizeTier := NormalizeImageBillingTierOrDefault(result.ImageSize)
 	resolved := s.resolveOpenAIChannelPricing(ctx, billingModel, apiKey)
+	if IsAtlasCloudPricedImageModel(billingModel) {
+		if price := atlasCloudConfiguredImageTierPrice(resolved, sizeTier); price != nil {
+			// Preserve explicit zero tiers and never price an image by a token interval.
+			exactTier := *resolved
+			exactTier.RequestTiers = nil
+			exactTier.DefaultPerRequestPrice = *price
+			resolved = &exactTier
+		} else {
+			// Admission permits the flat group image card when this tier is absent.
+			resolved = nil
+		}
+	}
 	if resolved != nil && resolved.Source == PricingSourceGroup &&
 		(resolved.Mode == BillingModePerRequest || resolved.Mode == BillingModeImage) {
 		gid := apiKey.Group.ID
@@ -828,8 +843,11 @@ func (s *OpenAIGatewayService) calculateOpenAIVideoCost(
 	if videoCount <= 0 {
 		videoCount = 1
 	}
-	resolution := NormalizeVideoBillingResolutionOrDefault(result.VideoResolution)
+	resolution := NormalizeVideoBillingResolutionForModel(billingModel, result.VideoResolution)
 	durationSeconds := NormalizeVideoBillingDurationSecondsOrDefault(result.VideoDurationSeconds)
+	if IsAtlasCloudVideoModel(billingModel) {
+		return s.billingService.CalculateVideoCost(billingModel, resolution, videoCount, durationSeconds, videoPriceConfigFromAPIKey(apiKey), multiplier)
+	}
 	resolved := s.resolveOpenAIChannelPricing(ctx, billingModel, apiKey)
 	if resolved != nil && resolved.Source == PricingSourceGroup && resolved.Mode == BillingModeVideo {
 		gid := apiKey.Group.ID

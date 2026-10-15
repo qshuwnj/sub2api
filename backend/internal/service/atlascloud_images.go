@@ -16,12 +16,14 @@ import (
 )
 
 const (
-	atlasCloudGPTImageModel = "openai/gpt-image-2/text-to-image"
-	atlasCloudImagesPath    = "/model/generateImage"
-	atlasCloudPollPath      = "/model/prediction/"
-	atlasCloudPollDelay     = 2 * time.Second
-	atlasCloudTimeout       = 180 * time.Second
-	atlasCloudBodyLimit     = 4 << 20
+	atlasCloudGPTImageModel   = "openai/gpt-image-2/text-to-image"
+	atlasCloudFlareImageModel = "openai/gpt-image-2.5-flare/text-to-image"
+	atlasCloudGrokImageModel  = "xai/grok-imagine-image-2.0-developer/text-to-image"
+	atlasCloudImagesPath      = "/model/generateImage"
+	atlasCloudPollPath        = "/model/prediction/"
+	atlasCloudPollDelay       = 2 * time.Second
+	atlasCloudTimeout         = 180 * time.Second
+	atlasCloudBodyLimit       = 4 << 20
 )
 
 func isAtlasCloudImagesBaseURL(base string) bool {
@@ -44,6 +46,12 @@ func atlasCloudImagePreset(size string) (string, string) {
 }
 
 func atlasCloudImageSize(model, size string) (string, string) {
+	if model == atlasCloudFlareImageModel {
+		return atlasCloudFlareSize(size)
+	}
+	if model == atlasCloudGrokImageModel {
+		return "", ""
+	}
 	if model != atlasCloudGPTImageModel {
 		return atlasCloudImagePreset(size)
 	}
@@ -61,7 +69,7 @@ func atlasCloudImageSize(model, size string) (string, string) {
 }
 
 func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
-	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel) {
+	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model)) {
 		return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
 	}
 	if parsed.IsEdits() || parsed.Multipart || len(parsed.InputImageURLs) > 0 || parsed.HasMask {
@@ -76,7 +84,7 @@ func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]b
 	if parsed.ResponseFormat != "" && parsed.ResponseFormat != "url" {
 		return nil, fmt.Errorf("AtlasCloud currently requires response_format=url")
 	}
-	if parsed.Background != "" || parsed.OutputCompression != nil ||
+	if (parsed.Background != "" && model != atlasCloudFlareImageModel) || parsed.OutputCompression != nil ||
 		parsed.PartialImages != nil || parsed.Style != "" || parsed.InputFidelity != "" || parsed.Moderation != "" {
 		return nil, fmt.Errorf("AtlasCloud does not support these OpenAI image options")
 	}
@@ -84,6 +92,9 @@ func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]b
 		if value := gjson.GetBytes(parsed.Body, field); value.Exists() && value.Type != gjson.Null {
 			return nil, fmt.Errorf("AtlasCloud does not support the %s option in text-to-image mode", field)
 		}
+	}
+	if model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel {
+		return buildAtlasCloudNewImagePayload(parsed, model)
 	}
 	size, _ := atlasCloudImageSize(model, parsed.Size)
 	if size == "" {
@@ -228,8 +239,24 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			responseBody, _ := json.Marshal(map[string]any{"id": predictionID, "created": time.Now().Unix(), "data": images})
 			synthetic := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}},
 				Body: io.NopCloser(bytes.NewReader(responseBody))}
+			size, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+			if upstreamModel == atlasCloudGrokImageModel {
+				tier = ImageBillingSize1K
+				if gjson.GetBytes(payload, "resolution").String() == "2k" {
+					tier = ImageBillingSize2K
+				}
+			}
+			if IsAtlasCloudPricedImageModel(upstreamModel) {
+				return &OpenAIForwardResult{
+					RequestID: predictionID, UpstreamModel: upstreamModel, Model: parsed.Model,
+					ImageCount: len(images), ImageSize: tier, ImageInputSize: strings.ReplaceAll(size, "*", "x"),
+					UpstreamEndpoint: "/api/v1" + atlasCloudImagesPath,
+					ResponseHeaders:  synthetic.Header.Clone(), Duration: time.Since(started),
+					AtlasCloudImageResponse: responseBody,
+				}, nil
+			}
 			responseRequest := parsed
-			if upstreamModel == atlasCloudGPTImageModel {
+			if upstreamModel == atlasCloudGPTImageModel || upstreamModel == atlasCloudFlareImageModel || upstreamModel == atlasCloudGrokImageModel {
 				// Keep GPT Image 2 URL-only even when the account enables base64 backfill.
 				urlRequest := *parsed
 				urlRequest.ResponseFormat = "url"
@@ -239,7 +266,6 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if err != nil {
 				return nil, err
 			}
-			size, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
 			return &OpenAIForwardResult{
 				RequestID: predictionID, UpstreamModel: upstreamModel, Model: parsed.Model, Usage: usage,
 				ImageCount: count, ImageSize: tier, ImageInputSize: strings.ReplaceAll(size, "*", "x"),

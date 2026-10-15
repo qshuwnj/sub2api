@@ -357,6 +357,29 @@ func TestGatewayRoutesCompositeVideoGenerationAllowed(t *testing.T) {
 	require.NotContains(t, w.Body.String(), "not supported")
 }
 
+func TestGatewayRoutesAtlasCloudVideosUseOpenAIHandler(t *testing.T) {
+	router := newGatewayRoutesTestRouter(service.PlatformOpenAI)
+	for _, model := range []string{
+		"google/gemini-omni-1.1-flash/text-to-video",
+		"minimax/h3-developer/text-to-video",
+		"xai/grok-imagine-video/text-to-video",
+	} {
+		for _, path := range []string{"/v1/videos/generations", "/videos/generations"} {
+			req := httptest.NewRequest(http.MethodPost, path, strings.NewReader(`{"model":"`+model+`","prompt":"draw"}`))
+			req.Header.Set("Content-Type", "application/json")
+			w := httptest.NewRecorder()
+			router.ServeHTTP(w, req)
+			require.NotEqual(t, http.StatusNotFound, w.Code, w.Body.String())
+			require.NotContains(t, w.Body.String(), "not supported for this platform")
+		}
+	}
+	for _, path := range []string{"/v1/videos/atlascloud:job", "/videos/atlascloud:job"} {
+		w := httptest.NewRecorder()
+		router.ServeHTTP(w, httptest.NewRequest(http.MethodGet, path, nil))
+		require.NotContains(t, w.Body.String(), "not supported for this platform")
+	}
+}
+
 func TestGatewayRoutesCompositeOpenAIOnlyEndpointsRequireOpenAITarget(t *testing.T) {
 	router := newGatewayRoutesTestRouter(service.PlatformComposite)
 

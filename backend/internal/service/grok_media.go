@@ -41,11 +41,11 @@ func (e GrokMediaEndpoint) RequiresRequestBody() bool {
 }
 
 func (e GrokMediaEndpoint) IsVideoLookupRequest() bool {
-	return e == GrokMediaEndpointVideoStatus || e == GrokMediaEndpointVideoContent || e == SeedanceEndpointStatus || e == SeedanceEndpointDelete
+	return e == GrokMediaEndpointVideoStatus || e == GrokMediaEndpointVideoContent || e == SeedanceEndpointStatus || e == SeedanceEndpointDelete || e == AtlasCloudEndpointVideoStatus
 }
 
 func (e GrokMediaEndpoint) IsGenerationRequest() bool {
-	if e == SeedanceEndpointCreate {
+	if e == SeedanceEndpointCreate || e == AtlasCloudEndpointVideoCreate {
 		return true
 	}
 	switch e {
@@ -375,6 +375,7 @@ func (s *OpenAIGatewayService) SelectMediaVideoRequestAccount(
 // first observes a completed video URL. Status may omit model/duration; we fall
 // back to this snapshot, then defaults.
 type GrokVideoPendingBilling struct {
+	Settled              bool   `json:"settled,omitempty"`
 	Model                string `json:"model"`
 	BillingModel         string `json:"billing_model,omitempty"`
 	UpstreamModel        string `json:"upstream_model,omitempty"`
@@ -458,7 +459,7 @@ func (s *OpenAIGatewayService) StoreGrokVideoPendingBilling(
 	pending.UpstreamModel = strings.TrimSpace(pending.UpstreamModel)
 	pending.OriginalModel = strings.TrimSpace(pending.OriginalModel)
 	if pending.VideoResolution != "" {
-		pending.VideoResolution = NormalizeVideoBillingResolutionOrDefault(pending.VideoResolution)
+		pending.VideoResolution = NormalizeVideoBillingResolutionForModel(pending.BillingModel, pending.VideoResolution)
 	}
 	if pending.VideoDurationSeconds > 0 {
 		pending.VideoDurationSeconds = NormalizeVideoBillingDurationSecondsOrDefault(pending.VideoDurationSeconds)
@@ -514,7 +515,12 @@ func (s *OpenAIGatewayService) ClaimGrokVideoBilling(
 	if key == "" {
 		return false, fmt.Errorf("grok video billing claim key is invalid")
 	}
-	return s.cache.ClaimGrokVideoBilled(ctx, key, grokVideoBilledClaimTTL(s.cfg))
+	ttl := grokVideoBilledClaimTTL(s.cfg)
+	if strings.HasPrefix(requestID, "atlascloud:") {
+		// Settlement has a one-minute deadline; a crashed holder must be recoverable.
+		ttl = 2 * time.Minute
+	}
+	return s.cache.ClaimGrokVideoBilled(ctx, key, ttl)
 }
 
 // ReleaseGrokVideoBilling clears a claim after a failed durable RecordUsage so a
@@ -545,6 +551,20 @@ func StableGrokVideoBillingRequestID(taskRequestID string) string {
 		return taskRequestID
 	}
 	return "grok-video:" + taskRequestID
+}
+
+func (s *OpenAIGatewayService) HasCommittedAtlasCloudVideoBilling(ctx context.Context, taskRequestID string, apiKeyID int64) (bool, error) {
+	if s == nil || apiKeyID <= 0 || !strings.HasPrefix(taskRequestID, "atlascloud:") {
+		return false, fmt.Errorf("invalid AtlasCloud video billing identity")
+	}
+	if s.usageBillingRepo == nil {
+		return false, nil
+	}
+	reader, ok := s.usageBillingRepo.(CommittedUsageBillingReader)
+	if !ok {
+		return false, fmt.Errorf("committed usage billing receipt reader is unavailable")
+	}
+	return reader.HasCommittedUsageBilling(ctx, StableGrokVideoBillingRequestID(taskRequestID), apiKeyID)
 }
 
 // Official xAI async video status success shape (docs.x.ai Video Generation):

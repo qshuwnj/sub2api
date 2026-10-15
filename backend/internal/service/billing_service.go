@@ -2248,7 +2248,7 @@ func (s *BillingService) CalculateVideoCost(model string, resolution string, vid
 	if videoCount <= 0 {
 		return &CostBreakdown{}
 	}
-	resolution = NormalizeVideoBillingResolutionOrDefault(resolution)
+	resolution = NormalizeVideoBillingResolutionForModel(model, resolution)
 	durationSeconds = NormalizeVideoBillingDurationSecondsOrDefault(durationSeconds)
 
 	perSecondPrice := s.getVideoUnitPrice(model, resolution, groupConfig)
@@ -2296,6 +2296,9 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 		if price := LookupVideoModelPrice(groupConfig.ModelPrices, model, resolution); price != nil {
 			return *price
 		}
+		if IsAtlasCloudVideoModel(model) {
+			return 0
+		}
 		switch NormalizeVideoBillingResolutionOrDefault(resolution) {
 		case VideoBillingResolution480P:
 			if groupConfig.Price480P != nil {
@@ -2312,6 +2315,9 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 		}
 	}
 
+	if IsAtlasCloudVideoModel(model) {
+		return 0
+	}
 	return s.getDefaultVideoPrice(model, resolution)
 }
 

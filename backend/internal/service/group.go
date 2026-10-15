@@ -207,6 +207,9 @@ func (g *Group) GetVideoPriceForModel(model, resolution string) *float64 {
 	if price := LookupVideoModelPrice(g.VideoModelPrices, model, resolution); price != nil {
 		return price
 	}
+	if IsAtlasCloudVideoModel(model) {
+		return nil
+	}
 	return g.GetVideoPrice(resolution)
 }
 

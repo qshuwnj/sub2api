@@ -1094,7 +1094,7 @@ export default {
         description:
           'Configure Grok video generation prices in USD per second of output video. Leave empty to use the default per-second rates (grok-imagine-video: $0.05/s 480p, $0.07/s 720p; video-1.5: $0.08/s 480p, $0.14/s 720p, $0.25/s 1080p).',
         modelOverridesTitle: 'Per-model video price overrides',
-        modelOverridesDescription: 'Each populated cell overrides the flat resolution price for that model family. Preview and legacy aliases for video-1.5 use the same family; empty cells fall back to the flat resolution price.',
+        modelOverridesDescription: 'Each populated cell sets a model-specific resolution price. Native Grok falls back to flat prices. AtlasCloud requires an explicit price for the exact model and resolution; empty cells block task creation.',
         independentMultiplier: 'Use independent video multiplier',
         videoMultiplier: 'Video multiplier',
         modeHint:

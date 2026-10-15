@@ -102,7 +102,7 @@ func NormalizeVideoModelPrices(in map[string]map[string]float64) map[string]map[
 			if price < 0 {
 				continue
 			}
-			tier, ok := LookupVideoBillingResolution(tierKey)
+			tier, ok := LookupVideoBillingResolutionForModel(family, tierKey)
 			if !ok {
 				slog.Warn("video_model_prices_unknown_resolution_dropped",
 					"model_key", modelKey,
@@ -146,7 +146,7 @@ func LookupVideoModelPrice(prices map[string]map[string]float64, model, resoluti
 	if !ok || len(tierPrices) == 0 {
 		return nil
 	}
-	tier := NormalizeVideoBillingResolutionOrDefault(resolution)
+	tier := NormalizeVideoBillingResolutionForModel(model, resolution)
 	if price, ok := tierPrices[tier]; ok {
 		p := price
 		return &p
