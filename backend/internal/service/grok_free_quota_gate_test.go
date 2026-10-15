@@ -82,14 +82,16 @@ func TestFilterGrokFreeQuotaAccountsOnlyBlocksExplicitFreeOAuth(t *testing.T) {
 	require.Equal(t, []int64{1, 2, 3, 4}, accountIDs(filtered), "miss fails open on hot path")
 
 	require.Eventually(t, func() bool {
-		repo.mu.Lock()
-		defer repo.mu.Unlock()
-		return repo.calls >= 1
+		cached, ok := scheduler.grokFreeQuotaGateCache.Load(int64(1))
+		entry, valid := cached.(grokFreeQuotaGateCacheEntry)
+		return ok && valid && entry.known && entry.tokens == 475_000
 	}, 2*time.Second, 10*time.Millisecond)
 
 	// Second pass: uses refreshed cache and blocks over-gate free OAuth.
 	filtered = scheduler.filterGrokFreeQuotaAccounts(context.Background(), accounts)
 	require.Equal(t, []int64{2, 3, 4}, accountIDs(filtered), "paid and unknown fail-open; API-key free marker is not gated")
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 	require.Equal(t, []int64{1}, repo.lastIDs, "paid, unknown, and API-key accounts must not enter the local free-tier query")
 	require.WithinDuration(t, time.Now().UTC().Add(-24*time.Hour), repo.start, time.Second)
 }
@@ -106,13 +108,15 @@ func TestFilterGrokFreeQuotaAccountsStatsFailureFailsOpen(t *testing.T) {
 	filtered := scheduler.filterGrokFreeQuotaAccounts(context.Background(), accounts)
 	require.Equal(t, []int64{1}, accountIDs(filtered))
 	require.Eventually(t, func() bool {
-		repo.mu.Lock()
-		defer repo.mu.Unlock()
-		return repo.calls >= 1
+		cached, ok := scheduler.grokFreeQuotaGateCache.Load(int64(1))
+		entry, valid := cached.(grokFreeQuotaGateCacheEntry)
+		return ok && valid && !entry.known
 	}, 2*time.Second, 10*time.Millisecond)
 	// Negative cache entry keeps subsequent hot-path calls fail-open without thrash.
 	filtered = scheduler.filterGrokFreeQuotaAccounts(context.Background(), accounts)
 	require.Equal(t, []int64{1}, accountIDs(filtered))
+	repo.mu.Lock()
+	defer repo.mu.Unlock()
 	require.Equal(t, 1, repo.calls)
 }
 

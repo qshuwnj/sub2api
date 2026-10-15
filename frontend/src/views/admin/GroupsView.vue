@@ -1129,13 +1129,13 @@
               <div
                 v-for="family in videoModelPriceFamilyRows(createForm.video_model_prices)"
                 :key="family.key"
-                class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,7rem))] sm:items-end"
+                class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:items-end"
               >
-                <div class="min-w-0 pb-1 font-mono text-xs text-gray-700 dark:text-gray-300">
+                <div class="col-span-2 min-w-0 break-all pb-1 font-mono text-xs text-gray-700 sm:col-span-4 dark:text-gray-300">
                   {{ family.label }}
                 </div>
                 <label
-                  v-for="resolution in grokVideoPriceResolutions"
+                  v-for="resolution in videoPriceResolutionsForModel(family.key)"
                   :key="resolution.key"
                   class="block"
                 >
@@ -2769,13 +2769,13 @@
               <div
                 v-for="family in videoModelPriceFamilyRows(editForm.video_model_prices)"
                 :key="family.key"
-                class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_repeat(3,minmax(0,7rem))] sm:items-end"
+                class="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:items-end"
               >
-                <div class="min-w-0 pb-1 font-mono text-xs text-gray-700 dark:text-gray-300">
+                <div class="col-span-2 min-w-0 break-all pb-1 font-mono text-xs text-gray-700 sm:col-span-4 dark:text-gray-300">
                   {{ family.label }}
                 </div>
                 <label
-                  v-for="resolution in grokVideoPriceResolutions"
+                  v-for="resolution in videoPriceResolutionsForModel(family.key)"
                   :key="resolution.key"
                   class="block"
                 >
@@ -4375,7 +4375,7 @@ import {
 } from "./groupsImagePricing";
 import {
   createVideoModelPricesForm,
-  grokVideoPriceResolutions,
+  videoPriceResolutionsForModel,
   serializeVideoModelPrices,
   videoModelPriceFamilyRows,
 } from "./groupsVideoModelPricing";

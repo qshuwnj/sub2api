@@ -62,6 +62,23 @@ func (r *usageBillingRepository) Apply(ctx context.Context, cmd *service.UsageBi
 	return result, nil
 }
 
+func (r *usageBillingRepository) HasCommittedUsageBilling(ctx context.Context, requestID string, apiKeyID int64) (bool, error) {
+	if r == nil || r.db == nil || strings.TrimSpace(requestID) == "" || apiKeyID <= 0 {
+		return false, errors.New("usage billing receipt identity or database is unavailable")
+	}
+	var committed bool
+	err := r.db.QueryRowContext(ctx, `
+		SELECT EXISTS (
+			SELECT 1 FROM usage_billing_dedup
+			WHERE request_id = $1 AND api_key_id = $2
+			UNION ALL
+			SELECT 1 FROM usage_billing_dedup_archive
+			WHERE request_id = $1 AND api_key_id = $2
+		)
+	`, requestID, apiKeyID).Scan(&committed)
+	return committed, err
+}
+
 func (r *usageBillingRepository) claimUsageBillingKey(ctx context.Context, tx *sql.Tx, cmd *service.UsageBillingCommand) (bool, error) {
 	return r.claimUsageBillingRequest(ctx, tx, cmd.RequestID, cmd.APIKeyID, cmd.RequestFingerprint)
 }

@@ -55,3 +55,34 @@ func NormalizeVideoBillingResolutionOrDefault(resolution string) string {
 	}
 	return VideoBillingResolution480P
 }
+
+// AtlasCloud tiers must not collapse into an unrelated provider's 480p price.
+func LookupVideoBillingResolutionForModel(model, resolution string) (string, bool) {
+	if !IsAtlasCloudVideoModel(model) {
+		return LookupVideoBillingResolution(resolution)
+	}
+	resolution = strings.ToLower(strings.TrimSpace(resolution))
+	var allowed []string
+	switch model {
+	case atlasCloudGeminiVideoModel:
+		allowed = []string{"360p", "720p", "1080p", "4k"}
+	case atlasCloudMinimaxVideoModel:
+		allowed = []string{"480p", "768p", "1440p-sr", "4k-sr"}
+	case atlasCloudGrokVideoModel:
+		allowed = []string{"480p", "720p"}
+	}
+	for _, tier := range allowed {
+		if resolution == tier {
+			return tier, true
+		}
+	}
+	return "", false
+}
+
+func NormalizeVideoBillingResolutionForModel(model, resolution string) string {
+	if IsAtlasCloudVideoModel(model) {
+		tier, _ := LookupVideoBillingResolutionForModel(model, resolution)
+		return tier
+	}
+	return NormalizeVideoBillingResolutionOrDefault(resolution)
+}

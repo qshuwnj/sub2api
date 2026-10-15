@@ -120,14 +120,20 @@ func (s *grokMediaSlotsCache) assertReleased(t *testing.T) {
 
 type grokMediaSlotBindings struct {
 	testutil.StubGatewayCache
-	owner   int64
-	writes  int
-	key     string
-	billed  map[string]bool
-	pending map[string][]byte
+	owner      int64
+	writes     int
+	key        string
+	billed     map[string]bool
+	pending    map[string][]byte
+	pendingErr error
+	claimErr   error
+	bindErr    error
 }
 
 func (s *grokMediaSlotBindings) SetGrokVideoPendingBilling(_ context.Context, key string, body []byte, _ time.Duration) error {
+	if s.pendingErr != nil {
+		return s.pendingErr
+	}
 	if s.pending == nil {
 		s.pending = make(map[string][]byte)
 	}
@@ -145,6 +151,9 @@ func (s *grokMediaSlotBindings) GetSessionAccountID(_ context.Context, groupID i
 	return s.owner, nil
 }
 func (s *grokMediaSlotBindings) SetSessionAccountID(_ context.Context, _ int64, key string, owner int64, _ time.Duration) error {
+	if s.bindErr != nil {
+		return s.bindErr
+	}
 	s.key, s.owner = key, owner
 	s.writes++
 	return nil
@@ -159,6 +168,9 @@ func (s *grokMediaSlotBindings) DeleteSessionAccountID(context.Context, int64, s
 }
 
 func (s *grokMediaSlotBindings) ClaimGrokVideoBilled(_ context.Context, key string, _ time.Duration) (bool, error) {
+	if s.claimErr != nil {
+		return false, s.claimErr
+	}
 	if s.billed == nil {
 		s.billed = make(map[string]bool)
 	}
@@ -167,6 +179,11 @@ func (s *grokMediaSlotBindings) ClaimGrokVideoBilled(_ context.Context, key stri
 	}
 	s.billed[key] = true
 	return true, nil
+}
+
+func (s *grokMediaSlotBindings) ReleaseGrokVideoBilled(_ context.Context, key string) error {
+	delete(s.billed, key)
+	return nil
 }
 
 type grokMediaSlotRepo struct {
@@ -199,6 +216,10 @@ func (p grokMediaSlotProber) ProbeMediaEligibility(ctx context.Context, id int64
 }
 
 func newGrokMediaSlotHandler(t *testing.T, oauth, mismatch bool, platforms ...string) (*OpenAIGatewayHandler, *grokMediaSlotsCache, *grokMediaSlotBindings, *grokMediaSlotUpstream) {
+	return newGrokMediaSlotHandlerWithBilling(t, oauth, mismatch, nil, platforms...)
+}
+
+func newGrokMediaSlotHandlerWithBilling(t *testing.T, oauth, mismatch bool, usageBilling service.UsageBillingRepository, platforms ...string) (*OpenAIGatewayHandler, *grokMediaSlotsCache, *grokMediaSlotBindings, *grokMediaSlotUpstream) {
 	t.Helper()
 	gin.SetMode(gin.TestMode)
 	accounts := make([]service.Account, 3)
@@ -209,6 +230,9 @@ func newGrokMediaSlotHandler(t *testing.T, oauth, mismatch bool, platforms ...st
 		if len(platforms) > 0 {
 			accounts[i].Platform = platforms[0]
 			accounts[i].Credentials["base_url"] = "https://ark.cn-beijing.volces.com/api/v3"
+			if len(platforms) > 1 {
+				accounts[i].Credentials["base_url"] = platforms[1]
+			}
 			accounts[i].Credentials["openai_capabilities"] = []string{"seedance"}
 		}
 		if oauth {
@@ -234,7 +258,8 @@ func newGrokMediaSlotHandler(t *testing.T, oauth, mismatch bool, platforms ...st
 		_, err := provider.GetAccessToken(context.Background(), &accounts[1])
 		require.NoError(t, err)
 	}
-	gateway := service.NewOpenAIGatewayService(repo, nil, nil, nil, nil, nil, bindings, cfg, nil, concurrency, nil, nil, nil, upstream, nil, nil, provider, nil, nil, nil, nil, nil)
+	deferred := service.NewDeferredService(repo, nil, time.Minute)
+	gateway := service.NewOpenAIGatewayService(repo, nil, usageBilling, nil, nil, nil, bindings, cfg, nil, concurrency, nil, nil, nil, upstream, deferred, nil, provider, nil, nil, nil, nil, nil)
 	groupID := int64(24)
 	require.NoError(t, gateway.BindGrokMediaVideoRequestAccount(context.Background(), &groupID, "task", 10, 20, 1))
 	bindings.writes = 0

@@ -224,3 +224,9 @@ type UsageBillingRepository interface {
 	CaptureBatchImageBalance(ctx context.Context, cmd *BatchImageBalanceHoldCommand) (*BatchImageBalanceHoldResult, error)
 	ReleaseBatchImageBalance(ctx context.Context, cmd *BatchImageBalanceHoldCommand) (*BatchImageBalanceHoldResult, error)
 }
+
+// CommittedUsageBillingReader is an optional read-only receipt check for
+// recovering completed asynchronous tasks when their cache marker was lost.
+type CommittedUsageBillingReader interface {
+	HasCommittedUsageBilling(ctx context.Context, requestID string, apiKeyID int64) (bool, error)
+}

@@ -230,6 +230,14 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		)
 
 		account := selection.Account
+		admissionModel := account.GetMappedModel(firstNonEmptyString(channelMapping.MappedModel, routingModel))
+		if err := h.gatewayService.ValidateAtlasCloudImagePricing(requestCtx, apiKey, parsed, admissionModel); err != nil {
+			if selection.Acquired && selection.ReleaseFunc != nil {
+				selection.ReleaseFunc()
+			}
+			h.errorResponse(c, http.StatusBadRequest, "pricing_not_configured", err.Error())
+			return
+		}
 		sessionHash = ensureOpenAIPoolModeSessionHash(sessionHash, account)
 		reqLog.Debug("openai.images.account_selected", zap.Int64("account_id", account.ID), zap.String("account_name", account.Name))
 		setOpsSelectedAccount(c, account.ID, account.Platform)
@@ -248,7 +256,13 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		}
 
 		service.SetOpsLatencyMs(c, service.OpsRoutingLatencyMsKey, time.Since(routingStart).Milliseconds())
-		if !parsed.Stream && !jsonKeepaliveStarted {
+		// A previous non-Atlas account attempt must not commit keepalive headers
+		// before failover to a priced AtlasCloud image account.
+		atlasCloudImage := service.IsAtlasCloudPricedImageModel(parsed.Model) ||
+			service.IsAtlasCloudPricedImageModel(channelMapping.MappedModel) ||
+			(account.SupportsOpenAIEndpointCapability(service.OpenAIEndpointCapabilityAtlasCloudVideo) &&
+				service.IsAtlasCloudPricedImageModel(admissionModel))
+		if !parsed.Stream && !jsonKeepaliveStarted && !atlasCloudImage {
 			stopJSONKeepalive = service.StartOpenAIImagesJSONKeepalive(c, h.openAIImagesJSONKeepaliveInterval())
 			jsonKeepaliveStarted = true
 		}
@@ -404,7 +418,7 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 			upstreamModel = result.UpstreamModel
 		}
 		sessionID := service.ExtractClientSessionID(c)
-		h.submitMandatoryUsageRecordTask(c.Request.Context(), func(ctx context.Context) {
+		record := func(ctx context.Context) error {
 			if err := h.gatewayService.RecordUsage(ctx, &service.OpenAIRecordUsageInput{
 				Result:             result,
 				APIKey:             apiKey,
@@ -429,8 +443,22 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 					zap.String("model", clientRequestModel),
 					zap.Int64("account_id", account.ID),
 				).Error("openai.images.record_usage_failed", zap.Error(err))
+				return err
 			}
-		})
+			return nil
+		}
+		if result != nil && len(result.AtlasCloudImageResponse) > 0 {
+			ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request.Context()), time.Minute)
+			billingErr := record(ctx)
+			cancel()
+			if billingErr != nil {
+				h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Image settlement is unavailable; do not resubmit generation")
+				return
+			}
+			c.Data(http.StatusOK, "application/json", result.AtlasCloudImageResponse)
+		} else {
+			h.submitMandatoryUsageRecordTask(c.Request.Context(), func(ctx context.Context) { _ = record(ctx) })
+		}
 
 		reqLog.Debug("openai.images.request_completed",
 			zap.Int64("account_id", account.ID),

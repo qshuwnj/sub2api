@@ -589,6 +589,16 @@ func (d inflightEstimateDeps) estimateOne(ctx context.Context, apiKey *APIKey, m
 			cost = tokenCost()
 		}
 	case InflightEstimateVideo:
+		if IsAtlasCloudVideoModel(model) {
+			if d.billing != nil {
+				b := d.billing.CalculateVideoCost(model, req.VideoResolution, units, req.VideoDurationSeconds,
+					videoPriceConfigFromAPIKey(apiKey), resolveVideoRateMultiplier(apiKey, textRate))
+				if b != nil {
+					cost = b.ActualCost
+				}
+			}
+			break
+		}
 		if perRequestMode {
 			cost = maxPerRequestPrice(resolved) * float64(units) * math.Max(textRate, imageRate)
 		}

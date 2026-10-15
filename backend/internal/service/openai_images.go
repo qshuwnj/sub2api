@@ -240,6 +240,17 @@ func (s *OpenAIGatewayService) ParseOpenAIImagesRequest(c *gin.Context, body []b
 		return nil, err
 	}
 	req.SizeTier = normalizeOpenAIImageSizeTier(req.Size)
+	if isAtlasCloudImageModel(req.Model) {
+		if _, tier := atlasCloudImageSize(req.Model, req.Size); tier != "" {
+			req.SizeTier = tier
+		}
+		if req.Model == atlasCloudGrokImageModel {
+			req.SizeTier = ImageBillingSize1K
+			if gjson.GetBytes(body, "resolution").String() == "2k" {
+				req.SizeTier = ImageBillingSize2K
+			}
+		}
+	}
 	req.RequiredCapability = classifyOpenAIImagesCapability(req)
 	return req, nil
 }
@@ -503,6 +514,12 @@ func validateOpenAIImagesModel(model string) error {
 	return fmt.Errorf("images endpoint requires an image model, got %q", model)
 }
 
+func isAtlasCloudImageModel(model string) bool {
+	model = strings.TrimSpace(model)
+	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
+		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel
+}
+
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also
 // drives native Responses tool conversion, pricing and rate-limit policy.
 func isGeminiCompatibleImageModel(model string) bool {
@@ -638,6 +655,13 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	SetOpsUpstreamModel(c, upstreamModel)
+	if isAtlasCloudNewImageModel(upstreamModel) && (account.Platform != PlatformOpenAI ||
+		account.Type != AccountTypeAPIKey || !atlasCloudAPIBaseValid(account.GetOpenAIBaseURL())) {
+		return atlasCloudImagesError(c, http.StatusBadRequest, "Use an AtlasCloud API-key account for this model")
+	}
+	if isAtlasCloudImagesBaseURL(account.GetOpenAIBaseURL()) {
+		return s.forwardAtlasCloudImages(ctx, c, account, parsed, upstreamModel)
+	}
 	logger.LegacyPrintf(
 		"service.openai_gateway",
 		"[OpenAI] Images request routing request_model=%s upstream_model=%s endpoint=%s account_type=%s",

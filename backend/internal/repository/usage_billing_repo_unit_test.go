@@ -24,6 +24,22 @@ const (
 	apiKeyRateLimitIncrementSQL = `(?s)UPDATE api_keys SET\s+usage_5h = .*WHERE id = \$2 AND deleted_at IS NULL`
 )
 
+func TestCommittedUsageBillingReceiptReadsDurableAndArchivedRows(t *testing.T) {
+	for _, exists := range []bool{false, true} {
+		db, mock, err := sqlmock.New()
+		require.NoError(t, err)
+		repo := &usageBillingRepository{db: db}
+		mock.ExpectQuery(`SELECT EXISTS \(`).
+			WithArgs("grok-video:atlascloud:job", int64(20)).
+			WillReturnRows(sqlmock.NewRows([]string{"exists"}).AddRow(exists))
+		committed, err := repo.HasCommittedUsageBilling(context.Background(), "grok-video:atlascloud:job", 20)
+		require.NoError(t, err)
+		require.Equal(t, exists, committed)
+		require.NoError(t, mock.ExpectationsWereMet())
+		_ = db.Close()
+	}
+}
+
 func TestDeductUsageBillingBalance_UsesSufficientBalanceGuard(t *testing.T) {
 	ctx := context.Background()
 	db, mock, err := sqlmock.New()
