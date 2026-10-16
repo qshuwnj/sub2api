@@ -44,6 +44,20 @@ func TestAtlasCloudImagePayload(t *testing.T) {
 	require.Error(t, err)
 }
 
+func TestAtlasCloudGenericImagePayload(t *testing.T) {
+	model := "google/nano-banana-2-lite/text-to-image"
+	parsed := &OpenAIImagesRequest{
+		Model:          model,
+		Prompt:         "draw a quiet mountain lake",
+		N:              1,
+		ResponseFormat: "url",
+		Body:           []byte(`{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","n":1,"response_format":"url"}`),
+	}
+	payload, err := buildAtlasCloudImagePayload(parsed, model)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","n":1,"response_format":"url"}`, string(payload))
+}
+
 func TestAtlasCloudImagesResponseSizeIsBounded(t *testing.T) {
 	upstream := &atlasImageUpstream{replies: []string{strings.Repeat("x", atlasCloudBodyLimit+1)}}
 	svc, c, rec, account, parsed := atlasImageFixture(t, upstream)
@@ -136,6 +150,23 @@ func TestAtlasCloudImagesForwardPollsAndReturnsActualImageCount(t *testing.T) {
 	}, upstream.urls)
 	require.Equal(t, []string{"Bearer upstream-only", "Bearer upstream-only"}, upstream.auth)
 	require.JSONEq(t, `{"model":"bytedance/seedream-v4.5","prompt":"draw","size":"2048*2048"}`, string(upstream.bodies[0]))
+}
+
+func TestAtlasCloudGenericImageForwardPreservesModel(t *testing.T) {
+	upstream := &atlasImageUpstream{replies: []string{
+		`{"data":{"id":"generic-image-1","status":"completed","outputs":["https://cdn.example/generic.png"]}}`,
+	}}
+	svc, c, _, account, _ := atlasImageFixture(t, upstream)
+	model := "google/nano-banana-2-lite/text-to-image"
+	body := []byte(`{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","n":1,"response_format":"url"}`)
+	parsed, err := svc.ParseOpenAIImagesRequest(c, body)
+	require.NoError(t, err)
+	account.Credentials["model_mapping"] = map[string]any{model: model}
+	result, err := svc.ForwardImages(context.Background(), c, account, body, parsed, "")
+	require.NoError(t, err)
+	require.Equal(t, model, result.UpstreamModel)
+	require.Equal(t, model, gjson.GetBytes(upstream.bodies[0], "model").String())
+	require.Equal(t, "https://api.atlascloud.ai/api/v1/model/generateImage", upstream.urls[0])
 }
 
 func TestAtlasCloudImagesErrorsAreWrittenWithoutRetryOrSecrets(t *testing.T) {

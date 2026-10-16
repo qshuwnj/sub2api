@@ -52,6 +52,16 @@ func TestAtlasCloudVideoDefaults(t *testing.T) {
 	}
 }
 
+func TestAtlasCloudGenericVideoDefaults(t *testing.T) {
+	model := "bytedance/seedance-2.0-fast/text-to-video"
+	info, err := ParseAtlasCloudVideoRequest([]byte(fmt.Sprintf(`{"model":%q,"prompt":"a paper boat on a stream"}`, model)))
+	require.NoError(t, err)
+	require.Equal(t, model, info.Model)
+	require.Equal(t, "720p", info.Resolution)
+	require.Equal(t, "16:9", info.AspectRatio)
+	require.Equal(t, 8, info.DurationSeconds)
+}
+
 func TestAtlasCloudVideoValidation(t *testing.T) {
 	for _, body := range []string{
 		`{}`, `{"model":"other","prompt":"draw"}`,
@@ -88,6 +98,21 @@ func TestAtlasCloudVideoForwardAndPoll(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, 1, result.VideoCount)
 	require.Equal(t, "https://api.atlascloud.ai/api/v1/model/prediction/job-123", upstream.urls[1])
+}
+
+func TestAtlasCloudGenericVideoForwardPreservesModel(t *testing.T) {
+	upstream := &atlasImageUpstream{replies: []string{
+		`{"code":200,"data":{"id":"generic-video-1","status":"created"}}`,
+	}}
+	svc, c, _, account, _ := atlasImageFixture(t, upstream)
+	model := "bytedance/seedance-2.0-fast/text-to-video"
+	body := []byte(`{"model":"bytedance/seedance-2.0-fast/text-to-video","prompt":"a paper boat on a stream","duration":8,"resolution":"720p","aspect_ratio":"16:9"}`)
+	account.Credentials["model_mapping"] = map[string]any{model: model}
+	result, err := svc.ForwardAtlasCloudVideo(context.Background(), c, account, AtlasCloudEndpointVideoCreate, "", body)
+	require.NoError(t, err)
+	require.Equal(t, model, result.UpstreamModel)
+	require.Equal(t, model, gjson.GetBytes(upstream.bodies[0], "model").String())
+	require.Equal(t, "https://api.atlascloud.ai/api/v1/model/generateVideo", upstream.urls[0])
 }
 
 func TestAtlasCloudVideoDefersCompletedResponseUntilSettlement(t *testing.T) {

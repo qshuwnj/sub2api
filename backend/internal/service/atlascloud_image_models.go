@@ -16,8 +16,14 @@ func isAtlasCloudNewImageModel(model string) bool {
 	return model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel
 }
 
+func IsAtlasCloudGenericImageModel(model string) bool {
+	model = strings.TrimSpace(model)
+	return strings.Contains(model, "/") && strings.HasSuffix(model, "/text-to-image") &&
+		model != atlasCloudGPTImageModel && model != atlasCloudFlareImageModel && model != atlasCloudGrokImageModel
+}
+
 func IsAtlasCloudPricedImageModel(model string) bool {
-	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel
+	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel || IsAtlasCloudGenericImageModel(model)
 }
 
 // Admission uses configured customer prices, never a guessed catalog fallback.
@@ -33,6 +39,9 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 		return err
 	}
 	_, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+	if IsAtlasCloudGenericImageModel(upstreamModel) {
+		tier = ImageBillingSize1K
+	}
 	if upstreamModel == atlasCloudGrokImageModel {
 		tier = ImageBillingSize1K
 		if gjson.GetBytes(payload, "resolution").String() == "2k" {

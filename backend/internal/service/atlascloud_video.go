@@ -27,8 +27,15 @@ func (e GrokMediaEndpoint) IsAtlasCloudVideo() bool {
 	return e == AtlasCloudEndpointVideoCreate || e == AtlasCloudEndpointVideoStatus
 }
 
+func IsAtlasCloudGenericVideoModel(model string) bool {
+	model = strings.TrimSpace(model)
+	return strings.Contains(model, "/") && strings.HasSuffix(model, "/text-to-video") &&
+		model != atlasCloudGeminiVideoModel && model != atlasCloudMinimaxVideoModel && model != atlasCloudGrokVideoModel
+}
+
 func IsAtlasCloudVideoModel(model string) bool {
-	return model == atlasCloudGeminiVideoModel || model == atlasCloudMinimaxVideoModel || model == atlasCloudGrokVideoModel
+	return model == atlasCloudGeminiVideoModel || model == atlasCloudMinimaxVideoModel || model == atlasCloudGrokVideoModel ||
+		IsAtlasCloudGenericVideoModel(model)
 }
 
 func atlasCloudAPIBaseValid(base string) bool {
@@ -75,6 +82,19 @@ func buildAtlasCloudVideoPayload(body []byte) (GrokMediaRequestInfo, []byte, err
 		minDuration, defaultRatio, defaultResolution = 4, "1:1", "768P"
 		ratios = []string{"21:9", "16:9", "4:3", "1:1", "3:4", "9:16"}
 		resolutions = []string{"480P", "768P", "1440p-sr", "4k-sr"}
+	case atlasCloudGrokVideoModel:
+		resolutions = []string{"480p", "720p"}
+		if utf8.RuneCountInString(info.Prompt) > 32000 {
+			return info, nil, fmt.Errorf("prompt exceeds 32000 characters")
+		}
+	default:
+		if !IsAtlasCloudGenericVideoModel(info.Model) {
+			return info, nil, fmt.Errorf("unsupported AtlasCloud video model")
+		}
+		if utf8.RuneCountInString(info.Prompt) > 32000 {
+			return info, nil, fmt.Errorf("prompt exceeds 32000 characters")
+		}
+		resolutions = []string{"480p", "720p", "1080p", "4k"}
 	}
 	if err := atlasCloudCheckFields(body, fields...); err != nil {
 		return info, nil, err
@@ -97,9 +117,22 @@ func buildAtlasCloudVideoPayload(body []byte) (GrokMediaRequestInfo, []byte, err
 	if err != nil {
 		return info, nil, err
 	}
-	resolution, err := atlasCloudOption(body, "resolution", defaultResolution, resolutions...)
-	if err != nil {
-		return info, nil, err
+	var resolution string
+	if IsAtlasCloudGenericVideoModel(info.Model) {
+		value := gjson.GetBytes(body, "resolution")
+		if !value.Exists() {
+			resolution = defaultResolution
+		} else if value.Type != gjson.String || strings.TrimSpace(value.String()) == "" ||
+			len(value.String()) > 32 {
+			return info, nil, fmt.Errorf("resolution must be a non-empty string")
+		} else {
+			resolution = value.String()
+		}
+	} else {
+		resolution, err = atlasCloudOption(body, "resolution", defaultResolution, resolutions...)
+		if err != nil {
+			return info, nil, err
+		}
 	}
 	info.AspectRatio, info.Resolution, info.DurationSeconds = ratio, strings.ToLower(resolution), duration
 	payload := map[string]any{"model": info.Model, "prompt": info.Prompt, "duration": duration, "resolution": resolution}

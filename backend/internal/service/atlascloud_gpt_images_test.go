@@ -85,7 +85,7 @@ func TestAtlasCloudGPTImagesRequireAPIKey(t *testing.T) {
 	}
 	require.False(t, IsGPTImageGenerationModel("openai/gpt-image-2/text-to-image"))
 	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2/edit"))
-	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2.5/text-to-image"))
+	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2.5/edit"))
 }
 
 func TestAtlasCloudGPTImagesForwardPollsCreatedJob(t *testing.T) {

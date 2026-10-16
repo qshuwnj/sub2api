@@ -517,7 +517,8 @@ func validateOpenAIImagesModel(model string) error {
 func isAtlasCloudImageModel(model string) bool {
 	model = strings.TrimSpace(model)
 	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
-		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel
+		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel ||
+		IsAtlasCloudGenericImageModel(model)
 }
 
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also
@@ -655,7 +656,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	SetOpsUpstreamModel(c, upstreamModel)
-	if isAtlasCloudNewImageModel(upstreamModel) && (account.Platform != PlatformOpenAI ||
+	if (isAtlasCloudNewImageModel(upstreamModel) || IsAtlasCloudGenericImageModel(upstreamModel)) && (account.Platform != PlatformOpenAI ||
 		account.Type != AccountTypeAPIKey || !atlasCloudAPIBaseValid(account.GetOpenAIBaseURL())) {
 		return atlasCloudImagesError(c, http.StatusBadRequest, "Use an AtlasCloud API-key account for this model")
 	}
