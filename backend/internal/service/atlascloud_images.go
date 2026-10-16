@@ -69,7 +69,7 @@ func atlasCloudImageSize(model, size string) (string, string) {
 }
 
 func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
-	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model)) {
+	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model) && !IsAtlasCloudGenericImageModel(model)) {
 		return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
 	}
 	if parsed.IsEdits() || parsed.Multipart || len(parsed.InputImageURLs) > 0 || parsed.HasMask {
@@ -92,6 +92,18 @@ func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]b
 		if value := gjson.GetBytes(parsed.Body, field); value.Exists() && value.Type != gjson.Null {
 			return nil, fmt.Errorf("AtlasCloud does not support the %s option in text-to-image mode", field)
 		}
+	}
+	if IsAtlasCloudGenericImageModel(model) {
+		if err := atlasCloudCheckFields(parsed.Body, "model", "prompt", "n", "response_format"); err != nil {
+			return nil, err
+		}
+		if len(parsed.Prompt) > 32000 {
+			return nil, fmt.Errorf("prompt exceeds 32000 characters")
+		}
+		return json.Marshal(map[string]any{
+			"model": model, "prompt": parsed.Prompt, "n": 1,
+			"response_format": "url",
+		})
 	}
 	if model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel {
 		return buildAtlasCloudNewImagePayload(parsed, model)
@@ -240,6 +252,10 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			synthetic := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}},
 				Body: io.NopCloser(bytes.NewReader(responseBody))}
 			size, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+			if IsAtlasCloudGenericImageModel(upstreamModel) {
+				tier = ImageBillingSize1K
+				size = ""
+			}
 			if upstreamModel == atlasCloudGrokImageModel {
 				tier = ImageBillingSize1K
 				if gjson.GetBytes(payload, "resolution").String() == "2k" {

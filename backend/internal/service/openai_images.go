@@ -517,7 +517,8 @@ func validateOpenAIImagesModel(model string) error {
 func isAtlasCloudImageModel(model string) bool {
 	model = strings.TrimSpace(model)
 	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
-		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel
+		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel ||
+		IsAtlasCloudGenericImageModel(model)
 }
 
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also
@@ -529,7 +530,7 @@ func isGeminiCompatibleImageModel(model string) bool {
 }
 
 func validateCompatibleImagesModel(model string) error {
-	if isGeminiCompatibleImageModel(model) {
+	if isGeminiCompatibleImageModel(model) || isAtlasCloudImageModel(model) {
 		return nil
 	}
 	return validateOpenAIImagesModel(model)
@@ -538,7 +539,7 @@ func validateCompatibleImagesModel(model string) error {
 // RequiredCapabilityForModel also applies the API-key-only fence when channel
 // mapping introduces a compatible provider model after request parsing.
 func (req *OpenAIImagesRequest) RequiredCapabilityForModel(model string) OpenAIImagesCapability {
-	if isGeminiCompatibleImageModel(model) {
+	if isGeminiCompatibleImageModel(model) || isAtlasCloudImageModel(model) {
 		return OpenAIImagesCapabilityAPIKey
 	}
 	return req.RequiredCapability
@@ -560,7 +561,7 @@ func classifyOpenAIImagesCapability(req *OpenAIImagesRequest) OpenAIImagesCapabi
 	if req == nil {
 		return OpenAIImagesCapabilityNative
 	}
-	if isGeminiCompatibleImageModel(req.Model) {
+	if isGeminiCompatibleImageModel(req.Model) || isAtlasCloudImageModel(req.Model) {
 		return OpenAIImagesCapabilityAPIKey
 	}
 	if req.ExplicitModel || req.ExplicitSize {
@@ -655,7 +656,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	SetOpsUpstreamModel(c, upstreamModel)
-	if isAtlasCloudNewImageModel(upstreamModel) && (account.Platform != PlatformOpenAI ||
+	if (isAtlasCloudNewImageModel(upstreamModel) || IsAtlasCloudGenericImageModel(upstreamModel)) && (account.Platform != PlatformOpenAI ||
 		account.Type != AccountTypeAPIKey || !atlasCloudAPIBaseValid(account.GetOpenAIBaseURL())) {
 		return atlasCloudImagesError(c, http.StatusBadRequest, "Use an AtlasCloud API-key account for this model")
 	}

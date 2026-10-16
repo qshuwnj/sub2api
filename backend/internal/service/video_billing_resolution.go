@@ -70,6 +70,10 @@ func LookupVideoBillingResolutionForModel(model, resolution string) (string, boo
 		allowed = []string{"480p", "768p", "1440p-sr", "4k-sr"}
 	case atlasCloudGrokVideoModel:
 		allowed = []string{"480p", "720p"}
+	default:
+		if IsAtlasCloudGenericVideoModel(model) {
+			allowed = []string{"480p", "720p", "1080p", "4k"}
+		}
 	}
 	for _, tier := range allowed {
 		if resolution == tier {
