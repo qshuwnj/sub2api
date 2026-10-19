@@ -804,7 +804,7 @@ func prepareGrokVideoCompletionBilling(
 	// Official default resolution is 480p when the create request omitted it.
 	merged.VideoResolution = service.NormalizeVideoBillingResolutionForModel(merged.BillingModel, merged.VideoResolution)
 	// Official default duration is 8s when neither status nor create provided it.
-	merged.VideoDurationSeconds = service.NormalizeVideoBillingDurationSecondsOrDefault(merged.VideoDurationSeconds)
+	merged.VideoDurationSeconds = service.NormalizeVideoBillingDurationForModel(merged.BillingModel, merged.VideoDurationSeconds)
 	// E2E latency for async video: create accept → this discovery of done+url.
 	// Bill on discovery (status/content), not after further client polls; duration
 	// must not be only the single discovery hop (~hundreds of ms).

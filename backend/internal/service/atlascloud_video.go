@@ -28,7 +28,8 @@ func (e GrokMediaEndpoint) IsAtlasCloudVideo() bool {
 }
 
 func IsAtlasCloudVideoModel(model string) bool {
-	return model == atlasCloudGeminiVideoModel || model == atlasCloudMinimaxVideoModel || model == atlasCloudGrokVideoModel
+	return model == atlasCloudGeminiVideoModel || model == atlasCloudMinimaxVideoModel || model == atlasCloudGrokVideoModel ||
+		atlasMediaModel(model, "video") != nil
 }
 
 func atlasCloudAPIBaseValid(base string) bool {
@@ -45,6 +46,10 @@ func ParseAtlasCloudVideoRequest(body []byte) (GrokMediaRequestInfo, error) {
 
 func buildAtlasCloudVideoPayload(body []byte) (GrokMediaRequestInfo, []byte, error) {
 	var info GrokMediaRequestInfo
+	id := gjson.GetBytes(body, "model").String()
+	if id != atlasCloudGeminiVideoModel && id != atlasCloudMinimaxVideoModel && id != atlasCloudGrokVideoModel {
+		return buildAtlasMediaVideoPayload(body, atlasMediaModel(id, "video"))
+	}
 	if !gjson.ValidBytes(body) || !gjson.ParseBytes(body).IsObject() {
 		return info, nil, fmt.Errorf("request body must be a JSON object")
 	}

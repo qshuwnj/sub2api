@@ -415,7 +415,7 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	if isVideoUsage {
 		usageLog.VideoCount = result.VideoCount
 		usageLog.VideoResolution = optionalTrimmedStringPtr(NormalizeVideoBillingResolutionForModel(result.BillingModel, result.VideoResolution))
-		videoDurationSeconds := NormalizeVideoBillingDurationSecondsOrDefault(result.VideoDurationSeconds)
+		videoDurationSeconds := NormalizeVideoBillingDurationForModel(result.BillingModel, result.VideoDurationSeconds)
 		usageLog.VideoDurationSeconds = &videoDurationSeconds
 	}
 	if cost != nil {
@@ -844,7 +844,7 @@ func (s *OpenAIGatewayService) calculateOpenAIVideoCost(
 		videoCount = 1
 	}
 	resolution := NormalizeVideoBillingResolutionForModel(billingModel, result.VideoResolution)
-	durationSeconds := NormalizeVideoBillingDurationSecondsOrDefault(result.VideoDurationSeconds)
+	durationSeconds := NormalizeVideoBillingDurationForModel(billingModel, result.VideoDurationSeconds)
 	if IsAtlasCloudVideoModel(billingModel) {
 		return s.billingService.CalculateVideoCost(billingModel, resolution, videoCount, durationSeconds, videoPriceConfigFromAPIKey(apiKey), multiplier)
 	}

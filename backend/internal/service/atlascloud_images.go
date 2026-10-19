@@ -53,6 +53,9 @@ func atlasCloudImageSize(model, size string) (string, string) {
 		return "", ""
 	}
 	if model != atlasCloudGPTImageModel {
+		if model != "bytedance/seedream-v4.5" {
+			return atlasMediaImageSize(model, size)
+		}
 		return atlasCloudImagePreset(size)
 	}
 	size = strings.ReplaceAll(strings.ToLower(strings.TrimSpace(size)), "*", "x")
@@ -69,6 +72,16 @@ func atlasCloudImageSize(model, size string) (string, string) {
 }
 
 func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
+	if parsed != nil && model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model) {
+		if parsed.Multipart || parsed.Stream || parsed.N != 1 {
+			return nil, fmt.Errorf("AtlasCloud media requires JSON, n=1 and stream=false")
+		}
+		payload, err := buildAtlasMediaContractPayload(parsed.Body, atlasMediaModel(model, "image"), true)
+		if err != nil {
+			return nil, err
+		}
+		return json.Marshal(payload)
+	}
 	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model)) {
 		return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
 	}
@@ -202,6 +215,10 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	}
 	ctx, cancel := context.WithDeadline(context.WithoutCancel(ctx), deadline)
 	defer cancel()
+	payload, err = s.prepareAtlasCloudImageReferences(ctx, account, token, upstreamModel, payload)
+	if err != nil {
+		return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
+	}
 	method, target, body := http.MethodPost, base+atlasCloudImagesPath, payload
 	predictionID := ""
 	for {
@@ -239,7 +256,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			responseBody, _ := json.Marshal(map[string]any{"id": predictionID, "created": time.Now().Unix(), "data": images})
 			synthetic := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}},
 				Body: io.NopCloser(bytes.NewReader(responseBody))}
-			size, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+			size, tier := atlasCloudRequestedImageSize(parsed, upstreamModel)
 			if upstreamModel == atlasCloudGrokImageModel {
 				tier = ImageBillingSize1K
 				if gjson.GetBytes(payload, "resolution").String() == "2k" {
@@ -291,7 +308,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 }
 
 func (s *OpenAIGatewayService) doAtlasCloudImagesRequest(
-	ctx context.Context, account *Account, method, target, token string, body []byte,
+	ctx context.Context, account *Account, method, target, token string, body []byte, contentTypes ...string,
 ) ([]byte, int, error) {
 	req, err := http.NewRequestWithContext(ctx, method, target, bytes.NewReader(body))
 	if err != nil {
@@ -300,7 +317,11 @@ func (s *OpenAIGatewayService) doAtlasCloudImagesRequest(
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
 	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
+		contentType := "application/json"
+		if len(contentTypes) > 0 {
+			contentType = contentTypes[0]
+		}
+		req.Header.Set("Content-Type", contentType)
 	}
 	proxyURL := ""
 	if account.ProxyID != nil && account.Proxy != nil {

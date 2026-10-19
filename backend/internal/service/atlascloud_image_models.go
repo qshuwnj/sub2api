@@ -17,7 +17,7 @@ func isAtlasCloudNewImageModel(model string) bool {
 }
 
 func IsAtlasCloudPricedImageModel(model string) bool {
-	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel
+	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel || atlasMediaModel(model, "image") != nil
 }
 
 // Admission uses configured customer prices, never a guessed catalog fallback.
@@ -32,7 +32,7 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	_, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+	_, tier := atlasCloudRequestedImageSize(parsed, upstreamModel)
 	if upstreamModel == atlasCloudGrokImageModel {
 		tier = ImageBillingSize1K
 		if gjson.GetBytes(payload, "resolution").String() == "2k" {
@@ -46,7 +46,7 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 	if resolved != nil && resolved.Mode != BillingModeImage && resolved.Mode != BillingModePerRequest {
 		return fmt.Errorf("AtlasCloud images require image or per-request pricing")
 	}
-	if price := key.Group.GetImagePrice(tier); price != nil &&
+	if price := key.Group.GetImagePrice(tier); tier != "" && price != nil &&
 		*price >= 0 && !math.IsNaN(*price) && !math.IsInf(*price, 0) {
 		return nil
 	}
