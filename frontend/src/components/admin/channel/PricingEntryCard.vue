@@ -230,7 +230,7 @@
             <input type="checkbox" :checked="qualityMode" @change="toggleQualityPricing(($event.target as HTMLInputElement).checked)" />
             {{ t('admin.channels.form.imageQualityEnable') }}
           </label>
-          <ImageQualityPrices v-if="qualityMode" :intervals="entry.intervals"
+          <ImageQualityPrices v-if="qualityMode" :intervals="entry.intervals" :models="entry.models"
             @update="emit('update', { ...entry, intervals: $event })" />
           <template v-else>
           <!-- Default image price (per-request, same as per_request mode) -->
@@ -315,7 +315,7 @@ import IntervalRow from './IntervalRow.vue'
 import ModelTagInput from './ModelTagInput.vue'
 import TimePricingSection from './TimePricingSection.vue'
 import ImageQualityPrices from './ImageQualityPrices.vue'
-import { isMiniQualityModelCard, setImageQualityPrice } from './imageQualityPricing'
+import { isMiniQualityModelCard, isImageQualityModelCard, imageQualityProfile, setImageQualitySizePrice } from './imageQualityPricing'
 import type { PricingFormEntry, IntervalFormEntry } from './types'
 import { perTokenToMTok, getPlatformTagClass, isValidPositiveMultiplier, validateReasoningEffortMultipliers } from './types'
 import { REASONING_EFFORT_LEVELS, type ReasoningEffortLevel } from '@/constants/channel'
@@ -346,14 +346,16 @@ const emit = defineEmits<{
 // Collapse state: entries with existing models default to collapsed
 const collapsed = ref(props.entry.models.length > 0)
 const qualityEligible = computed(() => props.enableImageQualityPricing && props.platform === 'openai' &&
-  props.entry.billing_mode === 'image' && isMiniQualityModelCard(props.entry.models))
+  props.entry.billing_mode === 'image' && isImageQualityModelCard(props.entry.models))
 const qualityMode = computed(() => qualityEligible.value && (qualityDraft.value ||
   props.entry.intervals.some(row => row.tier_label.startsWith('quality:'))))
 const qualityDraft = ref(false)
 
 function toggleQualityPricing(enabled: boolean) {
   qualityDraft.value = enabled
-  emit('update', { ...props.entry, intervals: enabled ? setImageQualityPrice([], 'medium', '') : [],
+  const profile = imageQualityProfile(props.entry.models)
+  emit('update', { ...props.entry, intervals: enabled
+    ? setImageQualitySizePrice([], profile.qualities.includes('medium') ? 'medium' : profile.qualities[0], profile.sizes[0].value, '', props.entry.models) : [],
     per_request_price: null, reasoning_effort_multipliers: null })
 }
 
@@ -432,13 +434,23 @@ function removeInterval(idx: number) {
 
 async function onModelsUpdate(newModels: string[]) {
   const oldModels = props.entry.models
+  if (props.entry.intervals.some(row => row.tier_label.startsWith('quality:')) &&
+      isImageQualityModelCard(newModels) && newModels.some(model => !oldModels.includes(model)) &&
+      !(oldModels.length > 0 && isMiniQualityModelCard([...oldModels, ...newModels]))) {
+    const profile = imageQualityProfile(newModels)
+    // Replacing an endpoint must not silently assign its predecessor's tariff.
+    emit('update', { ...props.entry, models: newModels, per_request_price: null,
+      intervals: setImageQualitySizePrice([], profile.qualities.includes('medium') ? 'medium' : profile.qualities[0],
+        profile.sizes[0].value, '', newModels) })
+    return
+  }
   emit('update', { ...props.entry, models: newModels })
 
   // 仅在「空条目首次加入单个模型」时自动填充默认价：
   // 条目已有模型时（即使价格留空、按各模型的官方默认价回退）追加模型不应改写整条价格，
   // 一次加入多个模型也不应把第一个模型的价格套用到整条，否则条目内所有模型都会被静默改价。
   const addedModels = newModels.filter(m => !oldModels.includes(m))
-  if (isMiniQualityModelCard(newModels)) return
+  if (isImageQualityModelCard(newModels)) return
   if (oldModels.length !== 0 || addedModels.length !== 1) return
 
   // 检查是否所有价格字段都为空

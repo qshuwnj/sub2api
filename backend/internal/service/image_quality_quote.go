@@ -45,6 +45,14 @@ func miniQualityEndpoint(model string) bool {
 	return false
 }
 
+func imageQualityEndpoint(model string) bool {
+	return strings.HasPrefix(model, "openai/") && atlasMediaModel(model, "image") != nil
+}
+
+func imageQualityCanonicalModel(model string) string {
+	return strings.TrimSuffix(strings.TrimSuffix(model, "/text-to-image"), "/edit")
+}
+
 type ImageQuoteRequest struct {
 	Model   string `json:"model"`
 	Quality string `json:"quality"`
@@ -53,19 +61,26 @@ type ImageQuoteRequest struct {
 }
 
 func (r ImageQuoteRequest) normalized() (ImageQuoteRequest, error) {
-	if !miniQualityEndpoint(r.Model) {
+	if !imageQualityEndpoint(r.Model) {
 		return r, fmt.Errorf("fixed quality quotes are not supported for this model")
 	}
+	properties := atlasMediaModel(r.Model, "image").Input.Properties
 	if r.Quality == "" {
-		r.Quality = "medium"
+		r.Quality, _ = properties["quality"].defaultString()
+		if properties["quality"] == nil {
+			r.Quality = "none"
+		}
 	}
 	if r.Size == "" {
-		r.Size = "1024x1024"
+		r.Size, _ = properties["size"].defaultString()
 	}
-	if r.Quality != "low" && r.Quality != "medium" && r.Quality != "high" {
+	if properties["quality"] == nil && r.Quality != "none" {
 		return r, fmt.Errorf("unsupported image quality")
 	}
-	if r.Size != "1024x1024" && r.Size != "1024x1536" && r.Size != "1536x1024" {
+	if properties["quality"] != nil && validateAtlasMediaValue(r.Quality, properties["quality"], "quality", true) != nil {
+		return r, fmt.Errorf("unsupported image quality")
+	}
+	if properties["size"] == nil || validateAtlasMediaValue(r.Size, properties["size"], "size", true) != nil {
 		return r, fmt.Errorf("unsupported image size")
 	}
 	if r.Count < 1 || r.Count > 4 {
@@ -118,7 +133,7 @@ type ImageChargeReceipt struct {
 }
 
 func (s *ImageQualityPriceSnapshot) Receipt() ImageChargeReceipt {
-	return ImageChargeReceipt{s.claims.ID, s.index, miniQualityModel, s.claims.Request.Quality,
+	return ImageChargeReceipt{s.claims.ID, s.index, imageQualityCanonicalModel(s.claims.Request.Model), s.claims.Request.Quality,
 		"USD", s.claims.UnitPrice, "settled", s.claims.Revision}
 }
 
@@ -145,7 +160,7 @@ func (s *ImageQualityPriceSnapshot) validateResult(result *OpenAIForwardResult) 
 	return nil
 }
 
-func miniQualityCard(key *APIKey) (*ChannelModelPricing, error) {
+func imageQualityCard(key *APIKey, model string) (*ChannelModelPricing, error) {
 	if key == nil || key.Group == nil {
 		return nil, nil
 	}
@@ -160,16 +175,18 @@ func miniQualityCard(key *APIKey) (*ChannelModelPricing, error) {
 			continue
 		}
 		matches := false
-		for _, model := range card.Models {
-			matches = matches || miniQualityEndpoint(model)
+		for _, candidate := range card.Models {
+			// Preserve the original Mini shared generation/edit card. New endpoints
+			// are exact matches because editing may have a different upstream price.
+			matches = matches || candidate == model || (miniQualityEndpoint(model) && miniQualityEndpoint(candidate))
 		}
 		if !matches {
 			continue
 		}
 		if found != nil {
-			return nil, fmt.Errorf("Mini endpoints must share one quality price card")
+			return nil, fmt.Errorf("image endpoint has overlapping quality price cards")
 		}
-		if err := validateMiniQualityCard(*card); err != nil {
+		if err := validateImageQualityCard(*card); err != nil {
 			return nil, err
 		}
 		found = card
@@ -177,23 +194,55 @@ func miniQualityCard(key *APIKey) (*ChannelModelPricing, error) {
 	return found, nil
 }
 
-func validateMiniQualityCard(card ChannelModelPricing) error {
+func imageQualityTier(label string) (quality, size string, valid bool) {
+	parts := strings.Split(label, ":")
+	if (len(parts) != 2 && len(parts) != 4) || parts[0] != "quality" || parts[1] == "" {
+		return "", "", false
+	}
+	if len(parts) == 4 {
+		if parts[2] != "size" || parts[3] == "" {
+			return "", "", false
+		}
+		size = parts[3]
+	}
+	return parts[1], size, true
+}
+
+func validateImageQualityCard(card ChannelModelPricing) error {
 	if card.BillingMode != BillingModeImage || card.Platform != PlatformOpenAI || card.PerRequestPrice != nil ||
 		len(card.ReasoningEffortMultipliers) != 0 || card.TimePricing != nil {
-		return fmt.Errorf("Mini quality tariffs require image billing without fallback prices or extra multipliers")
+		return fmt.Errorf("image quality tariffs require image billing without fallback prices or extra multipliers")
+	}
+	if len(card.Models) == 0 {
+		return fmt.Errorf("an image quality price card requires an exact model")
 	}
 	for _, model := range card.Models {
-		if !miniQualityEndpoint(model) {
-			return fmt.Errorf("a Mini quality price card cannot include other models or wildcards")
+		if !imageQualityEndpoint(model) || imageQualityCanonicalModel(model) != imageQualityCanonicalModel(card.Models[0]) {
+			return fmt.Errorf("an image quality price card cannot include other model families or wildcards")
 		}
 	}
 	seen := map[string]bool{}
-	for _, iv := range card.Intervals {
-		if iv.TierLabel != "quality:low" && iv.TierLabel != "quality:medium" && iv.TierLabel != "quality:high" {
-			return fmt.Errorf("Mini quality tariff contains an unsupported quality")
+	var sized bool
+	for i, iv := range card.Intervals {
+		quality, size, valid := imageQualityTier(iv.TierLabel)
+		if !valid {
+			return fmt.Errorf("image quality tariff contains an unsupported size or quality")
+		}
+		for _, model := range card.Models {
+			if size == "" && !miniQualityEndpoint(model) {
+				return fmt.Errorf("non-Mini image tariffs require an exact native size")
+			}
+			if _, err := (ImageQuoteRequest{Model: model, Quality: quality, Size: size, Count: 1}).normalized(); err != nil {
+				return fmt.Errorf("image quality tariff contains an unsupported size or quality: %w", err)
+			}
+		}
+		if i == 0 {
+			sized = size != ""
+		} else if sized != (size != "") {
+			return fmt.Errorf("image quality tariffs cannot mix flat and size-specific prices")
 		}
 		if seen[iv.TierLabel] || !validAtlasCloudImagePrice(iv.PerRequestPrice) {
-			return fmt.Errorf("Mini quality tariff must have unique, explicitly configured finite prices")
+			return fmt.Errorf("image quality tariff must have unique, explicitly configured finite prices")
 		}
 		if decimal.NewFromFloat(*iv.PerRequestPrice).Exponent() < -UsageBillingMonetaryScale {
 			return fmt.Errorf("image tariffs support at most eight decimal places")
@@ -207,16 +256,16 @@ func validateMiniQualityCard(card ChannelModelPricing) error {
 }
 
 func (s *OpenAIGatewayService) ImageQualityPricingEnrolled(key *APIKey, model string) (bool, error) {
-	if !miniQualityEndpoint(model) {
+	if !imageQualityEndpoint(model) {
 		return false, nil
 	}
-	card, err := miniQualityCard(key)
+	card, err := imageQualityCard(key, model)
 	return card != nil, err
 }
 
 // Always reload pilot tariff configuration at admission; cached auth snapshots may predate an admin edit.
 func (s *OpenAIGatewayService) RefreshImageQualityKey(ctx context.Context, key *APIKey, model string) (*APIKey, error) {
-	if !miniQualityEndpoint(model) || key == nil || key.GroupID == nil || s.channelService == nil || s.channelService.groupRepo == nil {
+	if !imageQualityEndpoint(model) || key == nil || key.GroupID == nil || s.channelService == nil || s.channelService.groupRepo == nil {
 		return key, nil
 	}
 	group, err := s.channelService.groupRepo.GetByIDLite(ctx, *key.GroupID)
@@ -233,18 +282,24 @@ func (s *OpenAIGatewayService) ImageQualitySettlementReady() bool {
 }
 
 func (s *OpenAIGatewayService) imageQualityTariff(ctx context.Context, key *APIKey, req ImageQuoteRequest) (base, unit, revision string, multiplier float64, err error) {
-	card, err := miniQualityCard(key)
+	card, err := imageQualityCard(key, req.Model)
 	if err != nil || card == nil {
 		return "", "", "", 0, fmt.Errorf("image quality tariff is not configured")
 	}
 	var price *float64
+	label := "quality:" + req.Quality
+	if len(card.Intervals) > 0 {
+		if _, size, _ := imageQualityTier(card.Intervals[0].TierLabel); size != "" {
+			label += ":size:" + req.Size
+		}
+	}
 	for _, iv := range card.Intervals {
-		if iv.TierLabel == "quality:"+req.Quality {
+		if iv.TierLabel == label {
 			price = iv.PerRequestPrice
 		}
 	}
 	if !validAtlasCloudImagePrice(price) {
-		return "", "", "", 0, fmt.Errorf("configure the selected image quality price before generation")
+		return "", "", "", 0, fmt.Errorf("configure the selected image size and quality price before generation")
 	}
 	rate := key.Group.RateMultiplier
 	if s.userGroupRateResolver != nil {
@@ -266,8 +321,9 @@ func (s *OpenAIGatewayService) imageQualityTariff(ctx context.Context, key *APIK
 	}
 	base = baseAmount.StringFixed(8)
 	unit = unitAmount.StringFixed(8)
-	// Revision follows the customer tariff, not ratio or count.
-	hash := sha256.Sum256([]byte(miniQualityModel + "|" + req.Quality + "|" + base + "|" + strconv.FormatFloat(multiplier, 'g', -1, 64)))
+	// Size-specific cards bind their exact cell; legacy flat-quality cards stay compatible.
+	tier := strings.TrimPrefix(label, "quality:")
+	hash := sha256.Sum256([]byte(req.Model + "|" + tier + "|" + base + "|" + strconv.FormatFloat(multiplier, 'g', -1, 64)))
 	revision = hex.EncodeToString(hash[:])
 	return base, unit, revision, multiplier, nil
 }

@@ -48,6 +48,122 @@ func TestImageQualityQuoteRatioInvariant(t *testing.T) {
 	}
 }
 
+func miniSizeQuoteFixture() (*OpenAIGatewayService, *APIKey) {
+	s, key := miniQuoteFixture()
+	key.Group.RateMultiplier = 1
+	key.Group.ModelPricing[0].Intervals = nil
+	prices := map[string][]float64{
+		"1024x1024": {0.00510, 0.01122, 0.03672},
+		"1024x1536": {0.00612, 0.01530, 0.05304},
+		"1536x1024": {0.00612, 0.01530, 0.05304},
+	}
+	for _, size := range []string{"1024x1024", "1024x1536", "1536x1024"} {
+		for i, quality := range []string{"low", "medium", "high"} {
+			key.Group.ModelPricing[0].Intervals = append(key.Group.ModelPricing[0].Intervals,
+				PricingInterval{TierLabel: "quality:" + quality + ":size:" + size, PerRequestPrice: quoteFloat(prices[size][i])})
+		}
+	}
+	return s, key
+}
+
+func TestImageQualityQuoteSizeMatrix(t *testing.T) {
+	cases := []struct{ size, quality, unit, total string }{
+		{"1024x1024", "low", "0.00510000", "0.01530000"},
+		{"1024x1024", "medium", "0.01122000", "0.03366000"},
+		{"1024x1024", "high", "0.03672000", "0.11016000"},
+		{"1024x1536", "low", "0.00612000", "0.01836000"},
+		{"1024x1536", "medium", "0.01530000", "0.04590000"},
+		{"1024x1536", "high", "0.05304000", "0.15912000"},
+		{"1536x1024", "low", "0.00612000", "0.01836000"},
+		{"1536x1024", "medium", "0.01530000", "0.04590000"},
+		{"1536x1024", "high", "0.05304000", "0.15912000"},
+	}
+	for _, model := range []string{"openai/gpt-image-1-mini/text-to-image", "openai/gpt-image-1-mini/edit"} {
+		for _, tc := range cases {
+			t.Run(model+"/"+tc.size+"/"+tc.quality, func(t *testing.T) {
+				s, key := miniSizeQuoteFixture()
+				q, err := s.QuoteImageQuality(context.Background(), key,
+					ImageQuoteRequest{Model: model, Quality: tc.quality, Size: tc.size, Count: 3}, time.Now())
+				require.NoError(t, err)
+				require.Equal(t, tc.unit, q.UnitPrice)
+				require.Equal(t, tc.total, q.Total)
+			})
+		}
+	}
+}
+
+func TestImageQualityQuoteSizeMatrixMissingCellAndValidation(t *testing.T) {
+	s, key := miniSizeQuoteFixture()
+	key.Group.ModelPricing[0].Intervals = key.Group.ModelPricing[0].Intervals[1:]
+	_, err := s.QuoteImageQuality(context.Background(), key,
+		ImageQuoteRequest{Model: "openai/gpt-image-1-mini/text-to-image", Quality: "low", Size: "1024x1024", Count: 1}, time.Now())
+	require.ErrorContains(t, err, "selected image size and quality")
+	q, err := s.QuoteImageQuality(context.Background(), key,
+		ImageQuoteRequest{Model: "openai/gpt-image-1-mini/text-to-image", Quality: "low", Size: "1024x1536", Count: 1}, time.Now())
+	require.NoError(t, err)
+	require.Equal(t, "0.00612000", q.Total)
+	for _, label := range []string{"quality:low", "quality:low:size:2048x2048", "quality:ultra:size:1024x1024", "quality:low:size:1024x1536:extra", "quality:low:size:1024x1536"} {
+		_, key = miniSizeQuoteFixture()
+		key.Group.ModelPricing[0].Intervals[0].TierLabel = label
+		_, err := normalizeGroupModelPricing(PlatformOpenAI, key.Group.ModelPricing)
+		require.Error(t, err, label)
+	}
+	_, key = miniSizeQuoteFixture()
+	normalized, err := normalizeGroupModelPricing(PlatformOpenAI, key.Group.ModelPricing)
+	require.NoError(t, err)
+	require.Len(t, normalized[0].Intervals, 9)
+}
+
+func TestImageQualityQuoteSizeMatrixCountsAndMultiplier(t *testing.T) {
+	s, key := miniSizeQuoteFixture()
+	req := ImageQuoteRequest{Model: "openai/gpt-image-1-mini/text-to-image", Quality: "medium", Size: "1536x1024"}
+	for _, tc := range []struct {
+		count int
+		total string
+	}{{1, "0.01530000"}, {2, "0.03060000"}, {3, "0.04590000"}, {4, "0.06120000"}} {
+		req.Count = tc.count
+		q, err := s.QuoteImageQuality(context.Background(), key, req, time.Now())
+		require.NoError(t, err)
+		require.Equal(t, tc.total, q.Total)
+	}
+	key.Group.RateMultiplier = 1.5
+	q, err := s.QuoteImageQuality(context.Background(), key, req, time.Now())
+	require.NoError(t, err)
+	require.Equal(t, "0.02295000", q.UnitPrice)
+	require.Equal(t, "0.09180000", q.Total)
+}
+
+func TestImageQualityQuoteSizeMatrixLockedSettlement(t *testing.T) {
+	s, key := miniSizeQuoteFixture()
+	now := time.Now()
+	req := ImageQuoteRequest{Model: "openai/gpt-image-1-mini/text-to-image", Quality: "high", Size: "1024x1536", Count: 2}
+	q, err := s.QuoteImageQuality(context.Background(), key, req, now)
+	require.NoError(t, err)
+	parsed := &OpenAIImagesRequest{Model: req.Model, Quality: req.Quality, Size: req.Size, N: 1}
+	snapshot, err := s.AcceptImageQualityQuote(context.Background(), key, parsed, q.Token, 1, now)
+	require.NoError(t, err)
+	require.Equal(t, "0.05304000", snapshot.Receipt().Charged)
+	require.Equal(t, 0.05304, snapshot.cost(1).ActualCost)
+	usageRepo := &openAIRecordUsageLogRepoStub{inserted: true}
+	billingRepo := &openAIRecordUsageBillingRepoStub{}
+	recorder := newOpenAIRecordUsageServiceWithBillingRepoForTest(usageRepo, billingRepo, &openAIRecordUsageUserRepoStub{}, &openAIRecordUsageSubRepoStub{}, nil)
+	key.Group.ModelPricing[0].Intervals[5].PerRequestPrice = quoteFloat(9)
+	err = recorder.RecordUsage(context.Background(), &OpenAIRecordUsageInput{
+		APIKey: key, User: key.User, Account: &Account{ID: 30, Type: AccountTypeAPIKey},
+		Result: &OpenAIForwardResult{Model: req.Model, UpstreamModel: req.Model, RequestID: "size-matrix-test",
+			ImageCount: 1, ImageQualityPricing: snapshot},
+	})
+	require.NoError(t, err)
+	require.Equal(t, 0.05304, billingRepo.lastCmd.BalanceCost)
+	require.Equal(t, 0.05304, usageRepo.lastLog.ActualCost)
+	require.Equal(t, snapshot.RequestID(), billingRepo.lastCmd.RequestID)
+	parsed.Size = "1024x1024"
+	_, err = s.AcceptImageQualityQuote(context.Background(), key, parsed, q.Token, 0, now)
+	require.Error(t, err)
+	key.Group.ModelPricing[0].Intervals[5].PerRequestPrice = quoteFloat(9)
+	require.Equal(t, 0.05304, snapshot.cost(1).ActualCost, "accepted tariff remains locked after edits")
+}
+
 func TestImageQualityQuoteRejectsInvalidOrMissingTariffs(t *testing.T) {
 	for _, price := range []*float64{nil, quoteFloat(-1), quoteFloat(math.NaN()), quoteFloat(math.Inf(1))} {
 		s, key := miniQuoteFixture()

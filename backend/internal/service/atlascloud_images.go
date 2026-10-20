@@ -200,7 +200,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			}
 		}()
 	}
-	if raw, exists := c.Get("api_key"); exists && miniQualityEndpoint(upstreamModel) {
+	if raw, exists := c.Get("api_key"); exists && imageQualityEndpoint(upstreamModel) {
 		if key, ok := raw.(*APIKey); ok {
 			fresh, err := s.RefreshImageQualityKey(ctx, key, upstreamModel)
 			if err != nil {

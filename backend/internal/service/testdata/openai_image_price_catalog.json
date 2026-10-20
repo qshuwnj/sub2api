@@ -1,0 +1,6094 @@
+{
+  "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+  "checkedAt": "2026-10-20T17:28:09.244Z",
+  "currency": "USD",
+  "markup": "1.20",
+  "cells": [
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.0306",
+      "original": "0.036",
+      "discount": "85",
+      "price": "0.03672000",
+      "checkedAt": "2026-10-20T17:28:09.796Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00425",
+      "original": "0.005",
+      "discount": "85",
+      "price": "0.00510000",
+      "checkedAt": "2026-10-20T17:28:12.764Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.00935",
+      "original": "0.011",
+      "discount": "85",
+      "price": "0.01122000",
+      "checkedAt": "2026-10-20T17:28:11.206Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.0442",
+      "original": "0.052",
+      "discount": "85",
+      "price": "0.05304000",
+      "checkedAt": "2026-10-20T17:28:14.316Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.0051",
+      "original": "0.006",
+      "discount": "85",
+      "price": "0.00612000",
+      "checkedAt": "2026-10-20T17:28:17.419Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.01275",
+      "original": "0.015",
+      "discount": "85",
+      "price": "0.01530000",
+      "checkedAt": "2026-10-20T17:28:15.860Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.0442",
+      "original": "0.052",
+      "discount": "85",
+      "price": "0.05304000",
+      "checkedAt": "2026-10-20T17:28:18.997Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.0051",
+      "original": "0.006",
+      "discount": "85",
+      "price": "0.00612000",
+      "checkedAt": "2026-10-20T17:28:22.091Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.01275",
+      "original": "0.015",
+      "discount": "85",
+      "price": "0.01530000",
+      "checkedAt": "2026-10-20T17:28:20.558Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.0306",
+      "original": "0.036",
+      "discount": "85",
+      "price": "0.03672000",
+      "checkedAt": "2026-10-20T17:28:27.079Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00425",
+      "original": "0.005",
+      "discount": "85",
+      "price": "0.00510000",
+      "checkedAt": "2026-10-20T17:28:23.648Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.00935",
+      "original": "0.011",
+      "discount": "85",
+      "price": "0.01122000",
+      "checkedAt": "2026-10-20T17:28:25.180Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.0442",
+      "original": "0.052",
+      "discount": "85",
+      "price": "0.05304000",
+      "checkedAt": "2026-10-20T17:28:31.422Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.0051",
+      "original": "0.006",
+      "discount": "85",
+      "price": "0.00612000",
+      "checkedAt": "2026-10-20T17:28:28.936Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.01275",
+      "original": "0.015",
+      "discount": "85",
+      "price": "0.01530000",
+      "checkedAt": "2026-10-20T17:28:29.860Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.0442",
+      "original": "0.052",
+      "discount": "85",
+      "price": "0.05304000",
+      "checkedAt": "2026-10-20T17:28:37.347Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.0051",
+      "original": "0.006",
+      "discount": "85",
+      "price": "0.00612000",
+      "checkedAt": "2026-10-20T17:28:32.984Z"
+    },
+    {
+      "model": "openai/gpt-image-1-mini/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.01275",
+      "original": "0.015",
+      "discount": "85",
+      "price": "0.01530000",
+      "checkedAt": "2026-10-20T17:28:34.556Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.259053",
+      "original": "0.304768",
+      "discount": "85",
+      "price": "0.31086360",
+      "checkedAt": "2026-10-20T17:28:40.874Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.073331",
+      "original": "0.086272",
+      "discount": "85",
+      "price": "0.08799720",
+      "checkedAt": "2026-10-20T17:28:37.739Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.115763",
+      "original": "0.136192",
+      "discount": "85",
+      "price": "0.13891560",
+      "checkedAt": "2026-10-20T17:28:39.685Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.217274",
+      "original": "0.255616",
+      "discount": "85",
+      "price": "0.26072880",
+      "checkedAt": "2026-10-20T17:28:45.529Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.072298",
+      "original": "0.085056",
+      "discount": "85",
+      "price": "0.08675760",
+      "checkedAt": "2026-10-20T17:28:42.440Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.105318",
+      "original": "0.123904",
+      "discount": "85",
+      "price": "0.12638160",
+      "checkedAt": "2026-10-20T17:28:43.989Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.217274",
+      "original": "0.255616",
+      "discount": "85",
+      "price": "0.26072880",
+      "checkedAt": "2026-10-20T17:28:50.216Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.072298",
+      "original": "0.085056",
+      "discount": "85",
+      "price": "0.08675760",
+      "checkedAt": "2026-10-20T17:28:47.098Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.105318",
+      "original": "0.123904",
+      "discount": "85",
+      "price": "0.12638160",
+      "checkedAt": "2026-10-20T17:28:48.657Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.259053",
+      "original": "0.304768",
+      "discount": "85",
+      "price": "0.31086360",
+      "checkedAt": "2026-10-20T17:28:54.879Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.073331",
+      "original": "0.086272",
+      "discount": "85",
+      "price": "0.08799720",
+      "checkedAt": "2026-10-20T17:28:52.090Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.115763",
+      "original": "0.136192",
+      "discount": "85",
+      "price": "0.13891560",
+      "checkedAt": "2026-10-20T17:28:53.330Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.217274",
+      "original": "0.255616",
+      "discount": "85",
+      "price": "0.26072880",
+      "checkedAt": "2026-10-20T17:28:59.539Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.072298",
+      "original": "0.085056",
+      "discount": "85",
+      "price": "0.08675760",
+      "checkedAt": "2026-10-20T17:28:56.419Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.105318",
+      "original": "0.123904",
+      "discount": "85",
+      "price": "0.12638160",
+      "checkedAt": "2026-10-20T17:28:57.979Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.217274",
+      "original": "0.255616",
+      "discount": "85",
+      "price": "0.26072880",
+      "checkedAt": "2026-10-20T17:29:04.544Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.072298",
+      "original": "0.085056",
+      "discount": "85",
+      "price": "0.08675760",
+      "checkedAt": "2026-10-20T17:29:01.088Z"
+    },
+    {
+      "model": "openai/gpt-image-1.5/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.105318",
+      "original": "0.123904",
+      "discount": "85",
+      "price": "0.12638160",
+      "checkedAt": "2026-10-20T17:29:02.651Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.14195",
+      "original": "0.167",
+      "discount": "85",
+      "price": "0.17034000",
+      "checkedAt": "2026-10-20T17:29:05.751Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00935",
+      "original": "0.011",
+      "discount": "85",
+      "price": "0.01122000",
+      "checkedAt": "2026-10-20T17:29:09.187Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.0357",
+      "original": "0.042",
+      "discount": "85",
+      "price": "0.04284000",
+      "checkedAt": "2026-10-20T17:29:07.327Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.2125",
+      "original": "0.25",
+      "discount": "85",
+      "price": "0.25500000",
+      "checkedAt": "2026-10-20T17:29:10.433Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.0136",
+      "original": "0.016",
+      "discount": "85",
+      "price": "0.01632000",
+      "checkedAt": "2026-10-20T17:29:13.574Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.05355",
+      "original": "0.063",
+      "discount": "85",
+      "price": "0.06426000",
+      "checkedAt": "2026-10-20T17:29:11.993Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.2125",
+      "original": "0.25",
+      "discount": "85",
+      "price": "0.25500000",
+      "checkedAt": "2026-10-20T17:29:15.115Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.0136",
+      "original": "0.016",
+      "discount": "85",
+      "price": "0.01632000",
+      "checkedAt": "2026-10-20T17:29:18.210Z"
+    },
+    {
+      "model": "openai/gpt-image-1/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.05355",
+      "original": "0.063",
+      "discount": "85",
+      "price": "0.06426000",
+      "checkedAt": "2026-10-20T17:29:16.671Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.14195",
+      "original": "0.167",
+      "discount": "85",
+      "price": "0.17034000",
+      "checkedAt": "2026-10-20T17:29:23.272Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00935",
+      "original": "0.011",
+      "discount": "85",
+      "price": "0.01122000",
+      "checkedAt": "2026-10-20T17:29:19.766Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.0357",
+      "original": "0.042",
+      "discount": "85",
+      "price": "0.04284000",
+      "checkedAt": "2026-10-20T17:29:21.336Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.2125",
+      "original": "0.25",
+      "discount": "85",
+      "price": "0.25500000",
+      "checkedAt": "2026-10-20T17:29:27.581Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.0136",
+      "original": "0.016",
+      "discount": "85",
+      "price": "0.01632000",
+      "checkedAt": "2026-10-20T17:29:24.446Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.05355",
+      "original": "0.063",
+      "discount": "85",
+      "price": "0.06426000",
+      "checkedAt": "2026-10-20T17:29:26.006Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.2125",
+      "original": "0.25",
+      "discount": "85",
+      "price": "0.25500000",
+      "checkedAt": "2026-10-20T17:29:32.221Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.0136",
+      "original": "0.016",
+      "discount": "85",
+      "price": "0.01632000",
+      "checkedAt": "2026-10-20T17:29:29.113Z"
+    },
+    {
+      "model": "openai/gpt-image-1/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.05355",
+      "original": "0.063",
+      "discount": "85",
+      "price": "0.06426000",
+      "checkedAt": "2026-10-20T17:29:30.688Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.10786",
+      "original": "0.21572",
+      "discount": "50",
+      "price": "0.12943200",
+      "checkedAt": "2026-10-20T17:29:36.919Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00544",
+      "original": "0.01088",
+      "discount": "50",
+      "price": "0.00652800",
+      "checkedAt": "2026-10-20T17:29:33.805Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.02884",
+      "original": "0.05768",
+      "discount": "50",
+      "price": "0.03460800",
+      "checkedAt": "2026-10-20T17:29:35.388Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.08482",
+      "original": "0.16964",
+      "discount": "50",
+      "price": "0.10178400",
+      "checkedAt": "2026-10-20T17:29:57.191Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.00487",
+      "original": "0.00974",
+      "discount": "50",
+      "price": "0.00584400",
+      "checkedAt": "2026-10-20T17:29:52.760Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.02308",
+      "original": "0.04616",
+      "discount": "50",
+      "price": "0.02769600",
+      "checkedAt": "2026-10-20T17:29:53.174Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.074725",
+      "original": "0.14945",
+      "discount": "50",
+      "price": "0.08967000",
+      "checkedAt": "2026-10-20T17:29:41.597Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:29:38.468Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.02056",
+      "original": "0.04112",
+      "discount": "50",
+      "price": "0.02467200",
+      "checkedAt": "2026-10-20T17:29:40.022Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.073135",
+      "original": "0.14627",
+      "discount": "50",
+      "price": "0.08776200",
+      "checkedAt": "2026-10-20T17:30:46.037Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:30:42.923Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.019735",
+      "original": "0.03947",
+      "discount": "50",
+      "price": "0.02368200",
+      "checkedAt": "2026-10-20T17:30:44.465Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.08725",
+      "original": "0.1745",
+      "discount": "50",
+      "price": "0.10470000",
+      "checkedAt": "2026-10-20T17:30:36.832Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.004855",
+      "original": "0.00971",
+      "discount": "50",
+      "price": "0.00582600",
+      "checkedAt": "2026-10-20T17:30:33.554Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.023695",
+      "original": "0.04739",
+      "discount": "50",
+      "price": "0.02843400",
+      "checkedAt": "2026-10-20T17:30:35.121Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.08482",
+      "original": "0.16964",
+      "discount": "50",
+      "price": "0.10178400",
+      "checkedAt": "2026-10-20T17:30:22.663Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.00487",
+      "original": "0.00974",
+      "discount": "50",
+      "price": "0.00584400",
+      "checkedAt": "2026-10-20T17:30:20.691Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.02308",
+      "original": "0.04616",
+      "discount": "50",
+      "price": "0.02769600",
+      "checkedAt": "2026-10-20T17:30:21.090Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.08725",
+      "original": "0.1745",
+      "discount": "50",
+      "price": "0.10470000",
+      "checkedAt": "2026-10-20T17:30:32.314Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.004855",
+      "original": "0.00971",
+      "discount": "50",
+      "price": "0.00582600",
+      "checkedAt": "2026-10-20T17:30:28.868Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.023695",
+      "original": "0.04739",
+      "discount": "50",
+      "price": "0.02843400",
+      "checkedAt": "2026-10-20T17:30:30.449Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.21658",
+      "original": "0.43316",
+      "discount": "50",
+      "price": "0.25989600",
+      "checkedAt": "2026-10-20T17:30:27.642Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.008455",
+      "original": "0.01691",
+      "discount": "50",
+      "price": "0.01014600",
+      "checkedAt": "2026-10-20T17:30:24.203Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.05602",
+      "original": "0.11204",
+      "discount": "50",
+      "price": "0.06722400",
+      "checkedAt": "2026-10-20T17:30:25.771Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.21559",
+      "original": "0.43118",
+      "discount": "50",
+      "price": "0.25870800",
+      "checkedAt": "2026-10-20T17:30:55.388Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.008425",
+      "original": "0.01685",
+      "discount": "50",
+      "price": "0.01011000",
+      "checkedAt": "2026-10-20T17:30:52.245Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.05578",
+      "original": "0.11156",
+      "discount": "50",
+      "price": "0.06693600",
+      "checkedAt": "2026-10-20T17:30:54.110Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.20263",
+      "original": "0.40526",
+      "discount": "50",
+      "price": "0.24315600",
+      "checkedAt": "2026-10-20T17:31:04.736Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.008065",
+      "original": "0.01613",
+      "discount": "50",
+      "price": "0.00967800",
+      "checkedAt": "2026-10-20T17:31:01.613Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.05254",
+      "original": "0.10508",
+      "discount": "50",
+      "price": "0.06304800",
+      "checkedAt": "2026-10-20T17:31:03.813Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.073135",
+      "original": "0.14627",
+      "discount": "50",
+      "price": "0.08776200",
+      "checkedAt": "2026-10-20T17:30:41.672Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:30:38.244Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.019735",
+      "original": "0.03947",
+      "discount": "50",
+      "price": "0.02368200",
+      "checkedAt": "2026-10-20T17:30:39.802Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.21559",
+      "original": "0.43118",
+      "discount": "50",
+      "price": "0.25870800",
+      "checkedAt": "2026-10-20T17:30:51.019Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.008425",
+      "original": "0.01685",
+      "discount": "50",
+      "price": "0.01011000",
+      "checkedAt": "2026-10-20T17:30:47.907Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.05578",
+      "original": "0.11156",
+      "discount": "50",
+      "price": "0.06693600",
+      "checkedAt": "2026-10-20T17:30:49.133Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.20263",
+      "original": "0.40526",
+      "discount": "50",
+      "price": "0.24315600",
+      "checkedAt": "2026-10-20T17:31:00.074Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.008065",
+      "original": "0.01613",
+      "discount": "50",
+      "price": "0.00967800",
+      "checkedAt": "2026-10-20T17:30:57.112Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.05254",
+      "original": "0.10508",
+      "discount": "50",
+      "price": "0.06304800",
+      "checkedAt": "2026-10-20T17:30:58.501Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.074725",
+      "original": "0.14945",
+      "discount": "50",
+      "price": "0.08967000",
+      "checkedAt": "2026-10-20T17:29:46.361Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:29:43.450Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/edit",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.02056",
+      "original": "0.04112",
+      "discount": "50",
+      "price": "0.02467200",
+      "checkedAt": "2026-10-20T17:29:45.934Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.10786",
+      "original": "0.21572",
+      "discount": "50",
+      "price": "0.12943200",
+      "checkedAt": "2026-10-20T17:31:09.416Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.00544",
+      "original": "0.01088",
+      "discount": "50",
+      "price": "0.00652800",
+      "checkedAt": "2026-10-20T17:31:06.296Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.02884",
+      "original": "0.05768",
+      "discount": "50",
+      "price": "0.03460800",
+      "checkedAt": "2026-10-20T17:31:08.035Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.08482",
+      "original": "0.16964",
+      "discount": "50",
+      "price": "0.10178400",
+      "checkedAt": "2026-10-20T17:31:23.459Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.00487",
+      "original": "0.00974",
+      "discount": "50",
+      "price": "0.00584400",
+      "checkedAt": "2026-10-20T17:31:20.324Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.02308",
+      "original": "0.04616",
+      "discount": "50",
+      "price": "0.02769600",
+      "checkedAt": "2026-10-20T17:31:21.894Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.074725",
+      "original": "0.14945",
+      "discount": "50",
+      "price": "0.08967000",
+      "checkedAt": "2026-10-20T17:31:14.102Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:31:10.969Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.02056",
+      "original": "0.04112",
+      "discount": "50",
+      "price": "0.02467200",
+      "checkedAt": "2026-10-20T17:31:12.546Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.073135",
+      "original": "0.14627",
+      "discount": "50",
+      "price": "0.08776200",
+      "checkedAt": "2026-10-20T17:31:51.509Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:31:48.391Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.019735",
+      "original": "0.03947",
+      "discount": "50",
+      "price": "0.02368200",
+      "checkedAt": "2026-10-20T17:31:50.265Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.08725",
+      "original": "0.1745",
+      "discount": "50",
+      "price": "0.10470000",
+      "checkedAt": "2026-10-20T17:31:42.158Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.004855",
+      "original": "0.00971",
+      "discount": "50",
+      "price": "0.00582600",
+      "checkedAt": "2026-10-20T17:31:39.030Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.023695",
+      "original": "0.04739",
+      "discount": "50",
+      "price": "0.02843400",
+      "checkedAt": "2026-10-20T17:31:40.592Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.08482",
+      "original": "0.16964",
+      "discount": "50",
+      "price": "0.10178400",
+      "checkedAt": "2026-10-20T17:31:28.436Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.00487",
+      "original": "0.00974",
+      "discount": "50",
+      "price": "0.00584400",
+      "checkedAt": "2026-10-20T17:31:25.009Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.02308",
+      "original": "0.04616",
+      "discount": "50",
+      "price": "0.02769600",
+      "checkedAt": "2026-10-20T17:31:26.567Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.08725",
+      "original": "0.1745",
+      "discount": "50",
+      "price": "0.10470000",
+      "checkedAt": "2026-10-20T17:31:37.469Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.004855",
+      "original": "0.00971",
+      "discount": "50",
+      "price": "0.00582600",
+      "checkedAt": "2026-10-20T17:31:35.169Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.023695",
+      "original": "0.04739",
+      "discount": "50",
+      "price": "0.02843400",
+      "checkedAt": "2026-10-20T17:31:35.925Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.21658",
+      "original": "0.43316",
+      "discount": "50",
+      "price": "0.25989600",
+      "checkedAt": "2026-10-20T17:31:32.818Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.008455",
+      "original": "0.01691",
+      "discount": "50",
+      "price": "0.01014600",
+      "checkedAt": "2026-10-20T17:31:29.688Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.05602",
+      "original": "0.11204",
+      "discount": "50",
+      "price": "0.06722400",
+      "checkedAt": "2026-10-20T17:31:31.572Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.21559",
+      "original": "0.43118",
+      "discount": "50",
+      "price": "0.25870800",
+      "checkedAt": "2026-10-20T17:32:00.857Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.008425",
+      "original": "0.01685",
+      "discount": "50",
+      "price": "0.01011000",
+      "checkedAt": "2026-10-20T17:31:57.737Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.05578",
+      "original": "0.11156",
+      "discount": "50",
+      "price": "0.06693600",
+      "checkedAt": "2026-10-20T17:31:59.289Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.20263",
+      "original": "0.40526",
+      "discount": "50",
+      "price": "0.24315600",
+      "checkedAt": "2026-10-20T17:32:10.191Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.008065",
+      "original": "0.01613",
+      "discount": "50",
+      "price": "0.00967800",
+      "checkedAt": "2026-10-20T17:32:07.092Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.05254",
+      "original": "0.10508",
+      "discount": "50",
+      "price": "0.06304800",
+      "checkedAt": "2026-10-20T17:32:08.641Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.073135",
+      "original": "0.14627",
+      "discount": "50",
+      "price": "0.08776200",
+      "checkedAt": "2026-10-20T17:31:46.842Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:31:44.040Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.019735",
+      "original": "0.03947",
+      "discount": "50",
+      "price": "0.02368200",
+      "checkedAt": "2026-10-20T17:31:45.285Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.21559",
+      "original": "0.43118",
+      "discount": "50",
+      "price": "0.25870800",
+      "checkedAt": "2026-10-20T17:31:56.171Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.008425",
+      "original": "0.01685",
+      "discount": "50",
+      "price": "0.01011000",
+      "checkedAt": "2026-10-20T17:31:53.084Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.05578",
+      "original": "0.11156",
+      "discount": "50",
+      "price": "0.06693600",
+      "checkedAt": "2026-10-20T17:31:54.620Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.20263",
+      "original": "0.40526",
+      "discount": "50",
+      "price": "0.24315600",
+      "checkedAt": "2026-10-20T17:32:05.533Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.008065",
+      "original": "0.01613",
+      "discount": "50",
+      "price": "0.00967800",
+      "checkedAt": "2026-10-20T17:32:02.417Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.05254",
+      "original": "0.10508",
+      "discount": "50",
+      "price": "0.06304800",
+      "checkedAt": "2026-10-20T17:32:03.980Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.074725",
+      "original": "0.14945",
+      "discount": "50",
+      "price": "0.08967000",
+      "checkedAt": "2026-10-20T17:31:18.778Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.00451",
+      "original": "0.00902",
+      "discount": "50",
+      "price": "0.00541200",
+      "checkedAt": "2026-10-20T17:31:15.664Z"
+    },
+    {
+      "model": "openai/gpt-image-2-developer/text-to-image",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.02056",
+      "original": "0.04112",
+      "discount": "50",
+      "price": "0.02467200",
+      "checkedAt": "2026-10-20T17:31:17.217Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1024x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:11.753Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1024x1536",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:16.424Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1024x768",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:13.319Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1088x2560",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:26.147Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1152x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:22.668Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "1536x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:17.988Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2048x1152",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:21.396Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2048x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:19.544Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2160x2880",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:28.914Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2160x3840",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:32.025Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2560x1088",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:24.241Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "2880x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:27.334Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "3840x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:30.478Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "768x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:14.880Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1024x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:33.570Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1024x1536",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:38.236Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1024x768",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:35.127Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1088x2560",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:47.576Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1152x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:44.466Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "1536x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:39.797Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2048x1152",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:43.225Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2048x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:41.363Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2160x2880",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:50.692Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2160x3840",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:54.115Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2560x1088",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:32:46.014Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "2880x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:49.634Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "3840x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:32:52.244Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "768x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:32:36.682Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:33:14.083Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:33:10.986Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:33:17.184Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:33:12.529Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:33:15.637Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:32:58.481Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:32:55.352Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:33:01.595Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:32:56.914Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:33:00.037Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:34:00.803Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:33:57.700Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:34:03.930Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:33:59.256Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:34:02.365Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:33:45.231Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:33:42.118Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:33:48.353Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:33:43.677Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:33:46.797Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:33:22.239Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:33:18.732Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:33:24.981Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:33:20.307Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:33:23.424Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:33:37.650Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:33:34.343Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:33:40.563Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:33:35.898Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:33:39.007Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.089632",
+      "original": "0.11204",
+      "discount": "80",
+      "price": "0.10755840",
+      "checkedAt": "2026-10-20T17:33:29.667Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.013528",
+      "original": "0.01691",
+      "discount": "80",
+      "price": "0.01623360",
+      "checkedAt": "2026-10-20T17:33:26.539Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "max",
+      "upstream": "0.346528",
+      "original": "0.43316",
+      "discount": "80",
+      "price": "0.41583360",
+      "checkedAt": "2026-10-20T17:33:32.780Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.025408",
+      "original": "0.03176",
+      "discount": "80",
+      "price": "0.03048960",
+      "checkedAt": "2026-10-20T17:33:28.114Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "xhigh",
+      "upstream": "0.156232",
+      "original": "0.19529",
+      "discount": "80",
+      "price": "0.18747840",
+      "checkedAt": "2026-10-20T17:33:31.238Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:34:16.395Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:34:13.285Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:34:19.515Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:34:14.844Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:34:17.950Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:34:31.990Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:34:28.867Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:34:35.412Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:34:30.420Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:34:33.576Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:33:53.014Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:33:49.898Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:33:56.141Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:33:51.473Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:33:54.595Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:34:09.124Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:34:05.861Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:34:11.928Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:34:07.039Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:34:10.158Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:34:24.194Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:34:21.062Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:34:27.303Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:34:22.622Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:34:25.748Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:33:06.907Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:33:03.158Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:33:09.397Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:33:04.711Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:33:07.840Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.046144",
+      "original": "0.05768",
+      "discount": "80",
+      "price": "0.05537280",
+      "checkedAt": "2026-10-20T17:34:39.775Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.008704",
+      "original": "0.01088",
+      "discount": "80",
+      "price": "0.01044480",
+      "checkedAt": "2026-10-20T17:34:36.667Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "max",
+      "upstream": "0.172576",
+      "original": "0.21572",
+      "discount": "80",
+      "price": "0.20709120",
+      "checkedAt": "2026-10-20T17:34:42.892Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.014536",
+      "original": "0.01817",
+      "discount": "80",
+      "price": "0.01744320",
+      "checkedAt": "2026-10-20T17:34:38.539Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "xhigh",
+      "upstream": "0.078928",
+      "original": "0.09866",
+      "discount": "80",
+      "price": "0.09471360",
+      "checkedAt": "2026-10-20T17:34:41.331Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "high",
+      "upstream": "0.04024",
+      "original": "0.0503",
+      "discount": "80",
+      "price": "0.04828800",
+      "checkedAt": "2026-10-20T17:35:03.155Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "low",
+      "upstream": "0.008152",
+      "original": "0.01019",
+      "discount": "80",
+      "price": "0.00978240",
+      "checkedAt": "2026-10-20T17:35:00.397Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "max",
+      "upstream": "0.150856",
+      "original": "0.18857",
+      "discount": "80",
+      "price": "0.18102720",
+      "checkedAt": "2026-10-20T17:35:06.263Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "medium",
+      "upstream": "0.013072",
+      "original": "0.01634",
+      "discount": "80",
+      "price": "0.01568640",
+      "checkedAt": "2026-10-20T17:35:01.590Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "xhigh",
+      "upstream": "0.068848",
+      "original": "0.08606",
+      "discount": "80",
+      "price": "0.08261760",
+      "checkedAt": "2026-10-20T17:35:04.715Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:35:10.935Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:35:07.820Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:35:14.045Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:35:09.765Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:35:12.484Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:34:47.571Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:34:44.462Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:34:50.698Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:34:46.016Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:34:49.124Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:35:57.654Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:35:54.536Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:36:01.099Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:35:56.092Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:35:59.202Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:35:42.088Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:35:38.981Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:35:45.198Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:35:40.527Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:35:43.628Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:35:18.713Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:35:15.610Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:35:21.852Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:35:17.175Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:35:20.998Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:35:34.271Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:35:31.192Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:35:37.414Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:35:32.732Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:35:35.843Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.089632",
+      "original": "0.11204",
+      "discount": "80",
+      "price": "0.10755840",
+      "checkedAt": "2026-10-20T17:35:26.519Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.013528",
+      "original": "0.01691",
+      "discount": "80",
+      "price": "0.01623360",
+      "checkedAt": "2026-10-20T17:35:23.415Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "max",
+      "upstream": "0.346528",
+      "original": "0.43316",
+      "discount": "80",
+      "price": "0.41583360",
+      "checkedAt": "2026-10-20T17:35:29.615Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.025408",
+      "original": "0.03176",
+      "discount": "80",
+      "price": "0.03048960",
+      "checkedAt": "2026-10-20T17:35:24.964Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "xhigh",
+      "upstream": "0.156232",
+      "original": "0.19529",
+      "discount": "80",
+      "price": "0.18747840",
+      "checkedAt": "2026-10-20T17:35:28.072Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:36:13.240Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:36:10.126Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:36:16.352Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:36:11.682Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:36:14.783Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:36:28.823Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:36:25.744Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:36:31.927Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:36:27.267Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:36:30.372Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:35:49.859Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:35:46.763Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:35:52.983Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:35:48.686Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:35:51.420Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:36:05.796Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:36:02.330Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:36:08.564Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:36:03.873Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:36:07.010Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:36:21.022Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:36:17.908Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:36:24.139Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:36:19.464Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:36:22.589Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:34:55.379Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:34:52.238Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:34:58.479Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:34:53.791Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:34:56.930Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1024x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:33.475Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1024x1536",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:38.147Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1024x768",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:35.036Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1088x2560",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:36:47.476Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1152x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:36:44.368Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "1536x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:39.685Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2048x1152",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:36:42.823Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2048x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:36:41.251Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2160x2880",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:36:50.588Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2160x3840",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:36:53.703Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2560x1088",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:36:45.933Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "2880x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:36:49.034Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "3840x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:36:52.147Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "768x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:36.589Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1024x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:55.253Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1024x1536",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:59.920Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1024x768",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:57.156Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1088x2560",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:37:09.283Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1152x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:37:06.153Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "1536x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:37:01.484Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2048x1152",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:37:04.612Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2048x2048",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:37:03.049Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2160x2880",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:37:12.379Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2160x3840",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:37:15.505Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2560x1088",
+      "quality": "none",
+      "upstream": "0.05",
+      "original": "0.05",
+      "discount": "100",
+      "price": "0.06000000",
+      "checkedAt": "2026-10-20T17:37:07.724Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "2880x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:37:10.837Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "3840x2160",
+      "quality": "none",
+      "upstream": "0.08",
+      "original": "0.08",
+      "discount": "100",
+      "price": "0.09600000",
+      "checkedAt": "2026-10-20T17:37:13.955Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "768x1024",
+      "quality": "none",
+      "upstream": "0.03",
+      "original": "0.03",
+      "discount": "100",
+      "price": "0.03600000",
+      "checkedAt": "2026-10-20T17:36:58.888Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.046144",
+      "original": "0.05768",
+      "discount": "80",
+      "price": "0.05537280",
+      "checkedAt": "2026-10-20T17:37:20.205Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.008704",
+      "original": "0.01088",
+      "discount": "80",
+      "price": "0.01044480",
+      "checkedAt": "2026-10-20T17:37:17.083Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "max",
+      "upstream": "0.172576",
+      "original": "0.21572",
+      "discount": "80",
+      "price": "0.20709120",
+      "checkedAt": "2026-10-20T17:37:23.332Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.014536",
+      "original": "0.01817",
+      "discount": "80",
+      "price": "0.01744320",
+      "checkedAt": "2026-10-20T17:37:18.652Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "xhigh",
+      "upstream": "0.078928",
+      "original": "0.09866",
+      "discount": "80",
+      "price": "0.09471360",
+      "checkedAt": "2026-10-20T17:37:21.766Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:37:43.593Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:37:40.969Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:37:46.700Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:37:42.034Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:37:45.515Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:37:28.365Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:37:24.888Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:37:31.129Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:37:26.448Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:37:29.567Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:38:30.860Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:38:27.229Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:38:33.454Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:38:28.772Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:38:31.891Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:38:14.748Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:38:11.635Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:38:17.869Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:38:13.196Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:38:16.306Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:37:51.378Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:37:48.269Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:37:54.678Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:37:49.826Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:37:52.935Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:38:07.307Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:38:03.859Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:38:10.089Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:38:05.409Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:38:08.528Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.089632",
+      "original": "0.11204",
+      "discount": "80",
+      "price": "0.10755840",
+      "checkedAt": "2026-10-20T17:37:59.176Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.013528",
+      "original": "0.01691",
+      "discount": "80",
+      "price": "0.01623360",
+      "checkedAt": "2026-10-20T17:37:56.049Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "max",
+      "upstream": "0.346528",
+      "original": "0.43316",
+      "discount": "80",
+      "price": "0.41583360",
+      "checkedAt": "2026-10-20T17:38:02.288Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.025408",
+      "original": "0.03176",
+      "discount": "80",
+      "price": "0.03048960",
+      "checkedAt": "2026-10-20T17:37:57.609Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "xhigh",
+      "upstream": "0.156232",
+      "original": "0.19529",
+      "discount": "80",
+      "price": "0.18747840",
+      "checkedAt": "2026-10-20T17:38:00.734Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:38:45.919Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:38:42.803Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:38:49.235Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:38:44.363Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:38:47.471Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:39:01.516Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:38:58.393Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:39:04.627Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:38:59.936Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:39:03.070Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:38:22.543Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:38:19.432Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:38:25.669Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:38:20.979Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:38:24.104Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:38:38.155Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:38:35.021Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:38:41.251Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:38:36.585Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:38:39.703Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:38:53.728Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:38:50.617Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:38:56.833Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:38:52.163Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:38:55.277Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:37:35.793Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:37:32.688Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:37:38.927Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:37:34.239Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:37:37.331Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.046144",
+      "original": "0.05768",
+      "discount": "80",
+      "price": "0.05537280",
+      "checkedAt": "2026-10-20T17:39:09.302Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.008704",
+      "original": "0.01088",
+      "discount": "80",
+      "price": "0.01044480",
+      "checkedAt": "2026-10-20T17:39:06.893Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "max",
+      "upstream": "0.172576",
+      "original": "0.21572",
+      "discount": "80",
+      "price": "0.20709120",
+      "checkedAt": "2026-10-20T17:39:12.420Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.014536",
+      "original": "0.01817",
+      "discount": "80",
+      "price": "0.01744320",
+      "checkedAt": "2026-10-20T17:39:07.739Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "xhigh",
+      "upstream": "0.078928",
+      "original": "0.09866",
+      "discount": "80",
+      "price": "0.09471360",
+      "checkedAt": "2026-10-20T17:39:10.858Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:39:32.692Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:39:29.578Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:39:35.809Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:39:31.101Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:39:34.246Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:39:17.094Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:39:13.975Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:39:20.202Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:39:15.540Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:39:18.662Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:40:19.442Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:40:16.328Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:40:22.550Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:40:18.221Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:40:21.214Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:40:03.871Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:40:00.770Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:40:06.987Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:40:02.331Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:40:05.431Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.036928",
+      "original": "0.04616",
+      "discount": "80",
+      "price": "0.04431360",
+      "checkedAt": "2026-10-20T17:39:40.495Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.007792",
+      "original": "0.00974",
+      "discount": "80",
+      "price": "0.00935040",
+      "checkedAt": "2026-10-20T17:39:37.383Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "max",
+      "upstream": "0.135712",
+      "original": "0.16964",
+      "discount": "80",
+      "price": "0.16285440",
+      "checkedAt": "2026-10-20T17:39:43.607Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.012232",
+      "original": "0.01529",
+      "discount": "80",
+      "price": "0.01467840",
+      "checkedAt": "2026-10-20T17:39:38.940Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "xhigh",
+      "upstream": "0.063016",
+      "original": "0.07877",
+      "discount": "80",
+      "price": "0.07561920",
+      "checkedAt": "2026-10-20T17:39:42.048Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.037912",
+      "original": "0.04739",
+      "discount": "80",
+      "price": "0.04549440",
+      "checkedAt": "2026-10-20T17:39:56.096Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.007768",
+      "original": "0.00971",
+      "discount": "80",
+      "price": "0.00932160",
+      "checkedAt": "2026-10-20T17:39:52.977Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "max",
+      "upstream": "0.1396",
+      "original": "0.1745",
+      "discount": "80",
+      "price": "0.16752000",
+      "checkedAt": "2026-10-20T17:39:59.215Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.012808",
+      "original": "0.01601",
+      "discount": "80",
+      "price": "0.01536960",
+      "checkedAt": "2026-10-20T17:39:54.551Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "xhigh",
+      "upstream": "0.064264",
+      "original": "0.08033",
+      "discount": "80",
+      "price": "0.07711680",
+      "checkedAt": "2026-10-20T17:39:57.657Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.089632",
+      "original": "0.11204",
+      "discount": "80",
+      "price": "0.10755840",
+      "checkedAt": "2026-10-20T17:39:48.311Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.013528",
+      "original": "0.01691",
+      "discount": "80",
+      "price": "0.01623360",
+      "checkedAt": "2026-10-20T17:39:45.361Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "max",
+      "upstream": "0.346528",
+      "original": "0.43316",
+      "discount": "80",
+      "price": "0.41583360",
+      "checkedAt": "2026-10-20T17:39:51.424Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.025408",
+      "original": "0.03176",
+      "discount": "80",
+      "price": "0.03048960",
+      "checkedAt": "2026-10-20T17:39:46.740Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "xhigh",
+      "upstream": "0.156232",
+      "original": "0.19529",
+      "discount": "80",
+      "price": "0.18747840",
+      "checkedAt": "2026-10-20T17:39:49.863Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:40:35.019Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:40:31.893Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:40:38.398Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:40:33.809Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:40:37.999Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:40:50.865Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:40:47.748Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:40:54.184Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:40:50.190Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:40:52.410Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.031576",
+      "original": "0.03947",
+      "discount": "80",
+      "price": "0.03789120",
+      "checkedAt": "2026-10-20T17:40:11.660Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:40:08.539Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "max",
+      "upstream": "0.117016",
+      "original": "0.14627",
+      "discount": "80",
+      "price": "0.14041920",
+      "checkedAt": "2026-10-20T17:40:14.770Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.010912",
+      "original": "0.01364",
+      "discount": "80",
+      "price": "0.01309440",
+      "checkedAt": "2026-10-20T17:40:10.086Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "xhigh",
+      "upstream": "0.053632",
+      "original": "0.06704",
+      "discount": "80",
+      "price": "0.06435840",
+      "checkedAt": "2026-10-20T17:40:13.243Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.089248",
+      "original": "0.11156",
+      "discount": "80",
+      "price": "0.10709760",
+      "checkedAt": "2026-10-20T17:40:27.230Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01348",
+      "original": "0.01685",
+      "discount": "80",
+      "price": "0.01617600",
+      "checkedAt": "2026-10-20T17:40:24.113Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "max",
+      "upstream": "0.344944",
+      "original": "0.43118",
+      "discount": "80",
+      "price": "0.41393280",
+      "checkedAt": "2026-10-20T17:40:30.671Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.025312",
+      "original": "0.03164",
+      "discount": "80",
+      "price": "0.03037440",
+      "checkedAt": "2026-10-20T17:40:25.676Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "xhigh",
+      "upstream": "0.155536",
+      "original": "0.19442",
+      "discount": "80",
+      "price": "0.18664320",
+      "checkedAt": "2026-10-20T17:40:28.783Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.084064",
+      "original": "0.10508",
+      "discount": "80",
+      "price": "0.10087680",
+      "checkedAt": "2026-10-20T17:40:43.075Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.012904",
+      "original": "0.01613",
+      "discount": "80",
+      "price": "0.01548480",
+      "checkedAt": "2026-10-20T17:40:39.957Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "max",
+      "upstream": "0.324208",
+      "original": "0.40526",
+      "discount": "80",
+      "price": "0.38904960",
+      "checkedAt": "2026-10-20T17:40:46.187Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.02476",
+      "original": "0.03095",
+      "discount": "80",
+      "price": "0.02971200",
+      "checkedAt": "2026-10-20T17:40:41.507Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "xhigh",
+      "upstream": "0.14632",
+      "original": "0.1829",
+      "discount": "80",
+      "price": "0.17558400",
+      "checkedAt": "2026-10-20T17:40:44.626Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.032896",
+      "original": "0.04112",
+      "discount": "80",
+      "price": "0.03947520",
+      "checkedAt": "2026-10-20T17:39:24.897Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.007216",
+      "original": "0.00902",
+      "discount": "80",
+      "price": "0.00865920",
+      "checkedAt": "2026-10-20T17:39:21.771Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "max",
+      "upstream": "0.11956",
+      "original": "0.14945",
+      "discount": "80",
+      "price": "0.14347200",
+      "checkedAt": "2026-10-20T17:39:28.014Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.011224",
+      "original": "0.01403",
+      "discount": "80",
+      "price": "0.01346880",
+      "checkedAt": "2026-10-20T17:39:23.326Z"
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "xhigh",
+      "upstream": "0.05536",
+      "original": "0.0692",
+      "discount": "80",
+      "price": "0.06643200",
+      "checkedAt": "2026-10-20T17:39:26.449Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.21572",
+      "original": "0.21572",
+      "discount": "100",
+      "price": "0.25886400",
+      "checkedAt": "2026-10-20T17:40:58.653Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.01088",
+      "original": "0.01088",
+      "discount": "100",
+      "price": "0.01305600",
+      "checkedAt": "2026-10-20T17:40:55.542Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.05768",
+      "original": "0.05768",
+      "discount": "100",
+      "price": "0.06921600",
+      "checkedAt": "2026-10-20T17:40:57.614Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.16964",
+      "original": "0.16964",
+      "discount": "100",
+      "price": "0.20356800",
+      "checkedAt": "2026-10-20T17:41:12.678Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.00974",
+      "original": "0.00974",
+      "discount": "100",
+      "price": "0.01168800",
+      "checkedAt": "2026-10-20T17:41:09.561Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.04616",
+      "original": "0.04616",
+      "discount": "100",
+      "price": "0.05539200",
+      "checkedAt": "2026-10-20T17:41:11.123Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.14945",
+      "original": "0.14945",
+      "discount": "100",
+      "price": "0.17934000",
+      "checkedAt": "2026-10-20T17:41:03.344Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:41:00.220Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.04112",
+      "original": "0.04112",
+      "discount": "100",
+      "price": "0.04934400",
+      "checkedAt": "2026-10-20T17:41:01.784Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.14627",
+      "original": "0.14627",
+      "discount": "100",
+      "price": "0.17552400",
+      "checkedAt": "2026-10-20T17:41:44.939Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:41:41.816Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.03947",
+      "original": "0.03947",
+      "discount": "100",
+      "price": "0.04736400",
+      "checkedAt": "2026-10-20T17:41:43.384Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.1745",
+      "original": "0.1745",
+      "discount": "100",
+      "price": "0.20940000",
+      "checkedAt": "2026-10-20T17:41:35.953Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.00971",
+      "original": "0.00971",
+      "discount": "100",
+      "price": "0.01165200",
+      "checkedAt": "2026-10-20T17:41:32.486Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.04739",
+      "original": "0.04739",
+      "discount": "100",
+      "price": "0.05686800",
+      "checkedAt": "2026-10-20T17:41:34.027Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.16964",
+      "original": "0.16964",
+      "discount": "100",
+      "price": "0.20356800",
+      "checkedAt": "2026-10-20T17:41:17.362Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.00974",
+      "original": "0.00974",
+      "discount": "100",
+      "price": "0.01168800",
+      "checkedAt": "2026-10-20T17:41:14.210Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.04616",
+      "original": "0.04616",
+      "discount": "100",
+      "price": "0.05539200",
+      "checkedAt": "2026-10-20T17:41:16.144Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.1745",
+      "original": "0.1745",
+      "discount": "100",
+      "price": "0.20940000",
+      "checkedAt": "2026-10-20T17:41:32.080Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.00971",
+      "original": "0.00971",
+      "discount": "100",
+      "price": "0.01165200",
+      "checkedAt": "2026-10-20T17:41:23.571Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.04739",
+      "original": "0.04739",
+      "discount": "100",
+      "price": "0.05686800",
+      "checkedAt": "2026-10-20T17:41:25.490Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.43316",
+      "original": "0.43316",
+      "discount": "100",
+      "price": "0.51979200",
+      "checkedAt": "2026-10-20T17:41:22.026Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.01691",
+      "original": "0.01691",
+      "discount": "100",
+      "price": "0.02029200",
+      "checkedAt": "2026-10-20T17:41:18.912Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.11204",
+      "original": "0.11204",
+      "discount": "100",
+      "price": "0.13444800",
+      "checkedAt": "2026-10-20T17:41:20.974Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.43118",
+      "original": "0.43118",
+      "discount": "100",
+      "price": "0.51741600",
+      "checkedAt": "2026-10-20T17:41:54.281Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01685",
+      "original": "0.01685",
+      "discount": "100",
+      "price": "0.02022000",
+      "checkedAt": "2026-10-20T17:41:51.166Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.11156",
+      "original": "0.11156",
+      "discount": "100",
+      "price": "0.13387200",
+      "checkedAt": "2026-10-20T17:41:52.717Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.40526",
+      "original": "0.40526",
+      "discount": "100",
+      "price": "0.48631200",
+      "checkedAt": "2026-10-20T17:42:03.615Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.01613",
+      "original": "0.01613",
+      "discount": "100",
+      "price": "0.01935600",
+      "checkedAt": "2026-10-20T17:42:00.502Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.10508",
+      "original": "0.10508",
+      "discount": "100",
+      "price": "0.12609600",
+      "checkedAt": "2026-10-20T17:42:02.065Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.14627",
+      "original": "0.14627",
+      "discount": "100",
+      "price": "0.17552400",
+      "checkedAt": "2026-10-20T17:41:40.275Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:41:37.144Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.03947",
+      "original": "0.03947",
+      "discount": "100",
+      "price": "0.04736400",
+      "checkedAt": "2026-10-20T17:41:38.709Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.43118",
+      "original": "0.43118",
+      "discount": "100",
+      "price": "0.51741600",
+      "checkedAt": "2026-10-20T17:41:49.604Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01685",
+      "original": "0.01685",
+      "discount": "100",
+      "price": "0.02022000",
+      "checkedAt": "2026-10-20T17:41:46.488Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.11156",
+      "original": "0.11156",
+      "discount": "100",
+      "price": "0.13387200",
+      "checkedAt": "2026-10-20T17:41:48.047Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.40526",
+      "original": "0.40526",
+      "discount": "100",
+      "price": "0.48631200",
+      "checkedAt": "2026-10-20T17:41:58.957Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.01613",
+      "original": "0.01613",
+      "discount": "100",
+      "price": "0.01935600",
+      "checkedAt": "2026-10-20T17:41:55.828Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.10508",
+      "original": "0.10508",
+      "discount": "100",
+      "price": "0.12609600",
+      "checkedAt": "2026-10-20T17:41:57.397Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.14945",
+      "original": "0.14945",
+      "discount": "100",
+      "price": "0.17934000",
+      "checkedAt": "2026-10-20T17:41:08.001Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:41:05.268Z"
+    },
+    {
+      "model": "openai/gpt-image-2/edit",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.04112",
+      "original": "0.04112",
+      "discount": "100",
+      "price": "0.04934400",
+      "checkedAt": "2026-10-20T17:41:06.429Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1024",
+      "quality": "high",
+      "upstream": "0.21572",
+      "original": "0.21572",
+      "discount": "100",
+      "price": "0.25886400",
+      "checkedAt": "2026-10-20T17:42:08.286Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1024",
+      "quality": "low",
+      "upstream": "0.01088",
+      "original": "0.01088",
+      "discount": "100",
+      "price": "0.01305600",
+      "checkedAt": "2026-10-20T17:42:05.172Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1024",
+      "quality": "medium",
+      "upstream": "0.05768",
+      "original": "0.05768",
+      "discount": "100",
+      "price": "0.06921600",
+      "checkedAt": "2026-10-20T17:42:06.744Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1536",
+      "quality": "high",
+      "upstream": "0.16964",
+      "original": "0.16964",
+      "discount": "100",
+      "price": "0.20356800",
+      "checkedAt": "2026-10-20T17:42:22.497Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1536",
+      "quality": "low",
+      "upstream": "0.00974",
+      "original": "0.00974",
+      "discount": "100",
+      "price": "0.01168800",
+      "checkedAt": "2026-10-20T17:42:19.183Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x1536",
+      "quality": "medium",
+      "upstream": "0.04616",
+      "original": "0.04616",
+      "discount": "100",
+      "price": "0.05539200",
+      "checkedAt": "2026-10-20T17:42:20.740Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x768",
+      "quality": "high",
+      "upstream": "0.14945",
+      "original": "0.14945",
+      "discount": "100",
+      "price": "0.17934000",
+      "checkedAt": "2026-10-20T17:42:12.961Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x768",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:42:09.856Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1024x768",
+      "quality": "medium",
+      "upstream": "0.04112",
+      "original": "0.04112",
+      "discount": "100",
+      "price": "0.04934400",
+      "checkedAt": "2026-10-20T17:42:11.404Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1088x2560",
+      "quality": "high",
+      "upstream": "0.14627",
+      "original": "0.14627",
+      "discount": "100",
+      "price": "0.17552400",
+      "checkedAt": "2026-10-20T17:42:50.865Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1088x2560",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:42:47.233Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1088x2560",
+      "quality": "medium",
+      "upstream": "0.03947",
+      "original": "0.03947",
+      "discount": "100",
+      "price": "0.04736400",
+      "checkedAt": "2026-10-20T17:42:48.789Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1152x2048",
+      "quality": "high",
+      "upstream": "0.1745",
+      "original": "0.1745",
+      "discount": "100",
+      "price": "0.20940000",
+      "checkedAt": "2026-10-20T17:42:40.990Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1152x2048",
+      "quality": "low",
+      "upstream": "0.00971",
+      "original": "0.00971",
+      "discount": "100",
+      "price": "0.01165200",
+      "checkedAt": "2026-10-20T17:42:37.865Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1152x2048",
+      "quality": "medium",
+      "upstream": "0.04739",
+      "original": "0.04739",
+      "discount": "100",
+      "price": "0.05686800",
+      "checkedAt": "2026-10-20T17:42:39.430Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1536x1024",
+      "quality": "high",
+      "upstream": "0.16964",
+      "original": "0.16964",
+      "discount": "100",
+      "price": "0.20356800",
+      "checkedAt": "2026-10-20T17:42:26.969Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1536x1024",
+      "quality": "low",
+      "upstream": "0.00974",
+      "original": "0.00974",
+      "discount": "100",
+      "price": "0.01168800",
+      "checkedAt": "2026-10-20T17:42:23.855Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "1536x1024",
+      "quality": "medium",
+      "upstream": "0.04616",
+      "original": "0.04616",
+      "discount": "100",
+      "price": "0.05539200",
+      "checkedAt": "2026-10-20T17:42:25.412Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x1152",
+      "quality": "high",
+      "upstream": "0.1745",
+      "original": "0.1745",
+      "discount": "100",
+      "price": "0.20940000",
+      "checkedAt": "2026-10-20T17:42:36.308Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x1152",
+      "quality": "low",
+      "upstream": "0.00971",
+      "original": "0.00971",
+      "discount": "100",
+      "price": "0.01165200",
+      "checkedAt": "2026-10-20T17:42:33.201Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x1152",
+      "quality": "medium",
+      "upstream": "0.04739",
+      "original": "0.04739",
+      "discount": "100",
+      "price": "0.05686800",
+      "checkedAt": "2026-10-20T17:42:34.752Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x2048",
+      "quality": "high",
+      "upstream": "0.43316",
+      "original": "0.43316",
+      "discount": "100",
+      "price": "0.51979200",
+      "checkedAt": "2026-10-20T17:42:31.634Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x2048",
+      "quality": "low",
+      "upstream": "0.01691",
+      "original": "0.01691",
+      "discount": "100",
+      "price": "0.02029200",
+      "checkedAt": "2026-10-20T17:42:28.527Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2048x2048",
+      "quality": "medium",
+      "upstream": "0.11204",
+      "original": "0.11204",
+      "discount": "100",
+      "price": "0.13444800",
+      "checkedAt": "2026-10-20T17:42:30.076Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x2880",
+      "quality": "high",
+      "upstream": "0.43118",
+      "original": "0.43118",
+      "discount": "100",
+      "price": "0.51741600",
+      "checkedAt": "2026-10-20T17:42:59.696Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x2880",
+      "quality": "low",
+      "upstream": "0.01685",
+      "original": "0.01685",
+      "discount": "100",
+      "price": "0.02022000",
+      "checkedAt": "2026-10-20T17:42:56.566Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x2880",
+      "quality": "medium",
+      "upstream": "0.11156",
+      "original": "0.11156",
+      "discount": "100",
+      "price": "0.13387200",
+      "checkedAt": "2026-10-20T17:42:58.524Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x3840",
+      "quality": "high",
+      "upstream": "0.40526",
+      "original": "0.40526",
+      "discount": "100",
+      "price": "0.48631200",
+      "checkedAt": "2026-10-20T17:43:09.039Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x3840",
+      "quality": "low",
+      "upstream": "0.01613",
+      "original": "0.01613",
+      "discount": "100",
+      "price": "0.01935600",
+      "checkedAt": "2026-10-20T17:43:05.928Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2160x3840",
+      "quality": "medium",
+      "upstream": "0.10508",
+      "original": "0.10508",
+      "discount": "100",
+      "price": "0.12609600",
+      "checkedAt": "2026-10-20T17:43:07.479Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2560x1088",
+      "quality": "high",
+      "upstream": "0.14627",
+      "original": "0.14627",
+      "discount": "100",
+      "price": "0.17552400",
+      "checkedAt": "2026-10-20T17:42:45.873Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2560x1088",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:42:42.546Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2560x1088",
+      "quality": "medium",
+      "upstream": "0.03947",
+      "original": "0.03947",
+      "discount": "100",
+      "price": "0.04736400",
+      "checkedAt": "2026-10-20T17:42:44.101Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2880x2160",
+      "quality": "high",
+      "upstream": "0.43118",
+      "original": "0.43118",
+      "discount": "100",
+      "price": "0.51741600",
+      "checkedAt": "2026-10-20T17:42:55.005Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2880x2160",
+      "quality": "low",
+      "upstream": "0.01685",
+      "original": "0.01685",
+      "discount": "100",
+      "price": "0.02022000",
+      "checkedAt": "2026-10-20T17:42:51.901Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "2880x2160",
+      "quality": "medium",
+      "upstream": "0.11156",
+      "original": "0.11156",
+      "discount": "100",
+      "price": "0.13387200",
+      "checkedAt": "2026-10-20T17:42:53.459Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "3840x2160",
+      "quality": "high",
+      "upstream": "0.40526",
+      "original": "0.40526",
+      "discount": "100",
+      "price": "0.48631200",
+      "checkedAt": "2026-10-20T17:43:04.378Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "3840x2160",
+      "quality": "low",
+      "upstream": "0.01613",
+      "original": "0.01613",
+      "discount": "100",
+      "price": "0.01935600",
+      "checkedAt": "2026-10-20T17:43:01.307Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "3840x2160",
+      "quality": "medium",
+      "upstream": "0.10508",
+      "original": "0.10508",
+      "discount": "100",
+      "price": "0.12609600",
+      "checkedAt": "2026-10-20T17:43:02.813Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "768x1024",
+      "quality": "high",
+      "upstream": "0.14945",
+      "original": "0.14945",
+      "discount": "100",
+      "price": "0.17934000",
+      "checkedAt": "2026-10-20T17:42:17.636Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "768x1024",
+      "quality": "low",
+      "upstream": "0.00902",
+      "original": "0.00902",
+      "discount": "100",
+      "price": "0.01082400",
+      "checkedAt": "2026-10-20T17:42:14.532Z"
+    },
+    {
+      "model": "openai/gpt-image-2/text-to-image",
+      "size": "768x1024",
+      "quality": "medium",
+      "upstream": "0.04112",
+      "original": "0.04112",
+      "discount": "100",
+      "price": "0.04934400",
+      "checkedAt": "2026-10-20T17:42:16.068Z"
+    }
+  ],
+  "excluded": [
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/edit",
+      "size": "auto",
+      "quality": "none",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare-developer/text-to-image",
+      "size": "auto",
+      "quality": "none",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "low",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "medium",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "high",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "xhigh",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "auto",
+      "quality": "max",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x768",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "768x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1024x1536",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1536x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2048x1152",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1152x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2560x1088",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "1088x2560",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2880x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x2880",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "3840x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/edit",
+      "size": "2160x3840",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "low",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "medium",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "high",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "xhigh",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "auto",
+      "quality": "max",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x768",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "768x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1280",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1024x1536",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1536x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2048x1152",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1152x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2560x1088",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "1088x2560",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2880x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x2880",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "3840x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-flare/text-to-image",
+      "size": "2160x3840",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/edit",
+      "size": "auto",
+      "quality": "none",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst-developer/text-to-image",
+      "size": "auto",
+      "quality": "none",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "low",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "medium",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "high",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "xhigh",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "auto",
+      "quality": "max",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x768",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "768x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1024x1536",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1536x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2048x1152",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1152x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2560x1088",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "1088x2560",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2880x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x2880",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "3840x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/edit",
+      "size": "2160x3840",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "low",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "medium",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "high",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "xhigh",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "auto",
+      "quality": "max",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x768",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "768x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1024x1536",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1536x1024",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2048x1152",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1152x2048",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2560x1088",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "1088x2560",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2880x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x2880",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "3840x2160",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    },
+    {
+      "model": "openai/gpt-image-2.5-sunburst/text-to-image",
+      "size": "2160x3840",
+      "quality": "auto",
+      "reason": "Automatic output size/quality does not establish a fixed-cost output."
+    }
+  ]
+}
