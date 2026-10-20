@@ -167,6 +167,9 @@ func buildAtlasCloudNewImagePayload(parsed *OpenAIImagesRequest, model string) (
 			return nil, fmt.Errorf("unsupported Flare quality")
 		}
 		size, _ := atlasCloudFlareSize(parsed.Size)
+		if parsed.Size == "auto" {
+			size = "auto"
+		}
 		if size == "" {
 			return nil, fmt.Errorf("unsupported Flare size")
 		}
