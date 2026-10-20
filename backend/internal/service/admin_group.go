@@ -1179,6 +1179,22 @@ func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) 
 	if err := validatePricingEntries(out); err != nil {
 		return nil, err
 	}
+	qualityCards := 0
+	for _, card := range out {
+		hasQuality := false
+		for _, iv := range card.Intervals {
+			hasQuality = hasQuality || strings.HasPrefix(iv.TierLabel, "quality:")
+		}
+		if hasQuality {
+			qualityCards++
+			if err := validateMiniQualityCard(card); err != nil {
+				return nil, infraerrors.BadRequest("INVALID_IMAGE_QUALITY_PRICING", err.Error())
+			}
+		}
+	}
+	if qualityCards > 1 {
+		return nil, infraerrors.BadRequest("INVALID_IMAGE_QUALITY_PRICING", "Mini endpoints must share one quality tariff card")
+	}
 	return out, nil
 }
 

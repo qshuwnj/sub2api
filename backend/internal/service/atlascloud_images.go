@@ -179,6 +179,10 @@ func atlasCloudImagesError(c *gin.Context, status int, message string) (*OpenAIF
 		errorType = "invalid_request_error"
 	}
 	err := &OpenAIImagesUpstreamError{StatusCode: status, ErrorType: errorType, Message: message}
+	if snapshot, _ := c.Request.Context().Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot); snapshot != nil {
+		// Quoted requests add their durable per-child outcome in the handler.
+		return nil, err
+	}
 	// The Images handler assumes typed upstream errors have already been written.
 	writeOpenAIImagesUpstreamErrorResponse(c, err)
 	return nil, err
@@ -188,6 +192,25 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	ctx context.Context, c *gin.Context, account *Account, parsed *OpenAIImagesRequest, upstreamModel string,
 ) (*OpenAIForwardResult, error) {
 	started := time.Now()
+	quoted, _ := ctx.Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot)
+	if quoted != nil {
+		defer func() {
+			if state := quoted.Outcome().Status; state == "submitting" || state == "pending" {
+				_ = quoted.markOutcome(ctx, "unknown", "")
+			}
+		}()
+	}
+	if raw, exists := c.Get("api_key"); exists && miniQualityEndpoint(upstreamModel) {
+		if key, ok := raw.(*APIKey); ok {
+			fresh, err := s.RefreshImageQualityKey(ctx, key, upstreamModel)
+			if err != nil {
+				return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image tariff unavailable")
+			}
+			if err := s.ValidateAtlasCloudImagePricing(ctx, fresh, parsed, upstreamModel); err != nil {
+				return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
+			}
+		}
+	}
 	payload, err := buildAtlasCloudImagePayload(parsed, upstreamModel)
 	if err != nil {
 		return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
@@ -221,6 +244,12 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	}
 	method, target, body := http.MethodPost, base+atlasCloudImagesPath, payload
 	predictionID := ""
+	if quoted != nil {
+		if err := quoted.markSubmitting(ctx, account.ID); err != nil {
+			_ = quoted.markOutcome(ctx, "not_submitted", "")
+			return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image submission audit is unavailable; no supplier request was made")
+		}
+	}
 	for {
 		raw, statusCode, requestErr := s.doAtlasCloudImagesRequest(ctx, account, method, target, token, body)
 		if requestErr != nil {
@@ -234,6 +263,9 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if statusCode == http.StatusTooManyRequests {
 				status = statusCode
 			}
+			if quoted != nil && method == http.MethodPost && statusCode >= 400 && statusCode < 500 && statusCode != http.StatusRequestTimeout {
+				_ = quoted.markOutcome(ctx, "failed", "")
+			}
 			return atlasCloudImagesError(c, status, "AtlasCloud rejected the image request")
 		}
 		if !gjson.ValidBytes(raw) {
@@ -241,6 +273,11 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 		}
 		if predictionID == "" {
 			predictionID = strings.TrimSpace(atlasCloudValue(raw, "id").String())
+			if quoted != nil && predictionID != "" {
+				if err := quoted.markOutcome(ctx, "pending", predictionID); err != nil {
+					return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image accepted but audit persistence is unavailable; do not resubmit")
+				}
+			}
 		}
 		status := strings.ToLower(strings.TrimSpace(atlasCloudValue(raw, "status").String()))
 		switch status {
@@ -248,6 +285,14 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			outputs := atlasCloudOutputURLs(raw)
 			if len(outputs) == 0 {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no image output")
+			}
+			if quoted != nil {
+				if predictionID == "" {
+					return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no prediction ID; do not resubmit")
+				}
+				if err := quoted.markOutcome(ctx, "generated", predictionID); err != nil {
+					return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image generated but audit persistence is unavailable; do not resubmit")
+				}
 			}
 			images := make([]map[string]string, len(outputs))
 			for i, output := range outputs {
@@ -293,6 +338,11 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if predictionID == "" {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no prediction ID")
 			}
+		case "failed", "error", "cancelled", "canceled":
+			if quoted != nil {
+				_ = quoted.markOutcome(ctx, "failed", predictionID)
+			}
+			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed")
 		default:
 			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed or returned an unsupported status")
 		}

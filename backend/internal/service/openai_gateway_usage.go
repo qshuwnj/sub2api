@@ -210,6 +210,9 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	baseMultiplier := multiplier
 	pricingAt := openAIUsagePricingAt(input)
 	multiplier, imageMultiplier := computePeakAwareMultipliers(apiKey, baseMultiplier, pricingAt)
+	if result.ImageQualityPricing != nil {
+		imageMultiplier = result.ImageQualityPricing.claims.Multiplier
+	}
 	videoMultiplier := resolveVideoRateMultiplier(apiKey, baseMultiplier)
 
 	var cost *CostBreakdown
@@ -339,6 +342,10 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 	durationMs := int(result.Duration.Milliseconds())
 	accountRateMultiplier := account.BillingRateMultiplier()
 	requestID := resolveUsageBillingRequestID(ctx, result.RequestID)
+	if result.ImageQualityPricing != nil {
+		// A batch child owns one charge, regardless of caller-supplied request IDs.
+		requestID = result.ImageQualityPricing.RequestID()
+	}
 	if result.OpenAIWSMode {
 		if upstreamRequestID := strings.TrimSpace(result.RequestID); upstreamRequestID != "" {
 			requestID = upstreamRequestID
@@ -437,6 +444,14 @@ func (s *OpenAIGatewayService) RecordUsage(ctx context.Context, input *OpenAIRec
 		usageLog.RateMultiplier = multiplier
 	}
 	usageLog.AccountRateMultiplier = &accountRateMultiplier
+	if result.ImageQualityPricing != nil {
+		// Keep the provider prediction reference while the customer charge uses
+		// the quote-child ID, so supplier and customer records can be reconciled.
+		id := strings.TrimSpace(result.RequestID)
+		if len(id) <= maxUsageUpstreamRequestIDLen {
+			usageLog.UpstreamRequestID = optionalTrimmedStringPtr(id)
+		}
+	}
 	usageLog.BillingType = billingType
 	usageLog.Stream = result.Stream
 	if input.CyberBlocked {
@@ -591,6 +606,18 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageCost(
 	pricingAt time.Time,
 ) (*CostBreakdown, error) {
 	billingModel := firstUsageBillingModel(billingModels)
+	if result != nil && result.ImageQualityPricing != nil {
+		if err := result.ImageQualityPricing.validateResult(result); err != nil {
+			return nil, err
+		}
+		return result.ImageQualityPricing.cost(result.ImageCount), nil
+	}
+	if result != nil && result.ImageCount > 0 {
+		enrolled, err := s.ImageQualityPricingEnrolled(apiKey, result.Model)
+		if err != nil || enrolled {
+			return nil, fmt.Errorf("enrolled image model requires an accepted quality price snapshot")
+		}
+	}
 	if result != nil && result.WebSearchCalls > 0 {
 		// Codex alpha/search 网页搜索按次计费：上游不返回 usage/token 字段，单价只取
 		// 分组覆盖价（nil 时默认 0.01 = 官方 $10/1000 次），不参与渠道级模型定价。

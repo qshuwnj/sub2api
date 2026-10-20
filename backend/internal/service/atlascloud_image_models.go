@@ -32,6 +32,14 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 	if err != nil {
 		return err
 	}
+	if snapshot, ok := ctx.Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot); ok && snapshot != nil {
+		return snapshot.validateUpstream(parsed, upstreamModel)
+	}
+	if enrolled, err := s.ImageQualityPricingEnrolled(key, upstreamModel); err != nil {
+		return err
+	} else if enrolled {
+		return fmt.Errorf("enrolled image model requires a confirmed quality quote")
+	}
 	_, tier := atlasCloudRequestedImageSize(parsed, upstreamModel)
 	if upstreamModel == atlasCloudGrokImageModel {
 		tier = ImageBillingSize1K

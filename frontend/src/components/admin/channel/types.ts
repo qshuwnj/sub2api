@@ -1,5 +1,6 @@
 import type { BillingMode, ChannelTimePricing, PricingInterval } from '@/api/admin/channels'
 import { REASONING_EFFORT_LEVELS } from '@/constants/channel'
+import { isValidImageQualityPrice } from './imageQualityPricing'
 
 type TranslateFn = (key: string, params?: Record<string, unknown>) => string
 
@@ -339,6 +340,9 @@ function intervalPriceLabel(t: TranslateFn, key: string): string {
 }
 
 function validateSingleInterval(iv: IntervalFormEntry, idx: number, t: TranslateFn): string | null {
+  if (iv.tier_label.startsWith('quality:') && !isValidImageQualityPrice(iv.per_request_price)) {
+    return t('admin.channels.form.imageQualityInvalid')
+  }
   const index = idx + 1
   if (iv.min_tokens < 0) {
     return intervalValidationMessage(
