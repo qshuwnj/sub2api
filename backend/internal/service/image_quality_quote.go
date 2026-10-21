@@ -15,6 +15,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 )
 
 const miniQualityModel = "openai/gpt-image-1-mini"
@@ -29,7 +30,7 @@ func (s *ImageQualityPriceSnapshot) validateUpstream(parsed *OpenAIImagesRequest
 	if parsed == nil || upstream != s.claims.Request.Model || parsed.Model != upstream {
 		return fmt.Errorf("quoted images require the exact selected upstream model")
 	}
-	req, err := (ImageQuoteRequest{Model: parsed.Model, Quality: parsed.Quality, Size: parsed.Size, Count: s.claims.Request.Count}).normalized()
+	req, err := normalizedImageQuoteFromParsed(parsed, s.claims.Request.Count)
 	if err != nil || req != s.claims.Request || parsed.N != 1 || parsed.Stream || parsed.Multipart {
 		return fmt.Errorf("upstream controls differ from the accepted image quote")
 	}
@@ -46,18 +47,35 @@ func miniQualityEndpoint(model string) bool {
 }
 
 func imageQualityEndpoint(model string) bool {
-	return strings.HasPrefix(model, "openai/") && atlasMediaModel(model, "image") != nil
+	return atlasMediaModel(model, "image") != nil
 }
 
 func imageQualityCanonicalModel(model string) string {
-	return strings.TrimSuffix(strings.TrimSuffix(model, "/text-to-image"), "/edit")
+	return strings.TrimSuffix(strings.TrimSuffix(strings.TrimSuffix(model, "/text-to-image"), "/image-edit"), "/edit")
 }
 
 type ImageQuoteRequest struct {
-	Model   string `json:"model"`
-	Quality string `json:"quality"`
-	Size    string `json:"size"`
-	Count   int    `json:"count"`
+	Model       string `json:"model"`
+	Quality     string `json:"quality"`
+	Size        string `json:"size"`
+	Count       int    `json:"count"`
+	Resolution  string `json:"resolution,omitempty"`
+	AspectRatio string `json:"aspect_ratio,omitempty"`
+}
+
+func normalizedImageQuoteFromParsed(parsed *OpenAIImagesRequest, count int) (ImageQuoteRequest, error) {
+	req := ImageQuoteRequest{Model: parsed.Model, Quality: parsed.Quality, Size: parsed.Size, Count: count,
+		Resolution:  gjson.GetBytes(parsed.Body, "resolution").String(),
+		AspectRatio: gjson.GetBytes(parsed.Body, "aspect_ratio").String()}
+	// Studio quotes cover output controls only. Grounding has a separate upstream
+	// charge and must not be enabled behind an accepted output-only tariff.
+	for _, field := range []string{"enable_web_search", "enable_image_search"} {
+		value := gjson.GetBytes(parsed.Body, field)
+		if value.Exists() && value.Type != gjson.False {
+			return req, fmt.Errorf("image quote does not include search grounding charges")
+		}
+	}
+	return req.normalized()
 }
 
 func (r ImageQuoteRequest) normalized() (ImageQuoteRequest, error) {
@@ -71,17 +89,38 @@ func (r ImageQuoteRequest) normalized() (ImageQuoteRequest, error) {
 			r.Quality = "none"
 		}
 	}
-	if r.Size == "" {
-		r.Size, _ = properties["size"].defaultString()
-	}
 	if properties["quality"] == nil && r.Quality != "none" {
 		return r, fmt.Errorf("unsupported image quality")
 	}
 	if properties["quality"] != nil && validateAtlasMediaValue(r.Quality, properties["quality"], "quality", true) != nil {
 		return r, fmt.Errorf("unsupported image quality")
 	}
-	if properties["size"] == nil || validateAtlasMediaValue(r.Size, properties["size"], "size", true) != nil {
-		return r, fmt.Errorf("unsupported image size")
+	for field, value := range map[string]*string{"size": &r.Size, "resolution": &r.Resolution, "aspect_ratio": &r.AspectRatio} {
+		schema := properties[field]
+		if schema == nil {
+			if *value != "" {
+				return r, fmt.Errorf("unsupported image %s", field)
+			}
+			continue
+		}
+		if *value == "" {
+			*value, _ = schema.defaultString()
+		}
+		if validateAtlasMediaValue(*value, schema, field, true) != nil {
+			return r, fmt.Errorf("unsupported image %s", field)
+		}
+	}
+	if dimensions := atlasMediaModel(r.Model, "image").SizeDimensions; dimensions != nil {
+		edges := strings.Split(r.Size, dimensions.Separator)
+		if len(edges) != 2 {
+			return r, fmt.Errorf("unsupported image size")
+		}
+		for _, edge := range edges {
+			n, err := strconv.Atoi(edge)
+			if err != nil || n < dimensions.Minimum || n > dimensions.Maximum || strconv.Itoa(n) != edge {
+				return r, fmt.Errorf("unsupported image size")
+			}
+		}
 	}
 	if r.Count < 1 || r.Count > 4 {
 		return r, fmt.Errorf("image count must be between 1 and 4")
@@ -208,6 +247,32 @@ func imageQualityTier(label string) (quality, size string, valid bool) {
 	return parts[1], size, true
 }
 
+// Native controls use a canonical, delimiter-safe tuple. The customer never
+// supplies a price; this is only the administrator's persisted tariff key.
+func imageNativeControlKey(req ImageQuoteRequest) string {
+	raw, _ := json.Marshal([]string{req.Size, req.Resolution, req.AspectRatio})
+	return "controls:" + base64.RawURLEncoding.EncodeToString(raw)
+}
+
+func imageNativeTier(label, model string) (ImageQuoteRequest, bool) {
+	parts := strings.Split(label, ":")
+	req := ImageQuoteRequest{Model: model, Count: 1}
+	if len(parts) != 4 || parts[0] != "quality" || parts[1] == "" || parts[2] != "controls" {
+		return req, false
+	}
+	raw, err := base64.RawURLEncoding.DecodeString(parts[3])
+	var controls []string
+	if err != nil || json.Unmarshal(raw, &controls) != nil || len(controls) != 3 {
+		return req, false
+	}
+	req.Quality, req.Size, req.Resolution, req.AspectRatio = parts[1], controls[0], controls[1], controls[2]
+	if imageNativeControlKey(req) != "controls:"+parts[3] {
+		return req, false
+	}
+	normalized, err := req.normalized()
+	return req, err == nil && normalized == req
+}
+
 func validateImageQualityCard(card ChannelModelPricing) error {
 	if card.BillingMode != BillingModeImage || card.Platform != PlatformOpenAI || card.PerRequestPrice != nil ||
 		len(card.ReasoningEffortMultipliers) != 0 || card.TimePricing != nil {
@@ -223,12 +288,23 @@ func validateImageQualityCard(card ChannelModelPricing) error {
 	}
 	seen := map[string]bool{}
 	var sized bool
+	var native bool
 	for i, iv := range card.Intervals {
+		isNative := strings.Contains(iv.TierLabel, ":controls:")
 		quality, size, valid := imageQualityTier(iv.TierLabel)
-		if !valid {
+		if !valid && !isNative {
 			return fmt.Errorf("image quality tariff contains an unsupported size or quality")
 		}
 		for _, model := range card.Models {
+			if isNative {
+				if _, ok := imageNativeTier(iv.TierLabel, model); !ok {
+					return fmt.Errorf("image tariff contains unsupported native controls")
+				}
+				continue
+			}
+			if !strings.HasPrefix(model, "openai/") {
+				return fmt.Errorf("non-OpenAI image tariffs require exact native controls")
+			}
 			if size == "" && !miniQualityEndpoint(model) {
 				return fmt.Errorf("non-Mini image tariffs require an exact native size")
 			}
@@ -238,7 +314,8 @@ func validateImageQualityCard(card ChannelModelPricing) error {
 		}
 		if i == 0 {
 			sized = size != ""
-		} else if sized != (size != "") {
+			native = isNative
+		} else if sized != (size != "") || native != isNative {
 			return fmt.Errorf("image quality tariffs cannot mix flat and size-specific prices")
 		}
 		if seen[iv.TierLabel] || !validAtlasCloudImagePrice(iv.PerRequestPrice) {
@@ -289,7 +366,9 @@ func (s *OpenAIGatewayService) imageQualityTariff(ctx context.Context, key *APIK
 	var price *float64
 	label := "quality:" + req.Quality
 	if len(card.Intervals) > 0 {
-		if _, size, _ := imageQualityTier(card.Intervals[0].TierLabel); size != "" {
+		if strings.Contains(card.Intervals[0].TierLabel, ":controls:") {
+			label += ":" + imageNativeControlKey(req)
+		} else if _, size, _ := imageQualityTier(card.Intervals[0].TierLabel); size != "" {
 			label += ":size:" + req.Size
 		}
 	}
@@ -397,7 +476,7 @@ func (s *OpenAIGatewayService) AcceptImageQualityQuote(ctx context.Context, key 
 		claims.KeyID != key.ID || claims.UserID != key.UserID || claims.GroupID != key.Group.ID || !now.Before(time.Unix(claims.Expires, 0)) {
 		return nil, fmt.Errorf("image quote expired or belongs to a different caller; refresh and confirm the price")
 	}
-	req, err := (ImageQuoteRequest{Model: parsed.Model, Quality: parsed.Quality, Size: parsed.Size, Count: claims.Request.Count}).normalized()
+	req, err := normalizedImageQuoteFromParsed(parsed, claims.Request.Count)
 	if err != nil || req != claims.Request || parsed.N != 1 || parsed.Stream || parsed.Multipart || index < 0 || index >= req.Count {
 		return nil, fmt.Errorf("image request differs from the quoted selection")
 	}
