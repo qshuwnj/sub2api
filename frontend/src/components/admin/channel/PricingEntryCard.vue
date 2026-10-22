@@ -90,6 +90,7 @@
               @update:modelValue="emit('update', {
                 ...entry,
                 billing_mode: $event as BillingMode,
+                video_tariff: undefined,
                 intervals: [],
                 time_pricing: { ...entry.time_pricing, periods: [] },
               })"
@@ -226,6 +227,8 @@
 
         <!-- Image/video mode -->
         <div v-else-if="entry.billing_mode === 'image' || entry.billing_mode === 'video'">
+          <NativeVideoPrices v-if="entry.video_tariff" :entry="entry" @update="emit('update', $event)" />
+          <template v-else>
           <label v-if="qualityEligible" class="mt-3 flex items-center gap-2 text-sm">
             <input type="checkbox" :checked="qualityMode" @change="toggleQualityPricing(($event.target as HTMLInputElement).checked)" />
             {{ t('admin.channels.form.imageQualityEnable') }}
@@ -263,9 +266,10 @@
             />
           </div>
           </template>
+          </template>
         </div>
 
-        <div v-if="!qualityMode" class="mt-3 border-t border-gray-200 pt-3 dark:border-dark-600" data-testid="reasoning-effort-multipliers">
+        <div v-if="!qualityMode && !entry.video_tariff" class="mt-3 border-t border-gray-200 pt-3 dark:border-dark-600" data-testid="reasoning-effort-multipliers">
           <div class="flex items-center justify-between gap-2">
             <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
               {{ t('admin.channels.form.reasoningEffortMultipliers') }}
@@ -315,6 +319,7 @@ import IntervalRow from './IntervalRow.vue'
 import ModelTagInput from './ModelTagInput.vue'
 import TimePricingSection from './TimePricingSection.vue'
 import ImageQualityPrices from './ImageQualityPrices.vue'
+import NativeVideoPrices from './NativeVideoPrices.vue'
 import { isMiniQualityModelCard, isImageQualityModelCard, imageQualityProfile, setImageQualitySizePrice } from './imageQualityPricing'
 import type { PricingFormEntry, IntervalFormEntry } from './types'
 import { perTokenToMTok, getPlatformTagClass, isValidPositiveMultiplier, validateReasoningEffortMultipliers } from './types'
@@ -434,6 +439,10 @@ function removeInterval(idx: number) {
 
 async function onModelsUpdate(newModels: string[]) {
   const oldModels = props.entry.models
+  if (props.entry.video_tariff && JSON.stringify(oldModels) !== JSON.stringify(newModels)) {
+    emit('update', { ...props.entry, models: newModels, intervals: [], video_tariff: undefined, per_request_price: null })
+    return
+  }
   if (props.entry.intervals.some(row => row.tier_label.startsWith('quality:')) &&
       isImageQualityModelCard(newModels) && newModels.some(model => !oldModels.includes(model)) &&
       !(oldModels.length > 0 && isMiniQualityModelCard([...oldModels, ...newModels]))) {

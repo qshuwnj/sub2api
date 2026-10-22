@@ -1485,6 +1485,10 @@
             <button type="button" class="btn btn-secondary shrink-0 whitespace-nowrap" @click="addGroupPricing(createForm.model_pricing)">
               <Icon name="plus" size="sm" class="mr-1" />{{ t("admin.groups.modelPricing.add") }}
             </button>
+            <button v-if="createForm.platform === 'openai'" type="button" class="btn btn-secondary shrink-0" @click="createVideoImport?.click()">
+              <Icon name="upload" size="sm" class="mr-1" />{{ t("admin.channels.form.nativeVideoImport") }}
+            </button>
+            <input ref="createVideoImport" type="file" accept=".json,application/json" class="hidden" @change="importVideoPricing($event, createForm)" />
           </div>
           <label class="mt-3 flex items-start gap-2">
             <input v-model="createForm.long_context_pricing_enabled" type="checkbox" class="mt-0.5" />
@@ -3135,6 +3139,10 @@
             <button type="button" class="btn btn-secondary shrink-0 whitespace-nowrap" @click="addGroupPricing(editForm.model_pricing)">
               <Icon name="plus" size="sm" class="mr-1" />{{ t("admin.groups.modelPricing.add") }}
             </button>
+            <button v-if="editForm.platform === 'openai'" type="button" class="btn btn-secondary shrink-0" @click="editVideoImport?.click()">
+              <Icon name="upload" size="sm" class="mr-1" />{{ t("admin.channels.form.nativeVideoImport") }}
+            </button>
+            <input ref="editVideoImport" type="file" accept=".json,application/json" class="hidden" @change="importVideoPricing($event, editForm)" />
           </div>
           <label class="mt-3 flex items-start gap-2">
             <input v-model="editForm.long_context_pricing_enabled" type="checkbox" class="mt-0.5" />
@@ -4308,6 +4316,7 @@ import ReasoningEffortPolicyFields from "@/components/admin/group/ReasoningEffor
 import CodexManifestAccountsField from "@/components/admin/group/CodexManifestAccountsField.vue";
 import PricingEntryCard from "@/components/admin/channel/PricingEntryCard.vue";
 import type { PricingFormEntry } from "@/components/admin/channel/types";
+import { copyVideoMetadata, importNativeVideoDraft, validateNativeVideoCard } from "@/components/admin/channel/videoTariffPricing";
 import {
   apiIntervalsToForm,
   createDefaultTimePricingForm,
@@ -4401,6 +4410,23 @@ const emptyGroupPricing = (): PricingFormEntry => ({
 
 const addGroupPricing = (entries: PricingFormEntry[]) =>
   entries.push(emptyGroupPricing());
+const createVideoImport = ref<HTMLInputElement | null>(null);
+const editVideoImport = ref<HTMLInputElement | null>(null);
+async function importVideoPricing(event: Event, form: { platform: string; model_pricing: PricingFormEntry[] }) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  try {
+    if (file.size > 20 * 1024 * 1024) throw new Error("Video pricing draft exceeds 20 MiB");
+    const merged = importNativeVideoDraft(await file.text(), groupPricingToAPI(form.model_pricing, form.platform));
+    const additions = groupPricingFromAPI(merged.slice(form.model_pricing.length));
+    form.model_pricing.push(...additions);
+  } catch (error) {
+    appStore.showError(error instanceof Error ? error.message : "Invalid native video pricing draft");
+  } finally {
+    input.value = "";
+  }
+}
 
 const groupPricingFromAPI = (
   pricing: ChannelModelPricing[] | undefined,
@@ -4421,6 +4447,7 @@ const groupPricingFromAPI = (
     per_request_price: entry.per_request_price,
     intervals: apiIntervalsToForm(entry.intervals || []),
     time_pricing: createDefaultTimePricingForm(),
+    video_tariff: copyVideoMetadata(entry.video_tariff),
   }));
 
 const groupPricingToAPI = (
@@ -4449,6 +4476,7 @@ const groupPricingToAPI = (
           ? []
           : formIntervalsToAPI(entry.intervals || []),
       time_pricing: null,
+      video_tariff: copyVideoMetadata(entry.video_tariff),
     }));
 
 const { t } = useI18n();
@@ -5874,6 +5902,13 @@ const validateProfitControlForm = (form: ProfitControlFormState): boolean => {
 
 const validateGroupReasoningMultipliers = (pricing: PricingFormEntry[]): boolean => {
   for (const entry of pricing) {
+    if (entry.video_tariff) {
+      const videoError = validateNativeVideoCard(entry);
+      if (videoError) {
+        appStore.showError(`${entry.models.join(", ")}: ${videoError}`);
+        return false;
+      }
+    }
     const error = validateReasoningEffortMultipliers(entry.reasoning_effort_multipliers, t);
     if (error) {
       appStore.showError(`${entry.models.join(", ") || t("admin.channels.form.unnamed")}: ${error}`);
