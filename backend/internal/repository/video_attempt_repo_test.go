@@ -34,6 +34,27 @@ func videoTestDB(t *testing.T) *sql.DB {
 	return db
 }
 
+func TestVideoAttemptPostgresRecoveryIndexes(t *testing.T) {
+	db := videoTestDB(t)
+	for _, index := range []struct {
+		name, columns string
+		predicates    []string
+	}{
+		{"video_attempts_known_reconcile", "(updated_at, id)", []string{"financial_state", "reserved", "upstream_task_id IS NOT NULL", "processing", "uncertain"}},
+		{"video_attempts_owned_task", "(user_id, api_key_id, upstream_task_id)", []string{"upstream_task_id IS NOT NULL"}},
+	} {
+		t.Run(index.name, func(t *testing.T) {
+			var definition string
+			require.NoError(t, db.QueryRow(`SELECT indexdef FROM pg_indexes WHERE schemaname='public' AND tablename='video_attempts' AND indexname=$1`, index.name).Scan(&definition))
+			require.NotContains(t, definition, "UNIQUE", "same task ID on different accounts must remain representable")
+			require.Contains(t, definition, index.columns)
+			for _, predicate := range index.predicates {
+				require.Contains(t, definition, predicate)
+			}
+		})
+	}
+}
+
 type videoFixture struct {
 	db         *sql.DB
 	r          *usageBillingRepository
@@ -68,6 +89,72 @@ func (f *videoFixture) command(amount string) *service.VideoAttemptAcceptCommand
 
 func (f *videoFixture) owner() service.VideoAttemptOwner {
 	return service.VideoAttemptOwner{UserID: f.u, APIKeyID: f.k}
+}
+
+func TestVideoAttemptPostgresOwnedTaskLookupAndCollision(t *testing.T) {
+	f := newVideoFixture(t, "10")
+	ctx := context.Background()
+	first := f.command("1.00000000")
+	_, err := f.r.AcceptVideoAttempt(ctx, first)
+	require.NoError(t, err)
+	for _, update := range []service.VideoAttemptUpdate{
+		{State: service.VideoAttemptSubmitting},
+		{State: service.VideoAttemptProcessing, UpstreamTaskID: "atlascloud:collision"},
+	} {
+		_, err = f.r.UpdateVideoAttempt(ctx, f.owner(), first.Attempt.ID, update)
+		require.NoError(t, err)
+	}
+	found, err := f.r.GetVideoAttemptByTask(ctx, f.owner(), "atlascloud:collision")
+	require.NoError(t, err)
+	require.Equal(t, first.Attempt.ID, found.ID)
+	_, err = f.r.GetVideoAttemptByTask(ctx, service.VideoAttemptOwner{UserID: f.u, APIKeyID: f.k + 10000}, "atlascloud:collision")
+	require.ErrorIs(t, err, service.ErrVideoAttemptNotFound)
+	var account int64
+	require.NoError(t, f.db.QueryRow(`INSERT INTO accounts(name,platform,type,concurrency) VALUES($1,'openai','apikey',100) RETURNING id`, uuid.NewString()).Scan(&account))
+	videoExec(t, f.db, `INSERT INTO account_groups(account_id,group_id) VALUES($1,$2)`, account, f.g)
+	second := f.command("1.00000000")
+	second.Attempt.AccountID = account
+	_, err = f.r.AcceptVideoAttempt(ctx, second)
+	require.NoError(t, err)
+	for _, update := range []service.VideoAttemptUpdate{
+		{State: service.VideoAttemptSubmitting},
+		{State: service.VideoAttemptProcessing, UpstreamTaskID: "atlascloud:collision"},
+	} {
+		_, err = f.r.UpdateVideoAttempt(ctx, f.owner(), second.Attempt.ID, update)
+		require.NoError(t, err)
+	}
+	_, err = f.r.GetVideoAttemptByTask(ctx, f.owner(), "atlascloud:collision")
+	require.ErrorIs(t, err, service.ErrVideoAttemptConflict, "never choose an arbitrary account's task")
+	found, err = f.r.GetVideoAttempt(ctx, f.owner(), first.Attempt.ID)
+	require.NoError(t, err)
+	require.Equal(t, f.a, found.AccountID, "attempt recovery remains unambiguous")
+}
+
+func TestVideoAttemptPostgresKnownTaskListCannotStarveBehindUnknown(t *testing.T) {
+	f := newVideoFixture(t, "10")
+	ctx := context.Background()
+	unknown, known := f.command("1.00000000"), f.command("1.00000000")
+	for _, cmd := range []*service.VideoAttemptAcceptCommand{unknown, known} {
+		_, err := f.r.AcceptVideoAttempt(ctx, cmd)
+		require.NoError(t, err)
+		_, err = f.r.UpdateVideoAttempt(ctx, f.owner(), cmd.Attempt.ID, service.VideoAttemptUpdate{State: service.VideoAttemptSubmitting})
+		require.NoError(t, err)
+	}
+	_, err := f.r.UpdateVideoAttempt(ctx, f.owner(), unknown.Attempt.ID, service.VideoAttemptUpdate{State: service.VideoAttemptUncertain})
+	require.NoError(t, err)
+	_, err = f.r.UpdateVideoAttempt(ctx, f.owner(), known.Attempt.ID, service.VideoAttemptUpdate{State: service.VideoAttemptProcessing, UpstreamTaskID: "atlascloud:known"})
+	require.NoError(t, err)
+	// This query is deliberately global. Keep its sentinel rows outside prior
+	// fixture dates and restore them so repeated local-DB runs stay isolated.
+	t.Cleanup(func() {
+		videoExec(t, f.db, `UPDATE video_attempts SET updated_at=NOW() WHERE id IN ($1,$2)`, unknown.Attempt.ID, known.Attempt.ID)
+	})
+	videoExec(t, f.db, `UPDATE video_attempts SET updated_at='0001-01-01' WHERE id=$1`, unknown.Attempt.ID)
+	videoExec(t, f.db, `UPDATE video_attempts SET updated_at='0001-01-02' WHERE id=$1`, known.Attempt.ID)
+	found, err := f.r.ListKnownTaskVideoAttempts(ctx, time.Date(2, 1, 1, 0, 0, 0, 0, time.UTC), 1)
+	require.NoError(t, err)
+	require.Len(t, found, 1)
+	require.Equal(t, known.Attempt.ID, found[0].ID)
 }
 func videoNumber(t *testing.T, db *sql.DB, query string, args ...any) string {
 	t.Helper()

@@ -474,6 +474,11 @@ type OpenAIGatewayService struct {
 	userPlatformQuotaRepo UserPlatformQuotaRepository
 	liveAttestation       liveattestation.Provider
 	liveAttestationCipher SecretEncryptor
+	videoAttemptOnce      sync.Once
+	videoAttempts         *VideoAttemptService
+	videoAuthInvalidator  APIKeyAuthCacheInvalidator
+	videoRuntimeOnce      sync.Once
+	videoReconciler       *VideoReconcileService
 
 	openaiWSPoolOnce               sync.Once
 	openaiWSStateStoreOnce         sync.Once

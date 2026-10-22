@@ -144,6 +144,8 @@ func ProvideOpenAIGatewayHandler(
 	h.compositeResolver = compositeResolver
 	h.securityAuditCoordinator = coordinator
 	h.grokMediaEligibilityProber = grokQuotaService
+	apiKeyService.SetVideoAttemptRecoveryLookup(gatewayService.GetQuotedVideo)
+	gatewayService.StartVideoReconciler(apiKeyService)
 	return h
 }
 

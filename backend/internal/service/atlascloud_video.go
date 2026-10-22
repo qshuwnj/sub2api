@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -42,6 +43,129 @@ func atlasCloudAPIBaseValid(base string) bool {
 func ParseAtlasCloudVideoRequest(body []byte) (GrokMediaRequestInfo, error) {
 	info, _, err := buildAtlasCloudVideoPayload(body)
 	return info, err
+}
+
+// SerializeAtlasCloudVideoRequest is the single native payload boundary used
+// both to bind an attempt's fingerprint and to send its one supplier request.
+func SerializeAtlasCloudVideoRequest(body []byte) (GrokMediaRequestInfo, []byte, error) {
+	return buildAtlasCloudVideoPayload(body)
+}
+
+// VideoTransportError deliberately contains no supplier body or credentials.
+// Only an explicit non-accepting HTTP response permits releasing an unknown ID.
+type VideoTransportError struct {
+	DefinitiveRejection bool
+}
+
+func (e *VideoTransportError) Error() string {
+	if e.DefinitiveRejection {
+		return "video supplier rejected the submission without accepting a task"
+	}
+	return "video supplier acceptance or outcome is unknown; recover the existing attempt, do not resubmit"
+}
+
+type VideoSupplierResult struct {
+	TaskID     string
+	State      string
+	ResultURLs []string
+}
+
+func (s *OpenAIGatewayService) requestQuotedAtlasVideo(ctx context.Context, account *Account, taskID string, native []byte) (*VideoSupplierResult, error) {
+	unknown := &VideoTransportError{}
+	if account == nil || !account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityAtlasCloudVideo) ||
+		strings.TrimSpace(account.GetCredential("api_key")) == "" || s.httpUpstream == nil {
+		return nil, ErrVideoAttemptUnavailable
+	}
+	const base = "https://api.atlascloud.ai/api/v1"
+	method, target := http.MethodPost, base+"/model/generateVideo"
+	if taskID != "" {
+		if !strings.HasPrefix(taskID, "atlascloud:") {
+			return nil, ErrVideoAttemptIneligible
+		}
+		id := strings.TrimPrefix(taskID, "atlascloud:")
+		if id == "" || validateUpstreamPathSegment("video task", id) != nil {
+			return nil, ErrVideoAttemptIneligible
+		}
+		method, target, native = http.MethodGet, base+atlasCloudPollPath+url.PathEscape(id), nil
+	}
+	// A 307/308 redirect is another POST, not safe video recovery.
+	ctx, cancel := context.WithTimeout(WithHTTPUpstreamRedirectsDisabled(ctx), time.Minute)
+	defer cancel()
+	raw, code, err := s.doAtlasCloudImagesRequest(ctx, account, method, target, strings.TrimSpace(account.GetCredential("api_key")), native)
+	// A truncated/rejected connection or body cannot prove no task was created.
+	if err != nil {
+		return nil, unknown
+	}
+	var known *VideoSupplierResult
+	if gjson.ValidBytes(raw) {
+		value := atlasCloudValue(raw, "id")
+		id := strings.TrimSpace(value.String())
+		if value.Type == gjson.String && id != "" && validateUpstreamPathSegment("video task", id) == nil {
+			candidate := "atlascloud:" + id
+			if taskID == "" || taskID == candidate {
+				known = &VideoSupplierResult{TaskID: candidate}
+			}
+		}
+	}
+	if code < 200 || code >= 300 {
+		if known != nil {
+			// Even an error HTTP response can carry evidence that a task
+			// exists. Save that identity; it is not a definitive rejection.
+			return known, unknown
+		}
+		// 408 is a timeout, not proof of non-acceptance. Other statuses not in
+		// this conservative explicit-rejection set retain the reservation.
+		// Malformed error documents or task-like fields are ambiguous too.
+		definitive := method == http.MethodPost &&
+			gjson.ValidBytes(raw) && gjson.ParseBytes(raw).IsObject() && !atlasCloudValue(raw, "id").Exists() &&
+			!atlasCloudValue(raw, "status").Exists() &&
+			(code == 400 || code == 401 || code == 403 || code == 404 || code == 405 ||
+				code == 413 || code == 415 || code == 422 || code == 429)
+		return nil, &VideoTransportError{DefinitiveRejection: definitive}
+	}
+	if !gjson.ValidBytes(raw) {
+		return nil, unknown
+	}
+	value := atlasCloudValue(raw, "id")
+	id := strings.TrimSpace(value.String())
+	if value.Exists() && value.Type != gjson.String {
+		return nil, unknown
+	}
+	if id != "" && validateUpstreamPathSegment("video task", id) != nil {
+		return nil, unknown
+	}
+	if taskID == "" {
+		if id == "" {
+			return nil, unknown
+		}
+		taskID = "atlascloud:" + id
+	} else if id != "" && taskID != "atlascloud:"+id {
+		return nil, unknown
+	}
+	result := &VideoSupplierResult{TaskID: taskID}
+	if v := gjson.GetBytes(raw, "code"); v.Exists() && (v.Type != gjson.Number || v.Int() != 200) {
+		return result, unknown
+	}
+	switch strings.ToLower(atlasCloudValue(raw, "status").String()) {
+	case "completed", "succeeded", "success":
+		result.ResultURLs = atlasCloudOutputURLs(raw)
+		if len(result.ResultURLs) != 1 {
+			return result, unknown
+		}
+		result.State = VideoAttemptCompleted
+	case "failed", "error", "timeout", "cancelled", "canceled":
+		result.State = VideoAttemptFailed
+	case "created", "pending", "queued", "starting", "processing", "running":
+		result.State = VideoAttemptProcessing
+	default:
+		return result, unknown
+	}
+	return result, nil
+}
+
+func definitiveVideoRejection(err error) bool {
+	var outcome *VideoTransportError
+	return errors.As(err, &outcome) && outcome.DefinitiveRejection
 }
 
 func buildAtlasCloudVideoPayload(body []byte) (GrokMediaRequestInfo, []byte, error) {

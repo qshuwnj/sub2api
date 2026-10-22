@@ -53,6 +53,11 @@ func (h *OpenAIGatewayHandler) GrokVideoContent(c *gin.Context) {
 }
 
 func (h *OpenAIGatewayHandler) AtlasCloudVideoGeneration(c *gin.Context) {
+	streamStarted := false
+	defer h.recoverResponsesPanic(c, &streamStarted)
+	if h.tryQuotedAtlasVideo(c) {
+		return
+	}
 	h.handleGrokMedia(c, service.AtlasCloudEndpointVideoCreate, "")
 }
 
@@ -60,6 +65,9 @@ func (h *OpenAIGatewayHandler) AtlasCloudVideoStatus(c *gin.Context) {
 	id := c.Param("request_id")
 	if !strings.HasPrefix(id, "atlascloud:") {
 		h.errorResponse(c, http.StatusNotFound, "not_found_error", "Video request not found")
+		return
+	}
+	if h.QuotedVideoStatus(c) {
 		return
 	}
 	h.handleGrokMedia(c, service.AtlasCloudEndpointVideoStatus, id)

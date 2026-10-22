@@ -9,10 +9,13 @@ import (
 
 	"github.com/Wei-Shaw/sub2api/internal/config"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/ctxkey"
+	pkghttputil "github.com/Wei-Shaw/sub2api/internal/pkg/httputil"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/ip"
+	"github.com/Wei-Shaw/sub2api/internal/pkg/requestmodel"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 
 	"github.com/gin-gonic/gin"
+	"github.com/tidwall/gjson"
 )
 
 const maxAPIKeyAuthorizationHeaderBytes = service.MaxAPIKeyCredentialBytes + 128
@@ -169,7 +172,32 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 		// Async image task polling only reads data that already belongs to the
 		// authenticated key and must remain available after the completed
 		// generation consumes the key's remaining balance.
-		skipBilling := c.Request.URL.Path == "/v1/usage" || billingInfoRequest || isAsyncImageTaskRead(c.Request.Method, c.Request.URL.Path)
+		skipBilling := c.Request.URL.Path == "/v1/usage" || billingInfoRequest || isAsyncImageTaskRead(c.Request.Method, c.Request.URL.Path) ||
+			isVideoAttemptRead(c.Request.Method, c.Request.URL.Path)
+		if !skipBilling && isNativeVideoCreatePath(c.Request.Method, c.Request.URL.Path) && service.ValidVideoAttemptID(c.GetHeader("Idempotency-Key")) {
+			body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
+			if err != nil {
+				var oversized *http.MaxBytesError
+				if errors.As(err, &oversized) {
+					AbortWithError(c, 413, "REQUEST_TOO_LARGE", "Video request exceeds the body limit")
+				} else {
+					AbortWithError(c, 400, "INVALID_REQUEST", "Failed to read video request")
+				}
+				return
+			}
+			requestmodel.ResetRequestBody(c.Request, body)
+			model := gjson.GetBytes(body, "model")
+			if gjson.ValidBytes(body) && gjson.ParseBytes(body).IsObject() && model.Type == gjson.String {
+				skipBilling, err = apiKeyService.CanRecoverVideoAttempt(c.Request.Context(), apiKey, c.GetHeader("Idempotency-Key"), model.String())
+				if err != nil {
+					AbortWithError(c, 503, "VIDEO_RECOVERY_UNAVAILABLE", "Video recovery could not be verified; do not resubmit generation")
+					return
+				}
+				if skipBilling {
+					c.Set(videoAttemptRecoveryVerifiedKey, true)
+				}
+			}
+		}
 
 		// ── 4. SimpleMode → early return ─────────────────────────────
 
@@ -338,6 +366,37 @@ func isAsyncImageTaskRead(method, path string) bool {
 		return false
 	}
 	return strings.HasPrefix(path, "/v1/images/tasks/") || strings.HasPrefix(path, "/images/tasks/")
+}
+
+func isNativeVideoCreatePath(method, path string) bool {
+	if method != http.MethodPost {
+		return false
+	}
+	return path == "/v1/videos" || path == "/v1/videos/generations" || path == "/videos" || path == "/videos/generations"
+}
+
+const videoAttemptRecoveryVerifiedKey = "server.verified_video_attempt_recovery"
+
+// Only auth's owned-record lookup can mark this context. HTTP headers are not
+// trusted markers. The route must terminate in the recovery-only handler.
+func VerifiedVideoAttemptRecovery(c *gin.Context) bool {
+	verified, _ := c.Get(videoAttemptRecoveryVerifiedKey)
+	return verified == true
+}
+
+func isVideoAttemptRead(method, path string) bool {
+	if method != http.MethodGet {
+		return false
+	}
+	path = strings.TrimPrefix(path, "/v1")
+	parts := strings.Split(strings.TrimPrefix(path, "/"), "/")
+	if len(parts) == 3 && parts[0] == "videos" && parts[1] == "attempts" {
+		return service.ValidVideoAttemptID(parts[2])
+	}
+	if len(parts) == 3 && parts[0] == "videos" && parts[1] == "generations" {
+		return strings.HasPrefix(parts[2], "atlascloud:") && !strings.ContainsAny(parts[2], `\%`)
+	}
+	return len(parts) == 2 && parts[0] == "videos" && strings.HasPrefix(parts[1], "atlascloud:") && !strings.ContainsAny(parts[1], `\%`)
 }
 
 // GetAPIKeyFromContext 从上下文中获取API key

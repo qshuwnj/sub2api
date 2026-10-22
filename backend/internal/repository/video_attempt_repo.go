@@ -73,6 +73,35 @@ func (r *usageBillingRepository) GetVideoAttempt(ctx context.Context, owner serv
 		FROM video_attempts WHERE id=$1 AND user_id=$2 AND api_key_id=$3`, id, owner.UserID, owner.APIKeyID))
 }
 
+func (r *usageBillingRepository) GetVideoAttemptByTask(ctx context.Context, owner service.VideoAttemptOwner, taskID string) (*service.VideoAttempt, error) {
+	rows, err := r.db.QueryContext(ctx, `SELECT `+videoAttemptColumns+`
+		FROM video_attempts WHERE user_id=$1 AND api_key_id=$2 AND upstream_task_id=$3 LIMIT 2`,
+		owner.UserID, owner.APIKeyID, taskID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var attempt *service.VideoAttempt
+	for rows.Next() {
+		if attempt != nil {
+			// Supplier IDs are unique per account, not globally. Require the
+			// stable attempt resource if two owned accounts use the same ID.
+			return nil, service.ErrVideoAttemptConflict
+		}
+		attempt, err = scanVideoAttempt(rows)
+		if err != nil {
+			return nil, err
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if attempt == nil {
+		return nil, service.ErrVideoAttemptNotFound
+	}
+	return attempt, nil
+}
+
 func videoOwnedAttempt(ctx context.Context, tx *sql.Tx, owner service.VideoAttemptOwner, id string) (*service.VideoAttempt, error) {
 	return scanVideoAttempt(tx.QueryRowContext(ctx, `SELECT `+videoAttemptColumns+`
 		FROM video_attempts WHERE id=$1 AND user_id=$2 AND api_key_id=$3 FOR UPDATE`, id, owner.UserID, owner.APIKeyID))
@@ -432,12 +461,25 @@ func (r *usageBillingRepository) UpdateVideoAttempt(ctx context.Context, owner s
 }
 
 func (r *usageBillingRepository) ListReconcilableVideoAttempts(ctx context.Context, before time.Time, limit int) ([]*service.VideoAttempt, error) {
+	return r.listVideoAttempts(ctx, before, limit, false)
+}
+
+// Filter before LIMIT so old unknown acceptances cannot starve known-ID work.
+func (r *usageBillingRepository) ListKnownTaskVideoAttempts(ctx context.Context, before time.Time, limit int) ([]*service.VideoAttempt, error) {
+	return r.listVideoAttempts(ctx, before, limit, true)
+}
+
+func (r *usageBillingRepository) listVideoAttempts(ctx context.Context, before time.Time, limit int, knownOnly bool) ([]*service.VideoAttempt, error) {
 	if limit < 1 || limit > 1000 {
 		return nil, service.ErrVideoAttemptIneligible
 	}
+	filter := ""
+	if knownOnly {
+		filter = " AND upstream_task_id IS NOT NULL AND state IN ('processing','uncertain')"
+	}
 	rows, err := r.db.QueryContext(ctx, `SELECT `+videoAttemptColumns+` FROM video_attempts
 		WHERE financial_state='reserved' AND updated_at<=$1 AND (lease_expires_at IS NULL OR lease_expires_at<=NOW())
-		ORDER BY updated_at,id LIMIT $2`, before, limit)
+		`+filter+` ORDER BY updated_at,id LIMIT $2`, before, limit)
 	if err != nil {
 		return nil, err
 	}
