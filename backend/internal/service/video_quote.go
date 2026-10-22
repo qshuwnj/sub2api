@@ -397,6 +397,30 @@ func videoCardEnrolled(card ChannelModelPricing) bool {
 	}
 	return false
 }
+
+func videoIntervalPrice(iv PricingInterval) (decimal.Decimal, error) {
+	if iv.PerRequestPrice == nil || math.IsNaN(*iv.PerRequestPrice) || math.IsInf(*iv.PerRequestPrice, 0) {
+		return decimal.Zero, fmt.Errorf("video prices require finite nonnegative amounts with at most eight decimals")
+	}
+	price := decimal.NewFromFloat(*iv.PerRequestPrice)
+	if iv.perRequestPriceDecimal != "" {
+		exact, err := decimal.NewFromString(iv.perRequestPriceDecimal)
+		if err != nil {
+			return decimal.Zero, fmt.Errorf("invalid native video retail decimal")
+		}
+		// Existing callers may intentionally mutate the legacy pointer. Only
+		// reuse captured source precision while it still represents that value.
+		original, _ := exact.Float64()
+		if original == *iv.PerRequestPrice {
+			price = exact
+		}
+	}
+	if price.IsNegative() || price.GreaterThanOrEqual(decimal.NewFromInt(1e12)) || price.Exponent() < -8 {
+		return decimal.Zero, fmt.Errorf("video prices require finite nonnegative amounts with at most eight decimals")
+	}
+	return price, nil
+}
+
 func validateVideoTariffCard(card ChannelModelPricing) error {
 	if card.Platform != PlatformOpenAI || card.BillingMode != BillingModeVideo || len(card.Models) != 1 || card.VideoTariff == nil ||
 		card.VideoTariff.Version != 1 || len(card.Intervals) == 0 || card.TimePricing != nil || len(card.ReasoningEffortMultipliers) != 0 ||
@@ -422,9 +446,9 @@ func validateVideoTariffCard(card ChannelModelPricing) error {
 			iv.InputMultiplier != nil || iv.OutputMultiplier != nil || iv.CacheWriteMultiplier != nil || iv.CacheReadMultiplier != nil {
 			return fmt.Errorf("video cells contain only complete per-job prices")
 		}
-		price := iv.PerRequestPrice
-		if price == nil || math.IsNaN(*price) || math.IsInf(*price, 0) || *price < 0 || *price >= 1e12 || decimal.NewFromFloat(*price).Exponent() < -8 {
-			return fmt.Errorf("video prices require finite nonnegative amounts with at most eight decimals")
+		price, err := videoIntervalPrice(iv)
+		if err != nil {
+			return err
 		}
 		provenance, ok := card.VideoTariff.Cells[iv.TierLabel]
 		if !ok || provenance.Source != VideoCalculatorURL || provenance.Policy != VideoRetailPolicy {
@@ -436,7 +460,7 @@ func validateVideoTariffCard(card ChannelModelPricing) error {
 		if _, err := VideoRetailPrice(provenance.UpstreamPrice); err != nil {
 			return err
 		}
-		if (*price == 0) != provenance.ExplicitFree {
+		if price.IsZero() != provenance.ExplicitFree {
 			return fmt.Errorf("zero video price requires explicit free tariff intent")
 		}
 	}
@@ -577,13 +601,14 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 			card = &key.Group.ModelPricing[i]
 		}
 	}
-	var price *float64
+	var selected *PricingInterval
 	for _, iv := range card.Intervals {
 		if iv.TierLabel == label {
-			price = iv.PerRequestPrice
+			cell := iv
+			selected = &cell
 		}
 	}
-	if price == nil {
+	if selected == nil {
 		err = fmt.Errorf("exact video tariff cell is not configured")
 		return
 	}
@@ -607,15 +632,14 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		err = fmt.Errorf("invalid customer video multiplier")
 		return
 	}
-	baseAmount := decimal.NewFromFloat(*price)
+	baseAmount, e := videoIntervalPrice(*selected)
+	if e != nil {
+		err = e
+		return
+	}
 	totalAmount := baseAmount.Mul(decimal.NewFromFloat(rate)).Round(8)
 	if totalAmount.GreaterThanOrEqual(decimal.NewFromInt(1e12)) || (baseAmount.IsPositive() && rate > 0 && totalAmount.IsZero()) {
 		err = fmt.Errorf("video total outside ledger range")
-		return
-	}
-	ledger, _ := totalAmount.Float64()
-	if !decimal.NewFromFloat(ledger).Equal(totalAmount) {
-		err = fmt.Errorf("video total outside ledger precision")
 		return
 	}
 	base, total, multiplier = baseAmount.StringFixed(8), totalAmount.StringFixed(8), decimal.NewFromFloat(rate).String()

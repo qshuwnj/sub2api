@@ -116,6 +116,70 @@ func videoFixture(t *testing.T) (*OpenAIGatewayService, *APIKey) {
 	return s, k
 }
 
+func TestVideoTariffRawDecimalStorageAndQuote(t *testing.T) {
+	for _, tc := range []struct {
+		price string
+		valid bool
+	}{
+		{"0.100000000000000001", false},
+		{"999999999999.12345678", true},
+	} {
+		t.Run(tc.price, func(t *testing.T) {
+			s, key := videoFixture(t)
+			raw, err := json.Marshal(key.Group.ModelPricing)
+			require.NoError(t, err)
+			raw = []byte(strings.Replace(string(raw), `"per_request_price":13.331712`, `"per_request_price":`+tc.price, 1))
+			var cards []ChannelModelPricing
+			err = json.Unmarshal(raw, &cards)
+			if !tc.valid {
+				if err == nil {
+					_, err = normalizeGroupModelPricing(PlatformOpenAI, cards)
+				}
+				require.Error(t, err, "the original overprecision decimal must be rejected")
+				return
+			}
+			require.NoError(t, err)
+			cards, err = normalizeGroupModelPricing(PlatformOpenAI, cards)
+			require.NoError(t, err)
+			cloned := (&Channel{ModelPricing: cards}).Clone()
+			saved, err := json.Marshal(cloned.ModelPricing)
+			require.NoError(t, err)
+			var wire []struct {
+				Intervals []struct {
+					Price json.Number `json:"per_request_price"`
+				} `json:"intervals"`
+			}
+			require.NoError(t, json.Unmarshal(saved, &wire))
+			require.Equal(t, tc.price, wire[0].Intervals[0].Price.String())
+			require.NoError(t, json.Unmarshal(saved, &key.Group.ModelPricing))
+			now := time.Now().UTC()
+			quote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
+			require.NoError(t, err)
+			require.Equal(t, tc.price, quote.TotalPrice)
+			body := []byte(`{"model":"google/veo3.1/text-to-video","prompt":"synthetic","aspect_ratio":"16:9","duration":8,"generate_audio":false,"resolution":"720p"}`)
+			snapshot, err := s.AcceptVideoQuote(context.Background(), key, body, quote.Token, now)
+			require.NoError(t, err)
+			require.Equal(t, tc.price, snapshot.BasePrice())
+			require.Equal(t, tc.price, snapshot.TotalPrice())
+			replacement := 2.5
+			key.Group.ModelPricing[0].Intervals[0].PerRequestPrice = &replacement
+			changed, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
+			require.NoError(t, err)
+			require.Equal(t, "2.50000000", changed.TotalPrice)
+		})
+	}
+}
+
+func TestVideoTariffRawDecimalMutationDoesNotReuseStalePrice(t *testing.T) {
+	var interval PricingInterval
+	require.NoError(t, json.Unmarshal([]byte(`{"tier_label":"video:v1:synthetic","per_request_price":999999999999.12345678}`), &interval))
+	price := 2.5
+	interval.PerRequestPrice = &price
+	raw, err := json.Marshal(interval)
+	require.NoError(t, err)
+	require.Contains(t, string(raw), `"per_request_price":2.5`)
+}
+
 func TestVideoTariffLiteralKeyAndRetail(t *testing.T) {
 	key, err := VideoTariffKey(videoTestRequest())
 	require.NoError(t, err)
