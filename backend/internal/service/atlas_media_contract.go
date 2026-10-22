@@ -21,25 +21,26 @@ import (
 var atlasMediaSchemaJSON []byte
 
 type atlasMediaSchema struct {
-	Type       string                       `json:"type"`
-	Properties map[string]*atlasMediaSchema `json:"properties"`
-	Items      *atlasMediaSchema            `json:"items"`
-	Required   []string                     `json:"required"`
-	Enum       []any                        `json:"enum"`
-	Const      any                          `json:"const"`
-	Default    any                          `json:"default"`
-	Minimum    *float64                     `json:"minimum"`
-	Maximum    *float64                     `json:"maximum"`
-	MinLength  int                          `json:"minLength"`
-	MaxLength  int                          `json:"maxLength"`
-	MinItems   int                          `json:"minItems"`
-	MaxItems   int                          `json:"maxItems"`
-	Pattern    string                       `json:"pattern"`
-	Format     string                       `json:"format"`
-	AllOf      []*atlasMediaSchema          `json:"allOf"`
-	If         *atlasMediaSchema            `json:"if"`
-	Then       *atlasMediaSchema            `json:"then"`
-	Else       *atlasMediaSchema            `json:"else"`
+	Type                 string                       `json:"type"`
+	Properties           map[string]*atlasMediaSchema `json:"properties"`
+	Items                *atlasMediaSchema            `json:"items"`
+	Required             []string                     `json:"required"`
+	Enum                 []any                        `json:"enum"`
+	Const                any                          `json:"const"`
+	Default              any                          `json:"default"`
+	Minimum              *float64                     `json:"minimum"`
+	Maximum              *float64                     `json:"maximum"`
+	MinLength            int                          `json:"minLength"`
+	MaxLength            int                          `json:"maxLength"`
+	MinItems             int                          `json:"minItems"`
+	MaxItems             int                          `json:"maxItems"`
+	Pattern              string                       `json:"pattern"`
+	Format               string                       `json:"format"`
+	AllOf                []*atlasMediaSchema          `json:"allOf"`
+	If                   *atlasMediaSchema            `json:"if"`
+	Then                 *atlasMediaSchema            `json:"then"`
+	Else                 *atlasMediaSchema            `json:"else"`
+	AdditionalProperties *bool                        `json:"additionalProperties"`
 }
 type atlasMediaReference struct {
 	Array   bool `json:"array"`
@@ -115,6 +116,15 @@ func validateAtlasMediaValue(value any, schema *atlasMediaSchema, field string, 
 	if kind == "" && (schema.MinItems > 0 || schema.MaxItems > 0) {
 		kind = "array"
 	}
+	// JSON Schema partials apply numeric/string bounds without requiring "type".
+	if kind == "" {
+		switch value.(type) {
+		case float64:
+			kind = "number"
+		case string:
+			kind = "string"
+		}
+	}
 	switch kind {
 	case "string":
 		text, ok := value.(string)
@@ -171,7 +181,7 @@ func validateAtlasMediaValue(value any, schema *atlasMediaSchema, field string, 
 		for key, child := range object {
 			property := schema.Properties[key]
 			if property == nil {
-				if strict {
+				if strict || schema.AdditionalProperties != nil && !*schema.AdditionalProperties {
 					return fmt.Errorf("unsupported AtlasCloud parameter %s.%s", field, key)
 				}
 				continue
@@ -442,6 +452,11 @@ func atlasMediaVideoResolution(model, resolution string) (string, bool) {
 		for _, candidate := range property.Enum {
 			value, ok := candidate.(string)
 			if ok && strings.EqualFold(value, resolution) {
+				return strings.ToLower(value), true
+			}
+		}
+		if len(property.Enum) == 0 {
+			if value, ok := property.defaultString(); ok && strings.EqualFold(value, resolution) {
 				return strings.ToLower(value), true
 			}
 		}

@@ -8304,10 +8304,7 @@
         },
         "resolution": {
           "default": "1080P",
-          "type": "string",
-          "enum": [
-            "1080P"
-          ]
+          "type": "string"
         },
         "multi_shot": {
           "type": "boolean",

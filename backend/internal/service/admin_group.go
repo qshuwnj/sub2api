@@ -1181,6 +1181,11 @@ func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) 
 	}
 	qualityModels := map[string]bool{}
 	for _, card := range out {
+		if videoCardEnrolled(card) {
+			if err := validateVideoTariffCard(card); err != nil {
+				return nil, infraerrors.BadRequest("INVALID_VIDEO_TARIFF", err.Error())
+			}
+		}
 		hasQuality := false
 		for _, iv := range card.Intervals {
 			hasQuality = hasQuality || strings.HasPrefix(iv.TierLabel, "quality:")
