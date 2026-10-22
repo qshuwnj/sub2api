@@ -157,6 +157,31 @@ type VideoAttemptRepository interface {
 // dedup and the usage log are already committed. It must not bill again.
 type VideoAttemptAfterCommit func(context.Context, *VideoAttempt, string)
 
+// VideoReservationBudgetReader is a separate admission-only view. Implementors
+// must never add holds to actual usage fields, cached snapshots or key status.
+// Zero pending means the existing soft >= limit check; a positive known charge
+// checks > limit. Native account checks use AccountID; key/subscription checks
+// use the authenticated key and (when billed by subscription) its group.
+type VideoReservationBudgetReader interface {
+	CheckVideoReservationHeadroom(context.Context, VideoReservationBudgetCheck) error
+}
+
+type VideoReservationBudgetCheck struct {
+	APIKeyID, UserID, GroupID, AccountID int64
+	SubscriptionBilling                  bool
+	KeyWindowsOnly                       bool
+	KeyPending, SubscriptionPending      string
+}
+
+func videoAccountHasReservationHeadroom(ctx context.Context, repo AccountRepository, account *Account) bool {
+	// Only OpenAI API-key accounts can own enrolled native-video attempts.
+	if account == nil || account.Platform != PlatformOpenAI || account.Type != AccountTypeAPIKey {
+		return true
+	}
+	reader, ok := repo.(VideoReservationBudgetReader)
+	return !ok || reader.CheckVideoReservationHeadroom(ctx, VideoReservationBudgetCheck{AccountID: account.ID}) == nil
+}
+
 type VideoAttemptService struct {
 	repo        VideoAttemptRepository
 	afterCommit VideoAttemptAfterCommit

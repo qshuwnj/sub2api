@@ -13,6 +13,7 @@ import (
 	infraerrors "github.com/Wei-Shaw/sub2api/internal/pkg/errors"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/logger"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/timezone"
+	"github.com/shopspring/decimal"
 	"golang.org/x/sync/singleflight"
 )
 
@@ -747,6 +748,9 @@ func (s *BillingCacheService) CheckBillingEligibility(ctx context.Context, user 
 	// API-key monetary windows from the database source of truth.
 	if s.cfg != nil && s.cfg.RunMode == config.RunModeSimple {
 		if s.cfg.SimpleModeKeyRateLimitEnabled {
+			if err := s.checkVideoReservedHeadroom(ctx, apiKey, nil, nil, 0, 0, true); err != nil {
+				return err
+			}
 			return s.checkSimpleModeAPIKeyRateLimits(ctx, apiKey)
 		}
 		return nil
@@ -766,6 +770,10 @@ func (s *BillingCacheService) CheckBillingEligibility(ctx context.Context, user 
 		if err := s.checkBalanceEligibility(ctx, user.ID); err != nil {
 			return err
 		}
+	}
+
+	if err := s.checkVideoReservedHeadroom(ctx, apiKey, group, subscription, 0, 0, false); err != nil {
+		return err
 	}
 
 	// user × platform quota 仅在 standard（余额）模式生效；订阅模式豁免
@@ -826,16 +834,45 @@ func (s *BillingCacheService) ReserveFixedCharge(ctx context.Context, user *User
 		res, apiKeyPending = s.reserveInflightScope(ctx, res, user.ID, inflightAPIKeyScope(apiKey.ID), amount)
 	}
 	if subscriptionBill {
-		err = s.checkFixedChargeSubscription(ctx, user.ID, group, amount+subscriptionPending)
+		if _, authoritative := s.apiKeyRateLimitLoader.(VideoReservationBudgetReader); !authoritative {
+			err = s.checkFixedChargeSubscription(ctx, user.ID, group, amount+subscriptionPending)
+		}
 	}
 	if err == nil && apiKey != nil {
 		err = s.checkFixedChargeAPIKey(ctx, apiKey, amount+apiKeyPending)
+	}
+	if err == nil {
+		err = s.checkVideoReservedHeadroom(ctx, apiKey, group, subscription, amount+apiKeyPending, amount+subscriptionPending, false)
 	}
 	if err != nil {
 		res.Release()
 		return nil, err
 	}
 	return res, nil
+}
+
+// This is a fresh read-side check, separate from actual usage and cached
+// snapshots. Cache invalidation is useful but cannot be its correctness gate.
+// Legacy repositories/mocks retain their existing admission behavior.
+func (s *BillingCacheService) checkVideoReservedHeadroom(ctx context.Context, key *APIKey, group *Group, sub *UserSubscription, keyPending, subPending float64, windowsOnly bool) error {
+	reader, ok := s.apiKeyRateLimitLoader.(VideoReservationBudgetReader)
+	if !ok {
+		return nil
+	}
+	check := VideoReservationBudgetCheck{
+		SubscriptionBilling: group != nil && group.IsSubscriptionType() && sub != nil,
+		KeyWindowsOnly:      windowsOnly,
+		KeyPending:          decimal.NewFromFloat(keyPending).String(), SubscriptionPending: decimal.NewFromFloat(subPending).String(),
+	}
+	if key != nil {
+		check.APIKeyID, check.UserID = key.ID, key.UserID
+	} else if sub != nil {
+		check.UserID = sub.UserID
+	}
+	if group != nil {
+		check.GroupID = group.ID
+	}
+	return reader.CheckVideoReservationHeadroom(ctx, check)
 }
 
 // checkFixedChargeSubscription 按库中订阅用量校验日 / 周 / 月剩余额度覆盖 pending。
@@ -1065,6 +1102,13 @@ func (s *BillingCacheService) checkSubscriptionEligibility(ctx context.Context, 
 	// 检查是否过期
 	if time.Now().After(subData.ExpiresAt) {
 		return ErrSubscriptionInvalid
+	}
+
+	// The exact fresh headroom check in CheckBillingEligibility replaces only
+	// quota comparisons, not cached status/expiry. Its single DB statement
+	// includes holds and effective windows without polluting cached actuals.
+	if _, authoritative := s.apiKeyRateLimitLoader.(VideoReservationBudgetReader); authoritative {
+		return nil
 	}
 
 	// 检查限额（使用传入的Group限额配置）
