@@ -403,13 +403,14 @@ func videoIntervalPrice(iv PricingInterval) (decimal.Decimal, error) {
 		return decimal.Zero, fmt.Errorf("video prices require finite nonnegative amounts with at most eight decimals")
 	}
 	price := decimal.NewFromFloat(*iv.PerRequestPrice)
-	if iv.perRequestPriceDecimal != "" {
+	if iv.perRequestPriceDecimal != "" && iv.perRequestPriceSource == iv.PerRequestPrice {
 		exact, err := decimal.NewFromString(iv.perRequestPriceDecimal)
 		if err != nil {
 			return decimal.Zero, fmt.Errorf("invalid native video retail decimal")
 		}
-		// Existing callers may intentionally mutate the legacy pointer. Only
-		// reuse captured source precision while it still represents that value.
+		// Copies retain the original pointer. Replacements invalidate captured
+		// precision, even when their binary64 value equals the source projection;
+		// different in-place values are detected by this value check.
 		original, _ := exact.Float64()
 		if original == *iv.PerRequestPrice {
 			price = exact

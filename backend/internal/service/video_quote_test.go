@@ -180,6 +180,52 @@ func TestVideoTariffRawDecimalMutationDoesNotReuseStalePrice(t *testing.T) {
 	require.Contains(t, string(raw), `"per_request_price":2.5`)
 }
 
+func TestVideoTariffRawDecimalSameProjectionPointerReplacement(t *testing.T) {
+	for name, clone := range map[string]func(ChannelModelPricing) ChannelModelPricing{
+		"value copy": func(card ChannelModelPricing) ChannelModelPricing { return card },
+		"card clone": func(card ChannelModelPricing) ChannelModelPricing { return card.Clone() },
+		"channel clone": func(card ChannelModelPricing) ChannelModelPricing {
+			return (&Channel{ModelPricing: []ChannelModelPricing{card}}).Clone().ModelPricing[0]
+		},
+	} {
+		t.Run(name, func(t *testing.T) {
+			s, key := videoFixture(t)
+			raw, err := json.Marshal(key.Group.ModelPricing)
+			require.NoError(t, err)
+			raw = []byte(strings.Replace(string(raw), `"per_request_price":13.331712`, `"per_request_price":999999999999.12345678`, 1))
+			require.NoError(t, json.Unmarshal(raw, &key.Group.ModelPricing))
+			key.Group.ModelPricing[0] = clone(key.Group.ModelPricing[0])
+			unchanged, err := json.Marshal(key.Group.ModelPricing)
+			require.NoError(t, err)
+			require.Contains(t, string(unchanged), `"per_request_price":999999999999.12345678`)
+			now := time.Now().UTC()
+			oldQuote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
+			require.NoError(t, err)
+			require.Equal(t, "999999999999.12345678", oldQuote.TotalPrice)
+			replacement := 999999999999.1234
+			require.Equal(t, *key.Group.ModelPricing[0].Intervals[0].PerRequestPrice, replacement, "both values have the same binary64 projection")
+			key.Group.ModelPricing[0].Intervals[0].PerRequestPrice = &replacement
+			saved, err := json.Marshal(key.Group.ModelPricing)
+			require.NoError(t, err)
+			require.Contains(t, string(saved), `"per_request_price":999999999999.1234`)
+			require.NotContains(t, string(saved), `"per_request_price":999999999999.12345678`)
+			newQuote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
+			require.NoError(t, err)
+			require.Equal(t, "999999999999.12340000", newQuote.TotalPrice)
+			require.NoError(t, json.Unmarshal(saved, &key.Group.ModelPricing))
+			reloaded, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
+			require.NoError(t, err)
+			require.Equal(t, newQuote.TotalPrice, reloaded.TotalPrice)
+			body := []byte(`{"model":"google/veo3.1/text-to-video","prompt":"synthetic","aspect_ratio":"16:9","duration":8,"generate_audio":false,"resolution":"720p"}`)
+			_, err = s.AcceptVideoQuote(context.Background(), key, body, oldQuote.Token, now)
+			require.Error(t, err, "the previous exact-price quote must become stale")
+			snapshot, err := s.AcceptVideoQuote(context.Background(), key, body, newQuote.Token, now)
+			require.NoError(t, err)
+			require.Equal(t, "999999999999.12340000", snapshot.TotalPrice())
+		})
+	}
+}
+
 func TestVideoTariffLiteralKeyAndRetail(t *testing.T) {
 	key, err := VideoTariffKey(videoTestRequest())
 	require.NoError(t, err)

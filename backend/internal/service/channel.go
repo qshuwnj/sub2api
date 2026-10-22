@@ -147,6 +147,7 @@ type PricingInterval struct {
 	UpdatedAt            time.Time `json:"updated_at,omitempty"`
 	// Native video retains the wire decimal; legacy float consumers are unchanged.
 	perRequestPriceDecimal string
+	perRequestPriceSource  *float64
 }
 
 // IsActive 判断渠道是否启用

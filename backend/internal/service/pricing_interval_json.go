@@ -25,6 +25,7 @@ func (iv *PricingInterval) UnmarshalJSON(data []byte) error {
 	value := PricingInterval(decoded)
 	if strings.HasPrefix(value.TierLabel, "video:") {
 		value.perRequestPriceDecimal = string(wire.Price)
+		value.perRequestPriceSource = value.PerRequestPrice
 		if _, err := videoIntervalPrice(value); err != nil {
 			return err
 		}
