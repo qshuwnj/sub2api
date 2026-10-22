@@ -139,21 +139,13 @@ func (r *usageBillingRepository) AcceptVideoAttempt(ctx context.Context, cmd *se
 	if !now.Before(cmd.QuoteExpiresAt) {
 		return nil, service.ErrVideoAttemptIneligible
 	}
-	// All video mutations lock: attempt (if existing), user, key, account,
-	// group, subscription. Holds are sums over immutable reserved attempts;
-	// the existing counters stay usage-only, so resets cannot lose holds.
-	if err = lockVideoBillingRows(ctx, tx, a, true); err != nil {
+	// Match the existing ledger: subscription (if billed), then user, key,
+	// account, group. Actual counters stay usage-only; holds survive resets.
+	admission := &videoAdmissionWindow{quoteExpiresAt: cmd.QuoteExpiresAt}
+	if err = lockVideoBillingRows(ctx, tx, a, admission); err != nil {
 		return nil, err
 	}
-	// NOW() is fixed at transaction start. Locks may outlive a short quote;
-	// check the database's wall clock again once every billing row is locked.
-	if err = tx.QueryRowContext(ctx, `SELECT clock_timestamp()`).Scan(&now); err != nil {
-		return nil, err
-	}
-	if !now.Before(cmd.QuoteExpiresAt) {
-		return nil, service.ErrVideoAttemptIneligible
-	}
-	if err = checkVideoReservationLimits(ctx, tx, a, now); err != nil {
+	if err = checkVideoReservationLimits(ctx, tx, a, admission.now); err != nil {
 		return nil, err
 	}
 	if a.SubscriptionID == nil {
@@ -191,9 +183,44 @@ func (r *usageBillingRepository) AcceptVideoAttempt(ctx context.Context, cmd *se
 	return &service.VideoAttemptAcceptResult{Attempt: a, Created: true}, nil
 }
 
-func lockVideoBillingRows(ctx context.Context, tx *sql.Tx, a *service.VideoAttempt, admission bool) error {
+type videoAdmissionWindow struct {
+	quoteExpiresAt time.Time
+	now            time.Time
+}
+
+func lockVideoBillingRows(ctx context.Context, tx *sql.Tx, a *service.VideoAttempt, admission *videoAdmissionWindow) error {
 	// Settlement must remain possible after administrative disable or price
-	// edits. Only admission tests current eligibility and expiry.
+	// edits. Only a non-nil admission tests current eligibility and expiry.
+	// Existing Apply updates subscription before user/key/account. Never hold
+	// a key/account while waiting for that subscription in either video path.
+	var observedSubType string
+	var subStarts, subExpires time.Time
+	if admission != nil {
+		// Observe without a row lock to choose the funding-row lock order.
+		// The locked group must still have this mode at final validation;
+		// a concurrent mode change rejects rather than changing funding source.
+		if err := tx.QueryRowContext(ctx, `SELECT subscription_type FROM groups WHERE id=$1`, a.GroupID).Scan(&observedSubType); err != nil {
+			return service.ErrVideoAttemptIneligible
+		}
+		a.SubscriptionID = nil
+		if observedSubType == service.SubscriptionTypeSubscription {
+			var id int64
+			if err := tx.QueryRowContext(ctx, `SELECT id,starts_at,expires_at FROM user_subscriptions
+				WHERE user_id=$1 AND group_id=$2 AND deleted_at IS NULL AND status='active' FOR UPDATE`,
+				a.UserID, a.GroupID).Scan(&id, &subStarts, &subExpires); err != nil {
+				if errors.Is(err, sql.ErrNoRows) {
+					return service.ErrVideoAttemptIneligible
+				}
+				return err
+			}
+			a.SubscriptionID = &id
+		}
+	} else if a.SubscriptionID != nil {
+		var id int64
+		if err := tx.QueryRowContext(ctx, `SELECT id FROM user_subscriptions WHERE id=$1 FOR UPDATE`, *a.SubscriptionID).Scan(&id); err != nil {
+			return err
+		}
+	}
 	var userStatus, keyStatus, accountStatus, accountType, accountPlatform, groupStatus, platform, subType string
 	var userDeleted, keyDeleted, accountDeleted, groupDeleted sql.NullTime
 	var keyUser int64
@@ -220,15 +247,17 @@ func lockVideoBillingRows(ctx context.Context, tx *sql.Tx, a *service.VideoAttem
 	if err != nil {
 		return service.ErrVideoAttemptIneligible
 	}
-	if admission {
+	if admission != nil {
 		var now time.Time
 		if err = tx.QueryRowContext(ctx, `SELECT clock_timestamp()`).Scan(&now); err != nil {
 			return err
 		}
+		admission.now = now
 		if userStatus != service.StatusActive || userDeleted.Valid || keyStatus != service.StatusAPIKeyActive || keyDeleted.Valid ||
 			keyUser != a.UserID || !keyGroup.Valid || keyGroup.Int64 != a.GroupID || (keyExpires.Valid && !now.Before(keyExpires.Time)) ||
 			accountStatus != service.StatusActive || accountDeleted.Valid || !schedulable || accountType != service.AccountTypeAPIKey || accountPlatform != service.PlatformOpenAI ||
-			groupStatus != service.StatusActive || groupDeleted.Valid || platform != service.PlatformOpenAI {
+			groupStatus != service.StatusActive || groupDeleted.Valid || platform != service.PlatformOpenAI || subType != observedSubType ||
+			!now.Before(admission.quoteExpiresAt) || (a.SubscriptionID != nil && (now.Before(subStarts) || !now.Before(subExpires))) {
 			return service.ErrVideoAttemptIneligible
 		}
 		var member bool
@@ -249,18 +278,7 @@ func lockVideoBillingRows(ctx context.Context, tx *sql.Tx, a *service.VideoAttem
 		if !service.ValidVideoLedgerMoney(a.AccountCost) {
 			return service.ErrVideoAttemptMoney
 		}
-		if subType == service.SubscriptionTypeSubscription {
-			var id int64
-			if err = tx.QueryRowContext(ctx, `SELECT id FROM user_subscriptions WHERE user_id=$1 AND group_id=$2
-				AND deleted_at IS NULL AND status='active' AND starts_at<=NOW() AND expires_at>NOW() FOR UPDATE`, a.UserID, a.GroupID).Scan(&id); err != nil {
-				if errors.Is(err, sql.ErrNoRows) {
-					return service.ErrVideoAttemptIneligible
-				}
-				return err
-			}
-			a.SubscriptionID = &id
-		} else {
-			a.SubscriptionID = nil
+		if a.SubscriptionID == nil {
 			// Any non-NULL limit, including explicit zero, is enforced by the
 			// existing quota semantics. Unlimited/all-NULL and deleted rows do
 			// not track usage. The legacy Redis absolute-snapshot flusher could
@@ -275,11 +293,6 @@ func lockVideoBillingRows(ctx context.Context, tx *sql.Tx, a *service.VideoAttem
 			if enforced {
 				return service.ErrVideoAttemptPlatformQuota
 			}
-		}
-	} else if a.SubscriptionID != nil {
-		var id int64
-		if err = tx.QueryRowContext(ctx, `SELECT id FROM user_subscriptions WHERE id=$1 FOR UPDATE`, *a.SubscriptionID).Scan(&id); err != nil {
-			return err
 		}
 	}
 	return nil
@@ -511,7 +524,7 @@ func (r *usageBillingRepository) settleVideoAttempt(ctx context.Context, owner s
 			}
 		}
 	}
-	if err = lockVideoBillingRows(ctx, tx, a, false); err != nil {
+	if err = lockVideoBillingRows(ctx, tx, a, nil); err != nil {
 		return nil, err
 	}
 	if capture {
