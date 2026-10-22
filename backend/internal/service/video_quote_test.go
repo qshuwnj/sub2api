@@ -122,7 +122,8 @@ func TestVideoTariffRawDecimalStorageAndQuote(t *testing.T) {
 		valid bool
 	}{
 		{"0.100000000000000001", false},
-		{"999999999999.12345678", true},
+		{"999999999999.12345678", false},
+		{"9999999999.12345678", true},
 	} {
 		t.Run(tc.price, func(t *testing.T) {
 			s, key := videoFixture(t)
@@ -192,26 +193,26 @@ func TestVideoTariffRawDecimalSameProjectionPointerReplacement(t *testing.T) {
 			s, key := videoFixture(t)
 			raw, err := json.Marshal(key.Group.ModelPricing)
 			require.NoError(t, err)
-			raw = []byte(strings.Replace(string(raw), `"per_request_price":13.331712`, `"per_request_price":999999999999.12345678`, 1))
+			raw = []byte(strings.Replace(string(raw), `"per_request_price":13.331712`, `"per_request_price":9999999999.12345678`, 1))
 			require.NoError(t, json.Unmarshal(raw, &key.Group.ModelPricing))
 			key.Group.ModelPricing[0] = clone(key.Group.ModelPricing[0])
 			unchanged, err := json.Marshal(key.Group.ModelPricing)
 			require.NoError(t, err)
-			require.Contains(t, string(unchanged), `"per_request_price":999999999999.12345678`)
+			require.Contains(t, string(unchanged), `"per_request_price":9999999999.12345678`)
 			now := time.Now().UTC()
 			oldQuote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
 			require.NoError(t, err)
-			require.Equal(t, "999999999999.12345678", oldQuote.TotalPrice)
-			replacement := 999999999999.1234
+			require.Equal(t, "9999999999.12345678", oldQuote.TotalPrice)
+			replacement := 9999999999.123457
 			require.Equal(t, *key.Group.ModelPricing[0].Intervals[0].PerRequestPrice, replacement, "both values have the same binary64 projection")
 			key.Group.ModelPricing[0].Intervals[0].PerRequestPrice = &replacement
 			saved, err := json.Marshal(key.Group.ModelPricing)
 			require.NoError(t, err)
-			require.Contains(t, string(saved), `"per_request_price":999999999999.1234`)
-			require.NotContains(t, string(saved), `"per_request_price":999999999999.12345678`)
+			require.Contains(t, string(saved), `"per_request_price":9999999999.123457`)
+			require.NotContains(t, string(saved), `"per_request_price":9999999999.12345678`)
 			newQuote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
 			require.NoError(t, err)
-			require.Equal(t, "999999999999.12340000", newQuote.TotalPrice)
+			require.Equal(t, "9999999999.12345700", newQuote.TotalPrice)
 			require.NoError(t, json.Unmarshal(saved, &key.Group.ModelPricing))
 			reloaded, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), now)
 			require.NoError(t, err)
@@ -221,7 +222,24 @@ func TestVideoTariffRawDecimalSameProjectionPointerReplacement(t *testing.T) {
 			require.Error(t, err, "the previous exact-price quote must become stale")
 			snapshot, err := s.AcceptVideoQuote(context.Background(), key, body, newQuote.Token, now)
 			require.NoError(t, err)
-			require.Equal(t, "999999999999.12340000", snapshot.TotalPrice())
+			require.Equal(t, "9999999999.12345700", snapshot.TotalPrice())
+		})
+	}
+}
+
+func TestVideoQuoteRejectsAmountOutsideSharedLedgerRange(t *testing.T) {
+	for name, multiplied := range map[string]bool{"base": false, "post multiplier": true} {
+		t.Run(name, func(t *testing.T) {
+			s, key := videoFixture(t)
+			price := 10000000000.0
+			if multiplied {
+				price = 5000000000.0
+				key.Group.VideoRateIndependent = true
+				key.Group.VideoRateMultiplier = 2
+			}
+			key.Group.ModelPricing[0].Intervals[0].PerRequestPrice = &price
+			_, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
+			require.Error(t, err, "numeric(20,10) usage ledger cannot settle this quote")
 		})
 	}
 }

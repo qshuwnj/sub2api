@@ -380,7 +380,7 @@ func VideoRetailPrice(upstream string) (string, error) {
 		return "", fmt.Errorf("positive supplier price required")
 	}
 	retail := amount.Mul(decimal.RequireFromString("8.33232")).Round(8)
-	if !retail.IsPositive() || retail.GreaterThanOrEqual(decimal.NewFromInt(1e12)) {
+	if !retail.IsPositive() || retail.GreaterThanOrEqual(decimal.NewFromInt(1e10)) {
 		return "", fmt.Errorf("retail price outside ledger range")
 	}
 	return retail.StringFixed(8), nil
@@ -450,6 +450,9 @@ func validateVideoTariffCard(card ChannelModelPricing) error {
 		price, err := videoIntervalPrice(iv)
 		if err != nil {
 			return err
+		}
+		if price.GreaterThanOrEqual(decimal.NewFromInt(1e10)) {
+			return ErrVideoAttemptMoney
 		}
 		provenance, ok := card.VideoTariff.Cells[iv.TierLabel]
 		if !ok || provenance.Source != VideoCalculatorURL || provenance.Policy != VideoRetailPolicy {
@@ -639,7 +642,7 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		return
 	}
 	totalAmount := baseAmount.Mul(decimal.NewFromFloat(rate)).Round(8)
-	if totalAmount.GreaterThanOrEqual(decimal.NewFromInt(1e12)) || (baseAmount.IsPositive() && rate > 0 && totalAmount.IsZero()) {
+	if baseAmount.GreaterThanOrEqual(decimal.NewFromInt(1e10)) || totalAmount.GreaterThanOrEqual(decimal.NewFromInt(1e10)) || (baseAmount.IsPositive() && rate > 0 && totalAmount.IsZero()) {
 		err = fmt.Errorf("video total outside ledger range")
 		return
 	}
