@@ -69,11 +69,45 @@ func atlasCloudImageSize(model, size string) (string, string) {
 }
 
 func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
-	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model) && !IsAtlasCloudGenericImageModel(model)) {
+	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel &&
+		!isAtlasCloudNewImageModel(model) && !isAtlasCloudImageEditModel(model) && !IsAtlasCloudGenericImageModel(model)) {
 		return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
 	}
-	if parsed.IsEdits() || parsed.Multipart || len(parsed.InputImageURLs) > 0 || parsed.HasMask {
+	if parsed.Multipart || parsed.HasMask {
 		return nil, fmt.Errorf("AtlasCloud image edits are not supported")
+	}
+	if isAtlasCloudImageEditModel(model) {
+		if strings.TrimSpace(parsed.Prompt) == "" {
+			return nil, fmt.Errorf("prompt is required")
+		}
+		if len(parsed.InputImageURLs) == 0 {
+			return nil, fmt.Errorf("images[].image_url is required")
+		}
+		if parsed.N != 1 {
+			return nil, fmt.Errorf("AtlasCloud image edits require n=1")
+		}
+		if parsed.ResponseFormat != "" && parsed.ResponseFormat != "url" {
+			return nil, fmt.Errorf("AtlasCloud image edits currently require response_format=url")
+		}
+		size, _ := atlasCloudImageSize(atlasCloudGPTImageModel, parsed.Size)
+		if size == "" {
+			return nil, fmt.Errorf("unsupported AtlasCloud image edit size")
+		}
+		quality := parsed.Quality
+		switch quality {
+		case "", "auto":
+			quality = "medium"
+		case "low", "medium", "high":
+		default:
+			return nil, fmt.Errorf("AtlasCloud GPT Image edit quality must be low, medium, high, or auto")
+		}
+		return json.Marshal(map[string]any{
+			"model": model, "prompt": parsed.Prompt, "n": 1,
+			"images": parsed.InputImageURLs, "size": size, "quality": quality,
+		})
+	}
+	if parsed.IsEdits() || len(parsed.InputImageURLs) > 0 {
+		return nil, fmt.Errorf("AtlasCloud image edits are not supported for this model")
 	}
 	if parsed.N != 1 || parsed.Stream {
 		return nil, fmt.Errorf("AtlasCloud requires n=1 and stream=false")
@@ -251,7 +285,11 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			responseBody, _ := json.Marshal(map[string]any{"id": predictionID, "created": time.Now().Unix(), "data": images})
 			synthetic := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}},
 				Body: io.NopCloser(bytes.NewReader(responseBody))}
-			size, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
+			sizeModel := upstreamModel
+			if isAtlasCloudImageEditModel(upstreamModel) {
+				sizeModel = atlasCloudGPTImageModel
+			}
+			size, tier := atlasCloudImageSize(sizeModel, parsed.Size)
 			if IsAtlasCloudGenericImageModel(upstreamModel) {
 				tier = ImageBillingSize1K
 				size = ""

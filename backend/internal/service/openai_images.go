@@ -305,14 +305,18 @@ func parseOpenAIImagesJSONRequest(body []byte, req *OpenAIImagesRequest) error {
 		v := int(partialImages.Int())
 		req.PartialImages = &v
 	}
-	if req.IsEdits() {
+	if req.IsEdits() || isAtlasCloudImageEditModel(req.Model) {
 		images := gjson.GetBytes(body, "images")
 		if images.Exists() {
 			if !images.IsArray() {
 				return fmt.Errorf("invalid images field type")
 			}
 			for _, item := range images.Array() {
-				if imageURL := strings.TrimSpace(item.Get("image_url").String()); imageURL != "" {
+				imageURL := strings.TrimSpace(item.String())
+				if imageURL == "" {
+					imageURL = strings.TrimSpace(item.Get("image_url").String())
+				}
+				if imageURL != "" {
 					req.InputImageURLs = append(req.InputImageURLs, imageURL)
 					continue
 				}
@@ -518,7 +522,7 @@ func isAtlasCloudImageModel(model string) bool {
 	model = strings.TrimSpace(model)
 	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
 		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel ||
-		IsAtlasCloudGenericImageModel(model)
+		isAtlasCloudImageEditModel(model) || IsAtlasCloudGenericImageModel(model)
 }
 
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also

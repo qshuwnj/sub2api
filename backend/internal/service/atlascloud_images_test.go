@@ -58,6 +58,30 @@ func TestAtlasCloudGenericImagePayload(t *testing.T) {
 	require.JSONEq(t, `{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","n":1,"response_format":"url"}`, string(payload))
 }
 
+func TestAtlasCloudGPTImageEditPayload(t *testing.T) {
+	model := "openai/gpt-image-2-developer/edit"
+	body := []byte(`{"model":"` + model + `","prompt":"edit the background","n":1,"size":"2048x1152","quality":"medium","response_format":"url","images":["data:image/png;base64,AA=="]}`)
+	parsed := &OpenAIImagesRequest{
+		Model: model, Prompt: "edit the background", N: 1, Size: "2048x1152",
+		Quality: "medium", ResponseFormat: "url",
+		InputImageURLs: []string{"data:image/png;base64,AA=="}, Body: body,
+	}
+	payload, err := buildAtlasCloudImagePayload(parsed, model)
+	require.NoError(t, err)
+	require.JSONEq(t, `{"model":"openai/gpt-image-2-developer/edit","prompt":"edit the background","n":1,"images":["data:image/png;base64,AA=="],"size":"2048x1152","quality":"medium"}`, string(payload))
+}
+
+func TestAtlasCloudGPTImageEditJSONParsesInlineImageArray(t *testing.T) {
+	model := "openai/gpt-image-2-developer/edit"
+	body := []byte(`{"model":"` + model + `","prompt":"edit","n":1,"size":"2048x1152","quality":"medium","response_format":"url","images":["data:image/png;base64,AA=="]}`)
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	c.Request = httptest.NewRequest(http.MethodPost, openAIImagesGenerationsEndpoint, bytes.NewReader(body))
+	parsed, err := (&OpenAIGatewayService{}).ParseOpenAIImagesRequest(c, body)
+	require.NoError(t, err)
+	require.Equal(t, []string{"data:image/png;base64,AA=="}, parsed.InputImageURLs)
+	require.Equal(t, OpenAIImagesCapabilityAPIKey, parsed.RequiredCapability)
+}
+
 func TestAtlasCloudImagesResponseSizeIsBounded(t *testing.T) {
 	upstream := &atlasImageUpstream{replies: []string{strings.Repeat("x", atlasCloudBodyLimit+1)}}
 	svc, c, rec, account, parsed := atlasImageFixture(t, upstream)
