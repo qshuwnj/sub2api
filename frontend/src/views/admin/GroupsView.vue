@@ -4418,8 +4418,16 @@ async function importVideoPricing(event: Event, form: { platform: string; model_
   if (!file) return;
   try {
     if (file.size > 20 * 1024 * 1024) throw new Error("Video pricing draft exceeds 20 MiB");
-    const merged = importNativeVideoDraft(await file.text(), groupPricingToAPI(form.model_pricing, form.platform));
-    const additions = groupPricingFromAPI(merged.slice(form.model_pricing.length));
+    const current = groupPricingToAPI(form.model_pricing, form.platform);
+    const merged = importNativeVideoDraft(await file.text(), current);
+    const currentVideoModels = new Set(current.filter(card => card.video_tariff).map(card => card.models[0]));
+    const refreshed = merged.filter(card => card.video_tariff && currentVideoModels.has(card.models[0]));
+    for (const card of refreshed) {
+      const target = form.model_pricing.find(entry => entry.billing_mode === "video" &&
+        entry.models.length === 1 && entry.models[0] === card.models[0]);
+      if (target) target.video_tariff = copyVideoMetadata(card.video_tariff);
+    }
+    const additions = groupPricingFromAPI(merged.filter(card => !currentVideoModels.has(card.models[0])));
     form.model_pricing.push(...additions);
   } catch (error) {
     appStore.showError(error instanceof Error ? error.message : "Invalid native video pricing draft");

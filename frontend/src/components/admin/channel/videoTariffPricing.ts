@@ -51,6 +51,9 @@ export function parseVideoPricingJSON(text: string): any {
   })
 }
 export function stringifyVideoPricingJSON(value: unknown): string {
+  if (typeof value === 'string') {
+    return stringifyVideoPricingJSON(parseVideoPricingJSON(value))
+  }
   return JSON.stringify(value, function (key, child) {
     if (key === 'per_request_price' && typeof this.tier_label === 'string' && this.tier_label.startsWith('video:')) {
       if (!exactJSON.rawJSON) throw new Error('This browser cannot safely save exact video prices')
@@ -112,10 +115,42 @@ export function importNativeVideoDraft(text: string, existing: ChannelModelPrici
   const native = cards.filter(card => card.video_tariff)
   if (!native.length) throw new Error('No verified native video cards in this draft')
   const result = [...existing]
+  const importedModels = new Set<string>()
   for (const card of native) {
     const error = validateNativeVideoCard(card)
     if (error) throw new Error(error)
     const model = card.models[0]
+    if (importedModels.has(model.toLowerCase())) throw new Error(`Overlapping model card: ${model}`)
+    importedModels.add(model.toLowerCase())
+    const exactExisting = result.filter(prior => prior.billing_mode === 'video' && prior.models.length === 1 &&
+      prior.models[0].toLowerCase() === model.toLowerCase() && prior.video_tariff)
+    if (exactExisting.length > 1) throw new Error(`Overlapping existing video cards: ${model}`)
+    if (exactExisting.length === 1) {
+      const prior = exactExisting[0]
+      const priorError = validateNativeVideoCard(prior)
+      if (priorError) throw new Error(`Existing video card is invalid: ${priorError}`)
+      const oldPrices = new Map(prior.intervals.map((row: ChannelModelPricing['intervals'][number]) => [row.tier_label, exactVideoPrice(row.per_request_price)]))
+      const incomingPrices = new Map(card.intervals.map((row: ChannelModelPricing['intervals'][number]) => [row.tier_label, exactVideoPrice(row.per_request_price)]))
+      if (oldPrices.size !== incomingPrices.size || [...oldPrices.keys()].some(key => !incomingPrices.has(key))) {
+        throw new Error(`Conflicting video tariff grid: ${model}`)
+      }
+      const refreshed = {
+        ...prior,
+        video_tariff: copyVideoMetadata(card.video_tariff),
+        intervals: prior.intervals.map((row: ChannelModelPricing['intervals'][number]) => ({ ...row })),
+      }
+      for (const row of refreshed.intervals as ChannelModelPricing['intervals']) {
+        const evidence = refreshed.video_tariff?.cells[row.tier_label]
+        if (evidence) {
+          if (Number(exactVideoPrice(row.per_request_price)) === 0) evidence.explicit_free = true
+          else delete evidence.explicit_free
+        }
+      }
+      const refreshedError = validateNativeVideoCard(refreshed)
+      if (refreshedError) throw new Error(`Refreshed video tariff is invalid: ${refreshedError}`)
+      result[result.indexOf(prior)] = refreshed
+      continue
+    }
     if (result.some(prior => prior.models.some(pattern => {
       const normalized = pattern.toLowerCase()
       return normalized === model.toLowerCase() ||

@@ -73,4 +73,27 @@ describe('native video administrator money boundary', () => {
     first.tier_label = 'video:v1:' + btoa(JSON.stringify([model, 't2v', wrong])).replace(/=+$/, '')
     expect(validateNativeVideoCard(card)).toMatch(/native.*cell/i)
   })
+  it('refreshes an exact existing model from a full-group draft without replacing retail prices or unrelated cards', () => {
+    const imported = parseVideoPricingJSON(raw).model_pricing[0]
+    imported.video_tariff.contract_revision = profiles[model].contractRevision
+    const evidence = imported.video_tariff.cells[key]
+    imported.intervals = nativeVideoCells(model).map(cell => ({ tier_label: cell.key, per_request_price: '5.25000000' }))
+    imported.video_tariff.cells = Object.fromEntries(imported.intervals.map((row: any) => [row.tier_label, { ...evidence }]))
+    const existing = structuredClone(imported)
+    existing.intervals = existing.intervals.map((row: any) => ({ ...row, per_request_price: '7.75000000' }))
+    existing.video_tariff.cells = Object.fromEntries(existing.intervals.map((row: any) => [row.tier_label, {
+      ...evidence, checked_at: '2026-10-20T00:00:00Z', upstream_price: '1.5',
+    }]))
+    const unrelated = { models: ['unrelated/image'], billing_mode: 'image' }
+    const merged = importNativeVideoDraft(stringifyVideoPricingJSON({ model_pricing: [imported, unrelated] }), [existing, unrelated] as never)
+    expect(merged).toHaveLength(2)
+    expect(merged[0].intervals.every((row: any) => row.per_request_price === '7.75000000')).toBe(true)
+    expect(merged[0].video_tariff.cells[key].upstream_price).toBe('1.6')
+    expect(merged[1]).toEqual(unrelated)
+    expect(existing.video_tariff.cells[key].upstream_price).toBe('1.5')
+
+    const conflictingPattern = { models: ['google/veo3.1/*'], billing_mode: 'token' }
+    expect(() => importNativeVideoDraft(stringifyVideoPricingJSON([imported]), [conflictingPattern] as never)).toThrow(/overlap/i)
+    expect(existing.intervals[0].per_request_price).toBe('7.75000000')
+  })
 })
