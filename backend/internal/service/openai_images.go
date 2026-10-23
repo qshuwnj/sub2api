@@ -241,9 +241,7 @@ func (s *OpenAIGatewayService) ParseOpenAIImagesRequest(c *gin.Context, body []b
 	}
 	req.SizeTier = normalizeOpenAIImageSizeTier(req.Size)
 	if isAtlasCloudImageModel(req.Model) {
-		if _, tier := atlasCloudImageSize(req.Model, req.Size); tier != "" {
-			req.SizeTier = tier
-		}
+		_, req.SizeTier = atlasCloudRequestedImageSize(req, req.Model)
 		if req.Model == atlasCloudGrokImageModel {
 			req.SizeTier = ImageBillingSize1K
 			if gjson.GetBytes(body, "resolution").String() == "2k" {
@@ -518,7 +516,7 @@ func isAtlasCloudImageModel(model string) bool {
 	model = strings.TrimSpace(model)
 	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
 		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel ||
-		IsAtlasCloudGenericImageModel(model)
+		IsAtlasCloudGenericImageModel(model) || atlasMediaModel(model, "image") != nil
 }
 
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also
@@ -656,7 +654,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	SetOpsUpstreamModel(c, upstreamModel)
-	if (isAtlasCloudNewImageModel(upstreamModel) || IsAtlasCloudGenericImageModel(upstreamModel)) && (account.Platform != PlatformOpenAI ||
+	if isAtlasCloudImageModel(upstreamModel) && (account.Platform != PlatformOpenAI ||
 		account.Type != AccountTypeAPIKey || !atlasCloudAPIBaseValid(account.GetOpenAIBaseURL())) {
 		return atlasCloudImagesError(c, http.StatusBadRequest, "Use an AtlasCloud API-key account for this model")
 	}

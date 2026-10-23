@@ -71,6 +71,9 @@ func LookupVideoBillingResolutionForModel(model, resolution string) (string, boo
 	case atlasCloudGrokVideoModel:
 		allowed = []string{"480p", "720p"}
 	default:
+		if tier, ok := atlasMediaVideoResolution(model, resolution); ok {
+			return tier, true
+		}
 		if IsAtlasCloudGenericVideoModel(model) {
 			allowed = []string{"480p", "720p", "1080p", "4k"}
 		}
@@ -81,6 +84,13 @@ func LookupVideoBillingResolutionForModel(model, resolution string) (string, boo
 		}
 	}
 	return "", false
+}
+
+func NormalizeVideoBillingDurationForModel(model string, durationSeconds int) int {
+	if IsAtlasCloudVideoModel(model) && durationSeconds > 0 && durationSeconds <= 120 {
+		return durationSeconds
+	}
+	return NormalizeVideoBillingDurationSecondsOrDefault(durationSeconds)
 }
 
 func NormalizeVideoBillingResolutionForModel(model, resolution string) string {

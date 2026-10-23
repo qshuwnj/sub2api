@@ -23,7 +23,8 @@ func IsAtlasCloudGenericImageModel(model string) bool {
 }
 
 func IsAtlasCloudPricedImageModel(model string) bool {
-	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel || IsAtlasCloudGenericImageModel(model)
+	return isAtlasCloudNewImageModel(model) || model == atlasCloudGPTImageModel ||
+		IsAtlasCloudGenericImageModel(model) || atlasMediaModel(model, "image") != nil
 }
 
 // Admission uses configured customer prices, never a guessed catalog fallback.
@@ -38,8 +39,16 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 	if err != nil {
 		return err
 	}
-	_, tier := atlasCloudImageSize(upstreamModel, parsed.Size)
-	if IsAtlasCloudGenericImageModel(upstreamModel) {
+	if snapshot, ok := ctx.Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot); ok && snapshot != nil {
+		return snapshot.validateUpstream(parsed, upstreamModel)
+	}
+	if enrolled, err := s.ImageQualityPricingEnrolled(key, upstreamModel); err != nil {
+		return err
+	} else if enrolled {
+		return fmt.Errorf("enrolled image model requires a confirmed quality quote")
+	}
+	_, tier := atlasCloudRequestedImageSize(parsed, upstreamModel)
+	if IsAtlasCloudGenericImageModel(upstreamModel) && atlasMediaModel(upstreamModel, "image") == nil {
 		tier = ImageBillingSize1K
 	}
 	if upstreamModel == atlasCloudGrokImageModel {
@@ -55,7 +64,7 @@ func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Contex
 	if resolved != nil && resolved.Mode != BillingModeImage && resolved.Mode != BillingModePerRequest {
 		return fmt.Errorf("AtlasCloud images require image or per-request pricing")
 	}
-	if price := key.Group.GetImagePrice(tier); price != nil &&
+	if price := key.Group.GetImagePrice(tier); tier != "" && price != nil &&
 		*price >= 0 && !math.IsNaN(*price) && !math.IsInf(*price, 0) {
 		return nil
 	}
@@ -176,6 +185,9 @@ func buildAtlasCloudNewImagePayload(parsed *OpenAIImagesRequest, model string) (
 			return nil, fmt.Errorf("unsupported Flare quality")
 		}
 		size, _ := atlasCloudFlareSize(parsed.Size)
+		if parsed.Size == "auto" {
+			size = "auto"
+		}
 		if size == "" {
 			return nil, fmt.Errorf("unsupported Flare size")
 		}

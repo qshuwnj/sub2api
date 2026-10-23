@@ -1186,6 +1186,39 @@ func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) 
 	if err := validatePricingEntries(out); err != nil {
 		return nil, err
 	}
+	qualityModels := map[string]bool{}
+	for _, card := range out {
+		if videoCardEnrolled(card) {
+			if err := validateVideoTariffCard(card); err != nil {
+				return nil, infraerrors.BadRequest("INVALID_VIDEO_TARIFF", err.Error())
+			}
+		}
+		hasQuality := false
+		for _, iv := range card.Intervals {
+			hasQuality = hasQuality || strings.HasPrefix(iv.TierLabel, "quality:")
+		}
+		if hasQuality {
+			if err := validateImageQualityCard(card); err != nil {
+				return nil, infraerrors.BadRequest("INVALID_IMAGE_QUALITY_PRICING", err.Error())
+			}
+			for _, model := range card.Models {
+				identity := model
+				if miniQualityEndpoint(model) {
+					identity = miniQualityModel
+				}
+				if qualityModels[identity] {
+					return nil, infraerrors.BadRequest("INVALID_IMAGE_QUALITY_PRICING", "image endpoint has overlapping quality price cards")
+				}
+			}
+			for _, model := range card.Models {
+				identity := model
+				if miniQualityEndpoint(model) {
+					identity = miniQualityModel
+				}
+				qualityModels[identity] = true
+			}
+		}
+	}
 	return out, nil
 }
 

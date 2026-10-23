@@ -26,6 +26,12 @@ type InflightBalanceReservationCache interface {
 	ReleaseInflightBalance(ctx context.Context, userID int64, requestID string) error
 }
 
+// Strict fixed-price admission registers first, then reads balance while its
+// hold is visible to other requests. It shares the legacy balance reservation keys.
+type InflightBalanceReservationRegistrar interface {
+	RegisterInflightBalance(ctx context.Context, userID int64, requestID string, amount float64, ttl time.Duration) (float64, error)
+}
+
 // InflightScopeReservationCache 订阅 / API Key 维度在途预留的缓存能力（可选），用于扣费前即可确定金额的费用；
 // 未实现时这两个维度不登记预留（fail-open），准入仍按库中用量校验。
 type InflightScopeReservationCache interface {

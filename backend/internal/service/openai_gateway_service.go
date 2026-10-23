@@ -238,6 +238,7 @@ type OpenAIForwardResult struct {
 	// AtlasCloud outputs are released by the handler only after settlement.
 	AtlasCloudVideoResponse map[string]any
 	AtlasCloudImageResponse []byte
+	ImageQualityPricing     *ImageQualityPriceSnapshot
 	// UpstreamHeaders 是直接上游的响应头，用于按账户配置解析上游请求标识。
 	UpstreamHeaders http.Header
 	Usage           OpenAIUsage
@@ -473,6 +474,11 @@ type OpenAIGatewayService struct {
 	userPlatformQuotaRepo UserPlatformQuotaRepository
 	liveAttestation       liveattestation.Provider
 	liveAttestationCipher SecretEncryptor
+	videoAttemptOnce      sync.Once
+	videoAttempts         *VideoAttemptService
+	videoAuthInvalidator  APIKeyAuthCacheInvalidator
+	videoRuntimeOnce      sync.Once
+	videoReconciler       *VideoReconcileService
 
 	openaiWSPoolOnce               sync.Once
 	openaiWSStateStoreOnce         sync.Once

@@ -84,7 +84,8 @@ func TestAtlasCloudGPTImagesRequireAPIKey(t *testing.T) {
 		require.False(t, (&Account{Platform: PlatformOpenAI, Type: typ}).SupportsOpenAIImageCapability(parsed.RequiredCapability))
 	}
 	require.False(t, IsGPTImageGenerationModel("openai/gpt-image-2/text-to-image"))
-	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2/edit"))
+	require.NoError(t, validateCompatibleImagesModel("openai/gpt-image-2/edit"), "exact edit contract is now implemented")
+	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2.5/text-to-image"))
 	require.Error(t, validateCompatibleImagesModel("openai/gpt-image-2.5/edit"))
 }
 

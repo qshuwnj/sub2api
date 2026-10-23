@@ -45,6 +45,14 @@ func RegisterGatewayRoutes(
 	// 分组级模型白名单准入：在 apiKeyAuth 之后、compositeTarget 之前，
 	// 保证校验发生在合成路由改写与调度之前，且只看客户端书写的模型名。
 	groupModelAllowlist := middleware.GroupModelAllowlist()
+	verifiedVideoRecovery := func(c *gin.Context) {
+		if middleware.VerifiedVideoAttemptRecovery(c) {
+			h.OpenAIGateway.RecoverVideoSubmission(c)
+			c.Abort()
+			return
+		}
+		c.Next()
+	}
 
 	isOpenAIResponsesCompatibleGatewayPlatform := func(c *gin.Context) bool {
 		// openai、grok 与多协议 API Key 供应商经 OpenAI 网关转发（平台清单）。
@@ -118,6 +126,9 @@ func RegisterGatewayRoutes(
 		})
 	}
 	videoStatusHandler := func(c *gin.Context) {
+		if strings.HasPrefix(c.Param("request_id"), "atlascloud:") && h.OpenAIGateway.QuotedVideoStatus(c) {
+			return
+		}
 		if (getGroupPlatform(c) == service.PlatformOpenAI && strings.HasPrefix(c.Param("request_id"), "atlascloud:")) ||
 			(getGroupPlatform(c) == service.PlatformComposite && strings.HasPrefix(c.Param("request_id"), "atlascloud:")) {
 			h.OpenAIGateway.AtlasCloudVideoStatus(c)
@@ -201,6 +212,7 @@ func RegisterGatewayRoutes(
 	gateway.Use(endpointNorm)
 	gateway.Use(gin.HandlerFunc(apiKeyAuth))
 	gateway.GET("/sub2api/billing", h.Gateway.KeyBillingInfo)
+	gateway.Use(verifiedVideoRecovery)
 	gateway.Use(groupModelAllowlist)
 	gateway.Use(compositeTarget)
 	gateway.Use(requireGroupAnthropic)
@@ -268,6 +280,9 @@ func RegisterGatewayRoutes(
 			h.OpenAIGateway.Embeddings(c)
 		})
 		gateway.POST("/images/generations", imagesHandler)
+		gateway.POST("/images/quote", h.OpenAIGateway.ImageQuote)
+		gateway.POST("/videos/quote", h.OpenAIGateway.VideoQuote)
+		gateway.GET("/videos/attempts/:attempt_id", h.OpenAIGateway.VideoAttempt)
 		gateway.POST("/images/edits", imagesHandler)
 		gateway.POST("/images/generations/async", h.AsyncImage.Submit)
 		gateway.POST("/images/edits/async", h.AsyncImage.Submit)
@@ -385,7 +400,7 @@ func RegisterGatewayRoutes(
 	// 根路径别名共用中间件链：白名单准入在 apiKeyAuth 之后、compositeTarget
 	// 之前，避免逐条路由手工维护链导致漏挂。
 	rootRoute := func(method, path string, limit gin.HandlerFunc, handler gin.HandlerFunc) {
-		r.Handle(method, path, limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), groupModelAllowlist, compositeTarget, requireGroupAnthropic, handler)
+		r.Handle(method, path, limit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth), verifiedVideoRecovery, groupModelAllowlist, compositeTarget, requireGroupAnthropic, handler)
 	}
 	for _, prefix := range []string{"/api/v3", "/v3", "/v1", ""} {
 		rootRoute(http.MethodPost, prefix+"/contents/generations/tasks", bodyLimit, h.OpenAIGateway.SeedanceTasks)
@@ -436,6 +451,9 @@ func RegisterGatewayRoutes(
 		h.OpenAIGateway.Embeddings(c)
 	})
 	rootRoute(http.MethodPost, "/images/generations", bodyLimit, imagesHandler)
+	rootRoute(http.MethodPost, "/images/quote", bodyLimit, h.OpenAIGateway.ImageQuote)
+	rootRoute(http.MethodPost, "/videos/quote", bodyLimit, h.OpenAIGateway.VideoQuote)
+	rootRoute(http.MethodGet, "/videos/attempts/:attempt_id", bodyLimit, h.OpenAIGateway.VideoAttempt)
 	rootRoute(http.MethodPost, "/images/edits", bodyLimit, imagesHandler)
 	rootRoute(http.MethodPost, "/images/generations/async", bodyLimit, h.AsyncImage.Submit)
 	rootRoute(http.MethodPost, "/images/edits/async", bodyLimit, h.AsyncImage.Submit)

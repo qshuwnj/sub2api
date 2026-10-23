@@ -26,6 +26,7 @@ func TestIdempotencyRepo_CreateProcessing_CompeteSameKey(t *testing.T) {
 	ctx := context.Background()
 
 	now := time.Now().UTC()
+	acceptedTariff := `{"accepted":{"unit":"0.06000000"},"child_index":0}`
 	record := &service.IdempotencyRecord{
 		Scope:              uniqueTestValue(t, "idem-scope-create"),
 		IdempotencyKeyHash: hashedTestValue(t, "idem-hash"),
@@ -33,11 +34,16 @@ func TestIdempotencyRepo_CreateProcessing_CompeteSameKey(t *testing.T) {
 		Status:             service.IdempotencyStatusProcessing,
 		LockedUntil:        ptrTime(now.Add(30 * time.Second)),
 		ExpiresAt:          now.Add(24 * time.Hour),
+		ResponseBody:       &acceptedTariff,
 	}
 	owner, err := repo.CreateProcessing(ctx, record)
 	require.NoError(t, err)
 	require.True(t, owner)
 	require.NotZero(t, record.ID)
+	stored, err := repo.GetByScopeAndKeyHash(ctx, record.Scope, record.IdempotencyKeyHash)
+	require.NoError(t, err)
+	require.NotNil(t, stored.ResponseBody)
+	require.Equal(t, acceptedTariff, *stored.ResponseBody)
 
 	duplicate := &service.IdempotencyRecord{
 		Scope:              record.Scope,
@@ -50,6 +56,30 @@ func TestIdempotencyRepo_CreateProcessing_CompeteSameKey(t *testing.T) {
 	owner, err = repo.CreateProcessing(ctx, duplicate)
 	require.NoError(t, err)
 	require.False(t, owner, "same scope+key hash should be de-duplicated")
+}
+
+func TestIdempotencyRepo_ImageQualityAuditRetainsProcessingLock(t *testing.T) {
+	repo := &idempotencyRepository{sql: testTx(t)}
+	ctx := context.Background()
+	expiry := time.Now().UTC().Add(24 * time.Hour)
+	record := &service.IdempotencyRecord{
+		Scope: "image-quality-quote-v1", IdempotencyKeyHash: hashedTestValue(t, "image-audit"),
+		RequestFingerprint: hashedTestValue(t, "image-body"), Status: service.IdempotencyStatusProcessing,
+		LockedUntil: &expiry, ExpiresAt: expiry,
+	}
+	owner, err := repo.CreateProcessing(ctx, record)
+	require.NoError(t, err)
+	require.True(t, owner)
+	body := `{"outcome":{"status":"pending","upstream_request_id":"synthetic-prediction"}}`
+	require.NoError(t, repo.UpdateImageQualityClaim(ctx, record.ID, body, expiry))
+	stored, err := repo.GetByScopeAndKeyHash(ctx, record.Scope, record.IdempotencyKeyHash)
+	require.NoError(t, err)
+	require.Equal(t, service.IdempotencyStatusProcessing, stored.Status)
+	require.NotNil(t, stored.LockedUntil)
+	require.Equal(t, body, *stored.ResponseBody)
+	require.NoError(t, repo.MarkSucceeded(ctx, record.ID, 200, `{"status":"settled"}`, expiry))
+	require.Error(t, repo.UpdateImageQualityClaim(ctx, record.ID, body, expiry), "never overwrite a terminal receipt with an intermediate state")
+	require.Error(t, repo.UpdateImageQualityClaim(ctx, -1, body, expiry))
 }
 
 func TestIdempotencyRepo_TryReclaim_StatusAndLockWindow(t *testing.T) {

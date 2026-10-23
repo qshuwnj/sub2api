@@ -1,5 +1,7 @@
-import type { BillingMode, ChannelTimePricing, PricingInterval } from '@/api/admin/channels'
+import type { BillingMode, ChannelTimePricing, PricingInterval, VideoTariffMetadata } from '@/api/admin/channels'
+import { exactVideoPrice } from './videoTariffPricing'
 import { REASONING_EFFORT_LEVELS } from '@/constants/channel'
+import { isValidImageQualityPrice } from './imageQualityPricing'
 
 type TranslateFn = (key: string, params?: Record<string, unknown>) => string
 
@@ -36,6 +38,7 @@ export interface PricingFormEntry {
   per_request_price: number | string | null
   intervals: IntervalFormEntry[]
   time_pricing: TimePricingFormEntry
+  video_tariff?: VideoTariffMetadata
 }
 
 export interface TimePricingPeriodFormEntry {
@@ -253,7 +256,8 @@ export function formIntervalsToAPI(intervals: IntervalFormEntry[]): PricingInter
     output_multiplier: toNullableNumber(iv.output_multiplier),
     cache_write_multiplier: toNullableNumber(iv.cache_write_multiplier),
     cache_read_multiplier: toNullableNumber(iv.cache_read_multiplier),
-    per_request_price: toNullableNumber(iv.per_request_price),
+    per_request_price: iv.tier_label.startsWith('video:')
+      ? exactVideoPrice(iv.per_request_price) : toNullableNumber(iv.per_request_price),
     sort_order: iv.sort_order
   }))
 }
@@ -339,6 +343,9 @@ function intervalPriceLabel(t: TranslateFn, key: string): string {
 }
 
 function validateSingleInterval(iv: IntervalFormEntry, idx: number, t: TranslateFn): string | null {
+  if (iv.tier_label.startsWith('quality:') && !isValidImageQualityPrice(iv.per_request_price)) {
+    return t('admin.channels.form.imageQualityInvalid')
+  }
   const index = idx + 1
   if (iv.min_tokens < 0) {
     return intervalValidationMessage(

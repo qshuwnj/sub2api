@@ -1485,13 +1485,17 @@
             <button type="button" class="btn btn-secondary shrink-0 whitespace-nowrap" @click="addGroupPricing(createForm.model_pricing)">
               <Icon name="plus" size="sm" class="mr-1" />{{ t("admin.groups.modelPricing.add") }}
             </button>
+            <button v-if="createForm.platform === 'openai'" type="button" class="btn btn-secondary shrink-0" @click="createVideoImport?.click()">
+              <Icon name="upload" size="sm" class="mr-1" />{{ t("admin.channels.form.nativeVideoImport") }}
+            </button>
+            <input ref="createVideoImport" type="file" accept=".json,application/json" class="hidden" @change="importVideoPricing($event, createForm)" />
           </div>
           <label class="mt-3 flex items-start gap-2">
             <input v-model="createForm.long_context_pricing_enabled" type="checkbox" class="mt-0.5" />
             <span><span class="block text-sm text-gray-700 dark:text-gray-300">{{ t("admin.groups.modelPricing.longContext") }}</span><span class="block text-xs text-gray-500">{{ t("admin.groups.modelPricing.longContextHint") }}</span></span>
           </label>
           <div class="mt-3 space-y-2">
-            <PricingEntryCard v-for="(entry, index) in createForm.model_pricing" :key="index" :entry="entry" :platform="createForm.platform" hide-token-intervals @update="createForm.model_pricing[index] = $event" @remove="createForm.model_pricing.splice(index, 1)" />
+            <PricingEntryCard v-for="(entry, index) in createForm.model_pricing" :key="index" :entry="entry" :platform="createForm.platform" hide-token-intervals enable-image-quality-pricing @update="createForm.model_pricing[index] = $event" @remove="createForm.model_pricing.splice(index, 1)" />
           </div>
         </div>
 
@@ -3135,13 +3139,17 @@
             <button type="button" class="btn btn-secondary shrink-0 whitespace-nowrap" @click="addGroupPricing(editForm.model_pricing)">
               <Icon name="plus" size="sm" class="mr-1" />{{ t("admin.groups.modelPricing.add") }}
             </button>
+            <button v-if="editForm.platform === 'openai'" type="button" class="btn btn-secondary shrink-0" @click="editVideoImport?.click()">
+              <Icon name="upload" size="sm" class="mr-1" />{{ t("admin.channels.form.nativeVideoImport") }}
+            </button>
+            <input ref="editVideoImport" type="file" accept=".json,application/json" class="hidden" @change="importVideoPricing($event, editForm)" />
           </div>
           <label class="mt-3 flex items-start gap-2">
             <input v-model="editForm.long_context_pricing_enabled" type="checkbox" class="mt-0.5" />
             <span><span class="block text-sm text-gray-700 dark:text-gray-300">{{ t("admin.groups.modelPricing.longContext") }}</span><span class="block text-xs text-gray-500">{{ t("admin.groups.modelPricing.longContextHint") }}</span></span>
           </label>
           <div class="mt-3 space-y-2">
-            <PricingEntryCard v-for="(entry, index) in editForm.model_pricing" :key="index" :entry="entry" :platform="editForm.platform" hide-token-intervals @update="editForm.model_pricing[index] = $event" @remove="editForm.model_pricing.splice(index, 1)" />
+            <PricingEntryCard v-for="(entry, index) in editForm.model_pricing" :key="index" :entry="entry" :platform="editForm.platform" hide-token-intervals enable-image-quality-pricing @update="editForm.model_pricing[index] = $event" @remove="editForm.model_pricing.splice(index, 1)" />
           </div>
         </div>
 
@@ -4308,6 +4316,7 @@ import ReasoningEffortPolicyFields from "@/components/admin/group/ReasoningEffor
 import CodexManifestAccountsField from "@/components/admin/group/CodexManifestAccountsField.vue";
 import PricingEntryCard from "@/components/admin/channel/PricingEntryCard.vue";
 import type { PricingFormEntry } from "@/components/admin/channel/types";
+import { copyVideoMetadata, importNativeVideoDraft, newNativeVideoAdditions, validateNativeVideoCard } from "@/components/admin/channel/videoTariffPricing";
 import {
   apiIntervalsToForm,
   createDefaultTimePricingForm,
@@ -4402,6 +4411,31 @@ const emptyGroupPricing = (): PricingFormEntry => ({
 
 const addGroupPricing = (entries: PricingFormEntry[]) =>
   entries.push(emptyGroupPricing());
+const createVideoImport = ref<HTMLInputElement | null>(null);
+const editVideoImport = ref<HTMLInputElement | null>(null);
+async function importVideoPricing(event: Event, form: { platform: string; model_pricing: PricingFormEntry[] }) {
+  const input = event.target as HTMLInputElement;
+  const file = input.files?.[0];
+  if (!file) return;
+  try {
+    if (file.size > 20 * 1024 * 1024) throw new Error("Video pricing draft exceeds 20 MiB");
+    const current = groupPricingToAPI(form.model_pricing, form.platform);
+    const merged = importNativeVideoDraft(await file.text(), current);
+    const currentVideoModels = new Set(current.filter(card => card.video_tariff).map(card => card.models[0]));
+    const refreshed = merged.filter(card => card.video_tariff && currentVideoModels.has(card.models[0]));
+    for (const card of refreshed) {
+      const target = form.model_pricing.find(entry => entry.billing_mode === "video" &&
+        entry.models.length === 1 && entry.models[0] === card.models[0]);
+      if (target) target.video_tariff = copyVideoMetadata(card.video_tariff);
+    }
+    const additions = groupPricingFromAPI(newNativeVideoAdditions(merged, current));
+    form.model_pricing.push(...additions);
+  } catch (error) {
+    appStore.showError(error instanceof Error ? error.message : "Invalid native video pricing draft");
+  } finally {
+    input.value = "";
+  }
+}
 
 const groupPricingFromAPI = (
   pricing: ChannelModelPricing[] | undefined,
@@ -4422,6 +4456,7 @@ const groupPricingFromAPI = (
     per_request_price: entry.per_request_price,
     intervals: apiIntervalsToForm(entry.intervals || []),
     time_pricing: createDefaultTimePricingForm(),
+    video_tariff: copyVideoMetadata(entry.video_tariff),
   }));
 
 const groupPricingToAPI = (
@@ -4450,6 +4485,7 @@ const groupPricingToAPI = (
           ? []
           : formIntervalsToAPI(entry.intervals || []),
       time_pricing: null,
+      video_tariff: copyVideoMetadata(entry.video_tariff),
     }));
 
 const { t } = useI18n();
@@ -5875,6 +5911,13 @@ const validateProfitControlForm = (form: ProfitControlFormState): boolean => {
 
 const validateGroupReasoningMultipliers = (pricing: PricingFormEntry[]): boolean => {
   for (const entry of pricing) {
+    if (entry.video_tariff) {
+      const videoError = validateNativeVideoCard(entry);
+      if (videoError) {
+        appStore.showError(`${entry.models.join(", ")}: ${videoError}`);
+        return false;
+      }
+    }
     const error = validateReasoningEffortMultipliers(entry.reasoning_effort_multipliers, t);
     if (error) {
       appStore.showError(`${entry.models.join(", ") || t("admin.channels.form.unnamed")}: ${error}`);

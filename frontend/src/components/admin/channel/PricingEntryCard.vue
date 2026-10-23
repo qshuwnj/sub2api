@@ -90,6 +90,7 @@
               @update:modelValue="emit('update', {
                 ...entry,
                 billing_mode: $event as BillingMode,
+                video_tariff: undefined,
                 intervals: [],
                 time_pricing: { ...entry.time_pricing, periods: [] },
               })"
@@ -226,6 +227,15 @@
 
         <!-- Image/video mode -->
         <div v-else-if="entry.billing_mode === 'image' || entry.billing_mode === 'video'">
+          <NativeVideoPrices v-if="entry.video_tariff" :entry="entry" @update="emit('update', $event)" />
+          <template v-else>
+          <label v-if="qualityEligible" class="mt-3 flex items-center gap-2 text-sm">
+            <input type="checkbox" :checked="qualityMode" @change="toggleQualityPricing(($event.target as HTMLInputElement).checked)" />
+            {{ t('admin.channels.form.imageQualityEnable') }}
+          </label>
+          <ImageQualityPrices v-if="qualityMode" :intervals="entry.intervals" :models="entry.models"
+            @update="emit('update', { ...entry, intervals: $event })" />
+          <template v-else>
           <!-- Default image price (per-request, same as per_request mode) -->
           <label class="mt-3 block text-xs font-medium text-gray-500 dark:text-gray-400">
             {{ entry.billing_mode === 'video' ? t('admin.channels.form.defaultVideoPrice') : t('admin.channels.form.defaultImagePrice') }}
@@ -255,9 +265,11 @@
               @remove="removeInterval(idx)"
             />
           </div>
+          </template>
+          </template>
         </div>
 
-        <div class="mt-3 border-t border-gray-200 pt-3 dark:border-dark-600" data-testid="reasoning-effort-multipliers">
+        <div v-if="!qualityMode && !entry.video_tariff" class="mt-3 border-t border-gray-200 pt-3 dark:border-dark-600" data-testid="reasoning-effort-multipliers">
           <div class="flex items-center justify-between gap-2">
             <label class="text-xs font-medium text-gray-500 dark:text-gray-400">
               {{ t('admin.channels.form.reasoningEffortMultipliers') }}
@@ -306,6 +318,9 @@ import Icon from '@/components/icons/Icon.vue'
 import IntervalRow from './IntervalRow.vue'
 import ModelTagInput from './ModelTagInput.vue'
 import TimePricingSection from './TimePricingSection.vue'
+import ImageQualityPrices from './ImageQualityPrices.vue'
+import NativeVideoPrices from './NativeVideoPrices.vue'
+import { isMiniQualityModelCard, isImageQualityModelCard, imageQualityProfile, setImageQualitySizePrice } from './imageQualityPricing'
 import type { PricingFormEntry, IntervalFormEntry } from './types'
 import { perTokenToMTok, getPlatformTagClass, isValidPositiveMultiplier, validateReasoningEffortMultipliers } from './types'
 import { REASONING_EFFORT_LEVELS, type ReasoningEffortLevel } from '@/constants/channel'
@@ -320,10 +335,12 @@ const props = withDefaults(defineProps<{
   hideTokenIntervals?: boolean
   enableTimePricing?: boolean
   enableTierMultipliers?: boolean
+  enableImageQualityPricing?: boolean
 }>(), {
   hideTokenIntervals: false,
   enableTimePricing: false,
   enableTierMultipliers: false,
+  enableImageQualityPricing: false,
 })
 
 const emit = defineEmits<{
@@ -333,6 +350,19 @@ const emit = defineEmits<{
 
 // Collapse state: entries with existing models default to collapsed
 const collapsed = ref(props.entry.models.length > 0)
+const qualityEligible = computed(() => props.enableImageQualityPricing && props.platform === 'openai' &&
+  props.entry.billing_mode === 'image' && isImageQualityModelCard(props.entry.models))
+const qualityMode = computed(() => qualityEligible.value && (qualityDraft.value ||
+  props.entry.intervals.some(row => row.tier_label.startsWith('quality:'))))
+const qualityDraft = ref(false)
+
+function toggleQualityPricing(enabled: boolean) {
+  qualityDraft.value = enabled
+  const profile = imageQualityProfile(props.entry.models)
+  emit('update', { ...props.entry, intervals: enabled
+    ? setImageQualitySizePrice([], profile.qualities.includes('medium') ? 'medium' : profile.qualities[0], profile.sizes[0].value, '', props.entry.models) : [],
+    per_request_price: null, reasoning_effort_multipliers: null })
+}
 
 const billingModeOptions = computed(() => [
   { value: 'token', label: t('admin.channels.billingMode.token') },
@@ -409,12 +439,27 @@ function removeInterval(idx: number) {
 
 async function onModelsUpdate(newModels: string[]) {
   const oldModels = props.entry.models
+  if (props.entry.video_tariff && JSON.stringify(oldModels) !== JSON.stringify(newModels)) {
+    emit('update', { ...props.entry, models: newModels, intervals: [], video_tariff: undefined, per_request_price: null })
+    return
+  }
+  if (props.entry.intervals.some(row => row.tier_label.startsWith('quality:')) &&
+      isImageQualityModelCard(newModels) && newModels.some(model => !oldModels.includes(model)) &&
+      !(oldModels.length > 0 && isMiniQualityModelCard([...oldModels, ...newModels]))) {
+    const profile = imageQualityProfile(newModels)
+    // Replacing an endpoint must not silently assign its predecessor's tariff.
+    emit('update', { ...props.entry, models: newModels, per_request_price: null,
+      intervals: setImageQualitySizePrice([], profile.qualities.includes('medium') ? 'medium' : profile.qualities[0],
+        profile.sizes[0].value, '', newModels) })
+    return
+  }
   emit('update', { ...props.entry, models: newModels })
 
   // 仅在「空条目首次加入单个模型」时自动填充默认价：
   // 条目已有模型时（即使价格留空、按各模型的官方默认价回退）追加模型不应改写整条价格，
   // 一次加入多个模型也不应把第一个模型的价格套用到整条，否则条目内所有模型都会被静默改价。
   const addedModels = newModels.filter(m => !oldModels.includes(m))
+  if (isImageQualityModelCard(newModels)) return
   if (oldModels.length !== 0 || addedModels.length !== 1) return
 
   // 检查是否所有价格字段都为空

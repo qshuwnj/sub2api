@@ -22,7 +22,7 @@ export interface PricingInterval {
   output_multiplier: number | null
   cache_write_multiplier: number | null
   cache_read_multiplier: number | null
-  per_request_price: number | null
+  per_request_price: number | string | null
   sort_order: number
 }
 
@@ -36,6 +36,19 @@ export interface ChannelTimePricing {
   timezone: string
   weekdays_only?: boolean
   periods: ChannelTimePricingPeriod[]
+}
+
+export interface VideoTariffMetadata {
+  version: 1
+  contract_revision: string
+  cells: Record<string, {
+    source: string
+    checked_at: string
+    upstream_price: string
+    supplier_estimated: boolean
+    policy: string
+    explicit_free?: boolean
+  }>
 }
 
 export interface ChannelModelPricing {
@@ -56,6 +69,7 @@ export interface ChannelModelPricing {
   per_request_price: number | null
   intervals: PricingInterval[]
   time_pricing: ChannelTimePricing | null
+  video_tariff?: VideoTariffMetadata
 }
 
 export interface AccountStatsPricingRule {
