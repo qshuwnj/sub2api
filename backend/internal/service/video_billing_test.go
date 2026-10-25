@@ -61,6 +61,33 @@ func TestCalculateVideoCostUsesFlatGroupPriceForAtlasModel(t *testing.T) {
 	require.InDelta(t, 2.0, cost.ActualCost, 1e-9)
 }
 
+func TestCalculateVideoCostUsesAtlasPublishedVideoDefaults(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	for _, tc := range []struct {
+		name       string
+		model      string
+		resolution string
+		want       float64
+	}{
+		{"seedance 2.5 native 480p", "bytedance/seedance-2.5/text-to-video", "480p", 0.13971204},
+		{"seedance 2.5 1080p esr", "bytedance/seedance-2.5/text-to-video", "1080p-esr", 0.4507},
+		{"seedance 2.5 4k esr", "bytedance/seedance-2.5/reference-to-video", "4k-esr", 1.7006},
+		{"seedance 2.0 mini native 480p", "bytedance/seedance-2.0-mini/text-to-video", "480p", 0.04499712},
+		{"seedance 2.0 mini 1080p sr", "bytedance/seedance-2.0-mini/image-to-video", "1080p-sr", 0.1742},
+		{"seedance 2.0 native 4k", "bytedance/seedance-2.0/text-to-video", "4k", 0.9722},
+		{"seedance 2.0 fast 1440p sr", "bytedance/seedance-2.0-fast/text-to-video", "1440p-sr", 0.4955},
+		{"gemini omni 720p", atlasCloudGeminiVideoModel, "720p", 0.099},
+		{"gemini omni 4k", atlasCloudGeminiVideoModel, "4k", 0.279},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cost := service.CalculateVideoCost(tc.model, tc.resolution, 1, 1, nil, 1)
+			require.InDelta(t, tc.want, cost.TotalCost, 1e-9)
+			require.InDelta(t, tc.want, cost.ActualCost, 1e-9)
+		})
+	}
+}
+
 func TestNormalizeVideoModelPricesDropsUnknownResolutions(t *testing.T) {
 	t.Parallel()
 	// "4k" and "1080i" are not billable tiers. Collapsing them into 480p would

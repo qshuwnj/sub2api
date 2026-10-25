@@ -2360,9 +2360,79 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 	}
 
 	if IsAtlasCloudVideoModel(model) {
-		return 0
+		return defaultAtlasCloudVideoPrice(model, resolution)
 	}
 	return s.getDefaultVideoPrice(model, resolution)
+}
+
+// defaultAtlasCloudVideoPrice contains the provider-published per-second
+// tariffs used when an operator has not configured an explicit group price.
+// Keep this fallback model-aware: Atlas exposes additional tiers that must not
+// be collapsed into the generic 480p/720p/1080p buckets.
+func defaultAtlasCloudVideoPrice(model, resolution string) float64 {
+	resolution = strings.ToLower(strings.TrimSpace(resolution))
+
+	if model == atlasCloudGeminiVideoModel {
+		switch resolution {
+		case "720p":
+			return 0.099
+		case "1080p":
+			return 0.144
+		case "4k":
+			return 0.279
+		default:
+			return 0
+		}
+	}
+
+	var prices map[string]float64
+	switch {
+	case strings.Contains(model, "bytedance/seedance-2.5/"):
+		prices = map[string]float64{
+			"480p":              0.13971204,
+			"720p":              0.3005,
+			"720p-sr":           0.2193,
+			"720p-esr":          0.2515,
+			"1080p":             0.5914,
+			"1080p-sr":          0.4056,
+			"1080p-esr":         0.4507,
+			"1080p-esr & 60fps": 0.4958,
+			"1440p-sr":          0.7000,
+			"1440p-esr":         0.7602,
+			"4k-esr":            1.7006,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0-mini/"):
+		prices = map[string]float64{
+			"480p":     0.04499712,
+			"720p":     0.0968,
+			"720p-sr":  0.081,
+			"1080p-sr": 0.1742,
+			"1440p-sr": 0.3097,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0-fast/"):
+		prices = map[string]float64{
+			"480p":     0.071995392,
+			"720p":     0.1548,
+			"720p-sr":  0.1296,
+			"1080p":    0.3484,
+			"1080p-sr": 0.2787,
+			"1440p-sr": 0.4955,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0/"):
+		prices = map[string]float64{
+			"480p":     0.08999424,
+			"720p":     0.1935,
+			"720p-sr":  0.162,
+			"1080p":    0.4355,
+			"1080p-sr": 0.3484,
+			"1440p-sr": 0.6193,
+			"4k":       0.9722,
+		}
+	default:
+		return 0
+	}
+
+	return prices[resolution]
 }
 
 // getDefaultImagePrice 获取 LiteLLM 默认图片价格
