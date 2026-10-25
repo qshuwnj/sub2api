@@ -48,6 +48,19 @@ func TestNormalizeAndLookupVideoModelPrices(t *testing.T) {
 	require.Nil(t, LookupVideoModelPrice(norm, "unknown-model", "480p"))
 }
 
+func TestCalculateVideoCostUsesFlatGroupPriceForAtlasModel(t *testing.T) {
+	price := 0.25
+	cost := (&BillingService{}).CalculateVideoCost(
+		"bytedance/seedance-2.5/text-to-video",
+		"720p",
+		1,
+		8,
+		&VideoPriceConfig{Price720P: &price},
+		1,
+	)
+	require.InDelta(t, 2.0, cost.ActualCost, 1e-9)
+}
+
 func TestNormalizeVideoModelPricesDropsUnknownResolutions(t *testing.T) {
 	t.Parallel()
 	// "4k" and "1080i" are not billable tiers. Collapsing them into 480p would

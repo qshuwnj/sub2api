@@ -106,6 +106,7 @@ func videoFixture(t *testing.T) (*OpenAIGatewayService, *APIKey) {
 	k := &APIKey{ID: 11, UserID: 3, Status: StatusActive, GroupID: &g.ID, Group: g, User: u}
 	s := &OpenAIGatewayService{
 		cfg:      &config.Config{JWT: config.JWTConfig{Secret: strings.Repeat("test", 12)}},
+		billingService: &BillingService{},
 		userRepo: &videoQuoteUsers{user: u}, channelService: &ChannelService{groupRepo: &videoQuoteGroups{group: g}, repo: &videoQuoteChannels{}},
 		billingCacheService: &BillingCacheService{apiKeyRateLimitLoader: &videoQuoteKeys{key: k}},
 		usageBillingRepo:    &videoQuoteBilling{ready: true},
@@ -169,6 +170,23 @@ func TestVideoTariffRawDecimalStorageAndQuote(t *testing.T) {
 			require.Equal(t, "2.50000000", changed.TotalPrice)
 		})
 	}
+}
+
+func TestVideoQuoteLegacyRuleEstimateUsesConfiguredVideoPrice(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = nil
+	price := 0.25
+	key.Group.VideoPrice720P = &price
+	key.Group.RateMultiplier = 1
+
+	quote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
+	require.NoError(t, err)
+	require.False(t, quote.Enrolled)
+	require.True(t, quote.EstimateOnly)
+	require.Equal(t, "2.00000000", quote.TotalPrice)
+	require.Equal(t, "USD", quote.Currency)
+	require.Equal(t, "job", quote.BillingUnit)
+	require.Equal(t, 1, quote.UnitCount)
 }
 
 func TestVideoTariffRawDecimalMutationDoesNotReuseStalePrice(t *testing.T) {
@@ -439,6 +457,7 @@ func TestVideoQuoteReadinessFreshAdmissionAndExactEnrollment(t *testing.T) {
 	q, err := s.QuoteVideo(context.Background(), k, videoTestRequest(), time.Now())
 	require.NoError(t, err)
 	require.False(t, q.Enrolled)
+	require.False(t, q.EstimateOnly)
 	require.Empty(t, q.Token)
 	require.Empty(t, q.TotalPrice)
 }

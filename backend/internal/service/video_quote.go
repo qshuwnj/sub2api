@@ -50,6 +50,7 @@ type VideoQuoteRequest struct {
 }
 type VideoQuote struct {
 	Enrolled bool `json:"enrolled"`
+	EstimateOnly bool `json:"estimate_only,omitempty"`
 	VideoQuoteRequest
 	ID                string    `json:"quote_id,omitempty"`
 	Token             string    `json:"quote_token,omitempty"`
@@ -620,24 +621,9 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		err = fmt.Errorf("exact video tariff cell is not configured")
 		return
 	}
-	rate := key.Group.RateMultiplier
-	// Bypass the rate cache, including its fail-open default, at financial admission.
-	if s.userGroupRateResolver != nil && s.userGroupRateResolver.repo != nil {
-		var override *float64
-		override, e = s.userGroupRateResolver.repo.GetByUserAndGroup(ctx, key.UserID, key.Group.ID)
-		if e != nil {
-			err = ErrVideoQuoteUnavailable
-			return
-		}
-		if override != nil {
-			rate = *override
-		}
-	}
-	if key.Group.VideoRateIndependent {
-		rate = key.Group.VideoRateMultiplier
-	}
-	if math.IsNaN(rate) || math.IsInf(rate, 0) || rate < 0 {
-		err = fmt.Errorf("invalid customer video multiplier")
+	rate, e := s.videoCustomerRate(ctx, key)
+	if e != nil {
+		err = e
 		return
 	}
 	baseAmount, e := videoIntervalPrice(*selected)
@@ -658,6 +644,64 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 	revision = hex.EncodeToString(hash[:])
 	return
 }
+
+func (s *OpenAIGatewayService) videoCustomerRate(ctx context.Context, key *APIKey) (float64, error) {
+	if key == nil || key.Group == nil {
+		return 0, ErrVideoQuoteUnavailable
+	}
+	rate := key.Group.RateMultiplier
+	// Bypass the rate cache, including its fail-open default, at financial admission.
+	if s.userGroupRateResolver != nil && s.userGroupRateResolver.repo != nil {
+		override, err := s.userGroupRateResolver.repo.GetByUserAndGroup(ctx, key.UserID, key.Group.ID)
+		if err != nil {
+			return 0, ErrVideoQuoteUnavailable
+		}
+		if override != nil {
+			rate = *override
+		}
+	}
+	if key.Group.VideoRateIndependent {
+		rate = key.Group.VideoRateMultiplier
+	}
+	if math.IsNaN(rate) || math.IsInf(rate, 0) || rate < 0 {
+		return 0, fmt.Errorf("invalid customer video multiplier")
+	}
+	return rate, nil
+}
+
+func (s *OpenAIGatewayService) videoLegacyEstimate(ctx context.Context, key *APIKey, req VideoQuoteRequest) (string, error) {
+	if s == nil || s.billingService == nil || key == nil || key.Group == nil {
+		return "", ErrVideoQuoteUnavailable
+	}
+	resolution, _ := req.Controls["resolution"].(string)
+	durationValue := req.Controls["duration"]
+	var duration decimal.Decimal
+	switch value := durationValue.(type) {
+	case float64:
+		duration = decimal.NewFromFloat(value)
+	case string:
+		var err error
+		duration, err = decimal.NewFromString(value)
+		if err != nil {
+			return "", fmt.Errorf("invalid native video duration")
+		}
+	default:
+		return "", fmt.Errorf("invalid native video duration")
+	}
+	if !duration.IsPositive() || !duration.Equal(duration.Truncate(0)) {
+		return "", fmt.Errorf("invalid native video duration")
+	}
+	rate, err := s.videoCustomerRate(ctx, key)
+	if err != nil {
+		return "", err
+	}
+	cost := s.billingService.CalculateVideoCost(req.Model, resolution, 1, int(duration.IntPart()), key.Group.VideoPriceConfig(), rate)
+	if cost == nil || math.IsNaN(cost.ActualCost) || math.IsInf(cost.ActualCost, 0) || cost.ActualCost <= 0 {
+		return "", fmt.Errorf("video tariff not configured")
+	}
+	return decimal.NewFromFloat(cost.ActualCost).Round(8).StringFixed(8), nil
+}
+
 func (s *OpenAIGatewayService) videoQuoteMAC(payload string) ([]byte, error) {
 	if s.cfg == nil || len(s.cfg.JWT.Secret) < 32 {
 		return nil, ErrVideoQuoteUnavailable
@@ -677,15 +721,28 @@ func (s *OpenAIGatewayService) QuoteVideo(ctx context.Context, key *APIKey, req 
 	if err != nil {
 		return nil, err
 	}
-	if !enrolled {
-		return &VideoQuote{Enrolled: false, VideoQuoteRequest: VideoQuoteRequest{Model: req.Model, Mode: req.Mode}}, nil
-	}
-	if !s.VideoQuotedBillingReady() {
-		return nil, ErrVideoQuoteUnavailable
-	}
 	req, err = req.normalized()
 	if err != nil {
 		return nil, err
+	}
+	if !enrolled {
+		total, estimateErr := s.videoLegacyEstimate(ctx, key, req)
+		if estimateErr != nil {
+			return &VideoQuote{Enrolled: false, VideoQuoteRequest: VideoQuoteRequest{Model: req.Model, Mode: req.Mode}}, nil
+		}
+		return &VideoQuote{
+			Enrolled: false,
+			EstimateOnly: true,
+			VideoQuoteRequest: req,
+			Currency: "USD",
+			BillingUnit: "job",
+			UnitCount: 1,
+			TotalPrice: total,
+			SupplierEstimated: false,
+		}, nil
+	}
+	if !s.VideoQuotedBillingReady() {
+		return nil, ErrVideoQuoteUnavailable
 	}
 	base, total, revision, multiplier, estimated, err := s.videoTariff(ctx, key, req)
 	if err != nil {

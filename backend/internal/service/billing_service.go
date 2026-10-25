@@ -2343,9 +2343,6 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 		if price := LookupVideoModelPrice(groupConfig.ModelPrices, model, resolution); price != nil {
 			return *price
 		}
-		if IsAtlasCloudVideoModel(model) {
-			return 0
-		}
 		switch NormalizeVideoBillingResolutionOrDefault(resolution) {
 		case VideoBillingResolution480P:
 			if groupConfig.Price480P != nil {
