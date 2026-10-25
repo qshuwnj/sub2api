@@ -5,11 +5,11 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"net"
 	"net/url"
 	"os/exec"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -74,7 +74,8 @@ type ffprobeDocument struct {
 		AvgRate   string `json:"avg_frame_rate"`
 	} `json:"streams"`
 	Format struct {
-		Duration string `json:"duration"`
+		Duration   string `json:"duration"`
+		FormatName string `json:"format_name"`
 	} `json:"format"`
 }
 
@@ -82,17 +83,38 @@ type VideoReferenceFFProbeRunner func(context.Context, ...string) ([]byte, error
 
 type VideoReferenceFFProbe struct {
 	Runner         VideoReferenceFFProbeRunner
+	ReaderRunner   func(context.Context, ...string) (io.ReadCloser, error)
 	Timeout        time.Duration
 	MaxOutputBytes int
 }
 
 func NewVideoReferenceFFProbe(runner VideoReferenceFFProbeRunner) *VideoReferenceFFProbe {
-	if runner == nil {
-		runner = func(ctx context.Context, args ...string) ([]byte, error) {
-			return exec.CommandContext(ctx, "ffprobe", args...).Output()
+	readerRunner := func(ctx context.Context, args ...string) (io.ReadCloser, error) {
+		cmd := exec.CommandContext(ctx, "ffprobe", args...)
+		stdout, err := cmd.StdoutPipe()
+		if err != nil {
+			return nil, err
 		}
+		if err := cmd.Start(); err != nil {
+			return nil, err
+		}
+		return &ffprobeReadCloser{ReadCloser: stdout, wait: cmd.Wait}, nil
 	}
-	return &VideoReferenceFFProbe{Runner: runner, Timeout: 10 * time.Second, MaxOutputBytes: 1 << 20}
+	return &VideoReferenceFFProbe{Runner: runner, ReaderRunner: readerRunner, Timeout: 10 * time.Second, MaxOutputBytes: 1 << 20}
+}
+
+type ffprobeReadCloser struct {
+	io.ReadCloser
+	wait func() error
+}
+
+func (r *ffprobeReadCloser) Close() error {
+	closeErr := r.ReadCloser.Close()
+	waitErr := r.wait()
+	if closeErr != nil {
+		return closeErr
+	}
+	return waitErr
 }
 
 func parseFFProbeFloat(value string) (float64, error) {
@@ -113,7 +135,7 @@ func parseFFProbeFloat(value string) (float64, error) {
 }
 
 func (p *VideoReferenceFFProbe) Probe(ctx context.Context, path string) (VideoReferenceMediaMetadata, error) {
-	if p == nil || p.Runner == nil || strings.TrimSpace(path) == "" {
+	if p == nil || (p.Runner == nil && p.ReaderRunner == nil) || strings.TrimSpace(path) == "" {
 		return VideoReferenceMediaMetadata{}, errors.New("ffprobe is not configured")
 	}
 	timeout := p.Timeout
@@ -126,7 +148,25 @@ func (p *VideoReferenceFFProbe) Probe(ctx context.Context, path string) (VideoRe
 	}
 	probeCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
-	raw, err := p.Runner(probeCtx, "-v", "error", "-print_format", "json", "-show_streams", "-show_format", path)
+	args := []string{"-v", "error", "-print_format", "json", "-show_streams", "-show_format", path}
+	var raw []byte
+	var err error
+	if p.Runner == nil && p.ReaderRunner != nil {
+		reader, openErr := p.ReaderRunner(probeCtx, args...)
+		if openErr != nil {
+			return VideoReferenceMediaMetadata{}, fmt.Errorf("ffprobe: %w", openErr)
+		}
+		raw, err = io.ReadAll(io.LimitReader(reader, int64(maxOutput)+1))
+		closeErr := reader.Close()
+		if len(raw) > maxOutput {
+			return VideoReferenceMediaMetadata{}, errors.New("ffprobe output exceeds bounded limit")
+		}
+		if err == nil && closeErr != nil {
+			err = closeErr
+		}
+	} else {
+		raw, err = p.Runner(probeCtx, args...)
+	}
 	if err != nil {
 		return VideoReferenceMediaMetadata{}, fmt.Errorf("ffprobe: %w", err)
 	}
@@ -170,28 +210,28 @@ func (p *VideoReferenceFFProbe) Probe(ctx context.Context, path string) (VideoRe
 	if out.Kind == "" {
 		return VideoReferenceMediaMetadata{}, errors.New("ffprobe returned no audio/video stream")
 	}
-	ext := strings.ToLower(filepath.Ext(path))
-	switch out.Kind {
-	case VideoReferenceVideo:
-		switch ext {
-		case ".webm":
+	format := strings.ToLower(doc.Format.FormatName)
+	switch {
+	case strings.Contains(format, "webm") || strings.Contains(format, "matroska"):
+		if out.Kind == VideoReferenceVideo {
 			out.MIME = "video/webm"
-		case ".mov":
-			out.MIME = "video/quicktime"
-		default:
+		} else {
+			out.MIME = "audio/webm"
+		}
+	case strings.Contains(format, "mov") || strings.Contains(format, "mp4") || strings.Contains(format, "m4a") || strings.Contains(format, "3gp"):
+		if out.Kind == VideoReferenceVideo {
 			out.MIME = "video/mp4"
-		}
-	case VideoReferenceAudio:
-		switch ext {
-		case ".wav":
-			out.MIME = "audio/wav"
-		case ".ogg", ".oga":
-			out.MIME = "audio/ogg"
-		case ".m4a", ".mp4":
+		} else {
 			out.MIME = "audio/mp4"
-		default:
-			out.MIME = "audio/mpeg"
 		}
+	case strings.Contains(format, "wav"):
+		out.MIME = "audio/wav"
+	case strings.Contains(format, "ogg"):
+		out.MIME = "audio/ogg"
+	case strings.Contains(format, "mp3") || strings.Contains(format, "mp2"):
+		out.MIME = "audio/mpeg"
+	default:
+		return VideoReferenceMediaMetadata{}, errors.New("ffprobe returned an unsupported media container")
 	}
 	return out, nil
 }
@@ -228,7 +268,8 @@ func ValidateVideoReferenceDescriptor(asset *VideoReferenceAsset) error {
 		return fmt.Errorf("reference %s exceeds byte limit", asset.Kind)
 	}
 	if asset.Kind == VideoReferenceImage {
-		if asset.Width < 1 || asset.Height < 1 || asset.Width > 8192 || asset.Height > 8192 {
+		aspect := float64(asset.Width) / float64(asset.Height)
+		if asset.Width < 300 || asset.Height < 300 || asset.Width > 6000 || asset.Height > 6000 || aspect < 0.4 || aspect > 2.5 {
 			return errors.New("invalid image dimensions")
 		}
 		if asset.MIME != "image/png" && asset.MIME != "image/jpeg" && asset.MIME != "image/webp" {
@@ -236,14 +277,20 @@ func ValidateVideoReferenceDescriptor(asset *VideoReferenceAsset) error {
 		}
 		return nil
 	}
-	if asset.Duration < limits.MinDuration || asset.Duration > limits.MaxDuration {
+	if math.IsNaN(asset.Duration) || math.IsInf(asset.Duration, 0) || asset.Duration < limits.MinDuration || asset.Duration > limits.MaxDuration {
 		return errors.New("reference duration outside family bounds")
 	}
 	if asset.Kind == VideoReferenceVideo {
-		if asset.Width < 16 || asset.Height < 16 || asset.Width > 8192 || asset.Height > 8192 {
+		pixels := asset.Width * asset.Height
+		maxPixels := 2086876
+		if asset.EndpointFamily == "2.5" {
+			maxPixels = 8295044
+		}
+		aspect := float64(asset.Width) / float64(asset.Height)
+		if asset.Width < 300 || asset.Height < 300 || asset.Width > 6000 || asset.Height > 6000 || pixels < 409600 || pixels > maxPixels || aspect < 0.4 || aspect > 2.5 {
 			return errors.New("invalid video dimensions")
 		}
-		if asset.FrameRate < 1 || asset.FrameRate > 120 || math.IsNaN(asset.FrameRate) {
+		if asset.FrameRate < 24 || asset.FrameRate > 60 || math.IsNaN(asset.FrameRate) {
 			return errors.New("invalid video frame rate")
 		}
 		if asset.MIME != "video/mp4" && asset.MIME != "video/webm" && asset.MIME != "video/quicktime" {
@@ -349,11 +396,11 @@ func (s *VideoReferenceAssetService) Admit(asset *VideoReferenceAsset) error {
 	}
 	return s.store.Put(asset)
 }
-func (s *VideoReferenceAssetService) ResolveOwned(id string, userID, apiKeyID int64) (*VideoReferenceAsset, error) {
+func (s *VideoReferenceAssetService) ResolveOwned(id string, userID, apiKeyID int64, accountID ...int64) (*VideoReferenceAsset, error) {
 	if s == nil || s.store == nil {
 		return nil, errors.New("reference asset service unavailable")
 	}
-	return s.store.GetOwned(id, userID, apiKeyID)
+	return s.store.GetOwned(id, userID, apiKeyID, accountID...)
 }
 func (s *VideoReferenceAssetService) Accept(id, attemptID string) error {
 	if s == nil || s.store == nil {
@@ -396,14 +443,18 @@ func (s *VideoReferenceAssetStore) Put(asset *VideoReferenceAsset) error {
 	return nil
 }
 
-func (s *VideoReferenceAssetStore) GetOwned(id string, userID, apiKeyID int64) (*VideoReferenceAsset, error) {
+func (s *VideoReferenceAssetStore) GetOwned(id string, userID, apiKeyID int64, accountID ...int64) (*VideoReferenceAsset, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	asset := s.items[id]
 	if asset == nil {
 		return nil, errors.New("reference asset not found")
 	}
-	if asset.UserID != userID || asset.APIKeyID != apiKeyID {
+	boundAccount := int64(0)
+	if len(accountID) > 0 {
+		boundAccount = accountID[0]
+	}
+	if asset.UserID != userID || asset.APIKeyID != apiKeyID || (asset.AccountID != 0 && asset.AccountID != boundAccount) {
 		return nil, errors.New("reference asset owner mismatch")
 	}
 	if asset.ExpiresAt.Before(s.now()) && asset.AcceptedAttempt == "" {
@@ -415,6 +466,9 @@ func (s *VideoReferenceAssetStore) GetOwned(id string, userID, apiKeyID int64) (
 }
 
 func (s *VideoReferenceAssetStore) MarkAccepted(id, attemptID string) error {
+	if strings.TrimSpace(attemptID) == "" {
+		return errors.New("accepted attempt ID is required")
+	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	asset := s.items[id]
