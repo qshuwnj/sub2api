@@ -114,13 +114,25 @@ func ProvideGatewayHandler(
 	settingService *service.SettingService,
 	coordinator *securityaudit.Coordinator,
 	geminiCachedContentService *service.GeminiCachedContentService,
+	videoReferenceAssetHandler *VideoReferenceAssetHandler,
 ) *GatewayHandler {
 	h := NewGatewayHandler(gatewayService, openAIGatewayService, geminiCompatService, antigravityGatewayService,
 		userService, concurrencyService, billingCacheService, usageService, apiKeyService, usageRecordWorkerPool,
 		errorPassthroughService, contentModerationService, userMsgQueueService, cfg, settingService)
 	h.securityAuditCoordinator = coordinator
 	h.geminiCachedContentService = geminiCachedContentService
+	h.SetVideoReferenceAssetHandler(videoReferenceAssetHandler)
 	return h
+}
+
+func ProvideVideoReferenceAssetHandler(
+	assetService *service.VideoReferenceAssetService,
+	imageStorage *service.ImageStorageSettingService,
+) *VideoReferenceAssetHandler {
+	if imageStorage == nil {
+		return NewVideoReferenceAssetHandler(assetService, nil)
+	}
+	return NewVideoReferenceAssetHandler(assetService, service.NewVideoReferenceBlobStore(imageStorage.Resolver()))
 }
 
 func ProvideOpenAIGatewayHandler(

@@ -36,7 +36,7 @@ func (h *OpenAIGatewayHandler) VideoQuote(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", err.Error())
 		return
 	}
-	for _, field := range []string{"prompt", "negative_prompt", "image", "image_url", "images", "image_urls", "reference_images", "last_image", "video", "audio", "total_price", "unit_price"} {
+	for _, field := range []string{"prompt", "negative_prompt", "image", "image_url", "images", "image_urls", "reference_images", "reference_videos", "reference_audios", "last_image", "video", "audio", "asset_id", "source_url", "total_price", "unit_price"} {
 		if _, exists := input.Controls[field]; exists {
 			h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Quote controls must not contain content or prices")
 			return

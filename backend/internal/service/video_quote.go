@@ -223,7 +223,7 @@ func videoSchemaSupported(value any) bool {
 
 func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 	c := atlasMediaModel(req.Model, "video")
-	if c == nil || req.Mode != c.Mode || (req.Mode != "t2v" && req.Mode != "i2v") || req.Controls == nil ||
+	if c == nil || req.Mode != c.Mode || (req.Mode != "t2v" && req.Mode != "i2v" && req.Mode != "r2v") || req.Controls == nil ||
 		!videoSchemaSupported(videoRawContracts[req.Model]["input"]) {
 		return req, fmt.Errorf("unsupported native video contract or mode")
 	}
@@ -309,9 +309,13 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 	for k, v := range controls {
 		body[k] = v
 	}
-	if req.Mode == "i2v" {
+	if req.Mode == "i2v" || req.Mode == "r2v" {
 		found := false
-		for _, field := range []string{"image", "image_url", "images", "image_urls", "reference_images"} {
+		fields := []string{"image", "image_url", "images", "image_urls", "reference_images"}
+		if req.Mode == "r2v" {
+			fields = []string{"reference_images", "reference_videos"}
+		}
+		for _, field := range fields {
 			if ref, ok := c.MediaFields[field]; ok {
 				if ref.Array {
 					body[field] = []any{"https://assets.example/price-schema-check.png"}

@@ -205,6 +205,15 @@ func RegisterGatewayRoutes(
 	}
 
 	// API网关（Claude API兼容）
+	referenceAssets := r.Group("/v1")
+	referenceAssets.Use(bodyLimit)
+	referenceAssets.Use(clientRequestID)
+	referenceAssets.Use(opsErrorLogger)
+	referenceAssets.Use(endpointNorm)
+	referenceAssets.Use(gin.HandlerFunc(apiKeyAuth))
+	referenceAssets.POST("/video-reference-assets", h.Gateway.VideoReferenceAssets)
+	referenceAssets.DELETE("/video-reference-assets", h.Gateway.VideoReferenceAssets)
+
 	gateway := r.Group("/v1")
 	gateway.Use(bodyLimit)
 	gateway.Use(clientRequestID)

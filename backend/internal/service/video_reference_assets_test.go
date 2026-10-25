@@ -69,6 +69,9 @@ func TestVideoReferenceAssetStoreEnforcesOwnershipExpiryAndAcceptedReplay(t *tes
 	if err := store.MarkAccepted("asset-1", "attempt-1"); err != nil {
 		t.Fatal(err)
 	}
+	if err := store.Put(asset); err == nil {
+		t.Fatal("accepted asset was unexpectedly replaced")
+	}
 	if err := store.MarkAccepted("asset-1", " "); err == nil {
 		t.Fatal("empty accepted attempt ID unexpectedly succeeded")
 	}
@@ -84,6 +87,52 @@ func TestVideoReferenceAssetStoreEnforcesOwnershipExpiryAndAcceptedReplay(t *tes
 	}
 	if removed := store.Cleanup(); removed != 1 {
 		t.Fatalf("expired asset count = %d", removed)
+	}
+}
+
+func TestVideoReferenceAssetServiceRequiresExplicitStore(t *testing.T) {
+	now := time.Now()
+	asset := &VideoReferenceAsset{
+		ID:             "asset-no-store",
+		UserID:         7,
+		APIKeyID:       8,
+		EndpointFamily: "2.5",
+		Kind:           VideoReferenceImage,
+		MIME:           "image/png",
+		Size:           4,
+		Width:          300,
+		Height:         300,
+		ExpiresAt:      now.Add(time.Minute),
+		State:          VideoReferenceStaged,
+	}
+
+	svc := NewVideoReferenceAssetService(nil, nil)
+	if err := svc.Admit(asset); err == nil || !strings.Contains(err.Error(), "unavailable") {
+		t.Fatalf("service without an explicit repository should fail closed, got %v", err)
+	}
+}
+
+func TestVideoReferenceFamilyForModelIsExact(t *testing.T) {
+	tests := map[string]string{
+		"bytedance/seedance-2.0/reference-to-video":      "2.0",
+		"bytedance/seedance-2.5/reference-to-video":      "2.5",
+		"bytedance/seedance-2.0-mini/reference-to-video": "2.0-mini",
+		"bytedance/seedance-2.0-fast/reference-to-video": "2.0-fast",
+	}
+	for model, want := range tests {
+		got, err := VideoReferenceFamilyForModel(model)
+		if err != nil || got != want {
+			t.Fatalf("%s: family=%q err=%v", model, got, err)
+		}
+	}
+	for _, model := range []string{
+		"bytedance/seedance-2.0/reference-to-video?family=2.5",
+		"other/seedance-2.0/reference-to-video",
+		"bytedance/seedance-2.0/reference-to-video-extra",
+	} {
+		if _, err := VideoReferenceFamilyForModel(model); err == nil {
+			t.Fatalf("expected %q to be rejected", model)
+		}
 	}
 }
 

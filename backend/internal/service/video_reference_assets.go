@@ -24,6 +24,23 @@ const (
 	VideoReferenceAudio VideoReferenceKind = "audio"
 )
 
+var videoReferenceModelFamilies = map[string]string{
+	"bytedance/seedance-2.0/reference-to-video":      "2.0",
+	"bytedance/seedance-2.5/reference-to-video":      "2.5",
+	"bytedance/seedance-2.0-mini/reference-to-video": "2.0-mini",
+	"bytedance/seedance-2.0-fast/reference-to-video": "2.0-fast",
+}
+
+// VideoReferenceFamilyForModel is intentionally exact. Reference admission
+// must not infer a family from a loose suffix or trust a client-supplied tier.
+func VideoReferenceFamilyForModel(model string) (string, error) {
+	family, ok := videoReferenceModelFamilies[strings.TrimSpace(model)]
+	if !ok {
+		return "", errors.New("unsupported reference video endpoint model")
+	}
+	return family, nil
+}
+
 type VideoReferenceCleanupState string
 
 const (
@@ -360,18 +377,80 @@ type VideoReferenceAssetStore struct {
 	failedAttempts map[string]bool
 }
 
+// VideoReferenceAssetRepository is the persistence boundary for staged
+// reference media. Implementations must enforce owner binding and cleanup
+// semantics; the process-local store remains useful only for isolated tests.
+type VideoReferenceAssetRepository interface {
+	Put(*VideoReferenceAsset) error
+	GetOwned(id string, userID, apiKeyID int64, accountID ...int64) (*VideoReferenceAsset, error)
+	MarkAccepted(id, attemptID string) error
+	MarkAttemptFailed(attemptID string)
+	MarkCancelled(id string) error
+	Cleanup() int
+}
+
+// VideoReferenceBlobStore is the byte-level half of staged media. Metadata
+// must not be committed until Save succeeds.
+type VideoReferenceBlobStore interface {
+	Save(ctx context.Context, key, contentType string, data []byte) (string, error)
+	Delete(ctx context.Context, key string) error
+}
+
+// VideoReferenceBlobResolver reuses the existing dynamically configured image
+// storage. It avoids duplicating admin-configured S3/R2 credentials.
+type VideoReferenceBlobResolver = ImageStorageResolver
+
+type resolvedVideoReferenceBlobStore struct {
+	resolve VideoReferenceBlobResolver
+}
+
+func NewVideoReferenceBlobStore(resolve VideoReferenceBlobResolver) VideoReferenceBlobStore {
+	if resolve == nil {
+		return nil
+	}
+	return &resolvedVideoReferenceBlobStore{resolve: resolve}
+}
+
+func (s *resolvedVideoReferenceBlobStore) uploader() (*ImageResultUploader, error) {
+	if s == nil || s.resolve == nil {
+		return nil, errors.New("video reference storage is unavailable")
+	}
+	uploader, enabled := s.resolve()
+	if !enabled || uploader == nil {
+		return nil, errors.New("video reference storage is unavailable")
+	}
+	return uploader, nil
+}
+
+func (s *resolvedVideoReferenceBlobStore) Save(ctx context.Context, key, contentType string, data []byte) (string, error) {
+	uploader, err := s.uploader()
+	if err != nil {
+		return "", err
+	}
+	return uploader.Save(ctx, key, contentType, data)
+}
+
+func (s *resolvedVideoReferenceBlobStore) Delete(ctx context.Context, key string) error {
+	uploader, err := s.uploader()
+	if err != nil {
+		return err
+	}
+	return uploader.Delete(ctx, key)
+}
+
 // VideoReferenceAssetService is the gateway-facing boundary used by handlers
-// and quote/attempt admission. The store is deliberately injectable so a
-// durable repository can be supplied without changing validation semantics.
+// and quote/attempt admission. A store must be supplied explicitly so a
+// missing durable repository cannot silently fall back to process-local state.
 type VideoReferenceAssetService struct {
-	store *VideoReferenceAssetStore
+	store VideoReferenceAssetRepository
 	probe *VideoReferenceFFProbe
 }
 
 func NewVideoReferenceAssetService(store *VideoReferenceAssetStore, probe *VideoReferenceFFProbe) *VideoReferenceAssetService {
-	if store == nil {
-		store = NewVideoReferenceAssetStore(nil)
-	}
+	return NewVideoReferenceAssetServiceWithRepository(store, probe)
+}
+
+func NewVideoReferenceAssetServiceWithRepository(store VideoReferenceAssetRepository, probe *VideoReferenceFFProbe) *VideoReferenceAssetService {
 	if probe == nil {
 		probe = NewVideoReferenceFFProbe(nil)
 	}
@@ -382,7 +461,8 @@ func (s *VideoReferenceAssetService) Store() *VideoReferenceAssetStore {
 	if s == nil {
 		return nil
 	}
-	return s.store
+	store, _ := s.store.(*VideoReferenceAssetStore)
+	return store
 }
 func (s *VideoReferenceAssetService) FFProbe() *VideoReferenceFFProbe {
 	if s == nil {
@@ -407,6 +487,12 @@ func (s *VideoReferenceAssetService) Accept(id, attemptID string) error {
 		return errors.New("reference asset service unavailable")
 	}
 	return s.store.MarkAccepted(id, attemptID)
+}
+func (s *VideoReferenceAssetService) Cancel(id string) error {
+	if s == nil || s.store == nil {
+		return errors.New("reference asset service unavailable")
+	}
+	return s.store.MarkCancelled(id)
 }
 func (s *VideoReferenceAssetService) Cleanup() int {
 	if s == nil || s.store == nil {
@@ -439,6 +525,16 @@ func (s *VideoReferenceAssetStore) Put(asset *VideoReferenceAsset) error {
 	}
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	if existing := s.items[asset.ID]; existing != nil {
+		if existing.UserID != asset.UserID || existing.APIKeyID != asset.APIKeyID ||
+			(existing.AccountID != 0 && asset.AccountID != 0 && existing.AccountID != asset.AccountID) ||
+			(existing.AccountID != 0 && asset.AccountID == 0) {
+			return errors.New("reference asset owner mismatch")
+		}
+		if existing.AcceptedAttempt != "" {
+			return errors.New("reference asset already accepted")
+		}
+	}
 	s.items[asset.ID] = cloneVideoReferenceAsset(asset)
 	return nil
 }
@@ -482,6 +578,16 @@ func (s *VideoReferenceAssetStore) MarkAttemptFailed(attemptID string) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	s.failedAttempts[attemptID] = true
+}
+func (s *VideoReferenceAssetStore) MarkCancelled(id string) error {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	asset := s.items[id]
+	if asset == nil {
+		return errors.New("reference asset not found")
+	}
+	asset.State = VideoReferenceCancelled
+	return nil
 }
 func (s *VideoReferenceAssetStore) Cleanup() int {
 	s.mu.Lock()
