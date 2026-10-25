@@ -70,15 +70,15 @@ func TestCalculateVideoCostUsesAtlasPublishedVideoDefaults(t *testing.T) {
 		resolution string
 		want       float64
 	}{
-		{"seedance 2.5 native 480p", "bytedance/seedance-2.5/text-to-video", "480p", 0.13971204},
-		{"seedance 2.5 1080p esr", "bytedance/seedance-2.5/text-to-video", "1080p-esr", 0.4507},
-		{"seedance 2.5 4k esr", "bytedance/seedance-2.5/reference-to-video", "4k-esr", 1.7006},
-		{"seedance 2.0 mini native 480p", "bytedance/seedance-2.0-mini/text-to-video", "480p", 0.04499712},
-		{"seedance 2.0 mini 1080p sr", "bytedance/seedance-2.0-mini/image-to-video", "1080p-sr", 0.1742},
-		{"seedance 2.0 native 4k", "bytedance/seedance-2.0/text-to-video", "4k", 0.9722},
-		{"seedance 2.0 fast 1440p sr", "bytedance/seedance-2.0-fast/text-to-video", "1440p-sr", 0.4955},
-		{"gemini omni 720p", atlasCloudGeminiVideoModel, "720p", 0.099},
-		{"gemini omni 4k", atlasCloudGeminiVideoModel, "4k", 0.279},
+		{"seedance 2.5 native 480p", "bytedance/seedance-2.5/text-to-video", "480p", 1.1641254251328},
+		{"seedance 2.5 1080p esr", "bytedance/seedance-2.5/text-to-video", "1080p-esr", 3.755376624},
+		{"seedance 2.5 4k esr", "bytedance/seedance-2.5/reference-to-video", "4k-esr", 14.169943392},
+		{"seedance 2.0 mini native 480p", "bytedance/seedance-2.0-mini/text-to-video", "480p", 0.3749304029184},
+		{"seedance 2.0 mini 1080p sr", "bytedance/seedance-2.0-mini/image-to-video", "1080p-sr", 1.451490144},
+		{"seedance 2.0 native 4k", "bytedance/seedance-2.0/text-to-video", "4k", 8.100681504},
+		{"seedance 2.0 fast 1440p sr", "bytedance/seedance-2.0-fast/text-to-video", "1440p-sr", 4.12866456},
+		{"gemini omni 720p", atlasCloudGeminiVideoModel, "720p", 0.82489968},
+		{"gemini omni 4k", atlasCloudGeminiVideoModel, "4k", 2.32471728},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			cost := service.CalculateVideoCost(tc.model, tc.resolution, 1, 1, nil, 1)
@@ -86,6 +86,20 @@ func TestCalculateVideoCostUsesAtlasPublishedVideoDefaults(t *testing.T) {
 			require.InDelta(t, tc.want, cost.ActualCost, 1e-9)
 		})
 	}
+}
+
+func TestCalculateVideoCostAppliesGroupMultiplierAfterAtlasRetailConversion(t *testing.T) {
+	t.Parallel()
+	cost := (&BillingService{}).CalculateVideoCost(
+		"bytedance/seedance-2.5/text-to-video",
+		"720p",
+		1,
+		1,
+		nil,
+		1.2,
+	)
+	require.InDelta(t, 2.50386216, cost.TotalCost, 1e-9)
+	require.InDelta(t, 3.0046345919999995, cost.ActualCost, 1e-9)
 }
 
 func TestNormalizeVideoModelPricesDropsUnknownResolutions(t *testing.T) {

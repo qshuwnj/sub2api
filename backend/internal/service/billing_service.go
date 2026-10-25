@@ -2127,6 +2127,12 @@ type VideoPriceConfig struct {
 const (
 	defaultImageGenerationPrice = 0.134
 
+	// Atlas video fallback tariffs are published in supplier USD. Convert them
+	// to the gateway's retail ledger price with the configured FX rate and
+	// 1.2x markup (6.9436 * 1.2 = 8.33232). Explicit group prices are already
+	// retail values and are returned before this fallback.
+	atlasCloudVideoRetailFactor = 8.33232
+
 	defaultGrokImagineImagePrice1K        = 0.02
 	defaultGrokImagineImagePrice2K        = 0.02
 	defaultGrokImagineImageQualityPrice1K = 0.05
@@ -2360,7 +2366,7 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 	}
 
 	if IsAtlasCloudVideoModel(model) {
-		return defaultAtlasCloudVideoPrice(model, resolution)
+		return defaultAtlasCloudVideoPrice(model, resolution) * atlasCloudVideoRetailFactor
 	}
 	return s.getDefaultVideoPrice(model, resolution)
 }

@@ -105,9 +105,9 @@ func videoFixture(t *testing.T) (*OpenAIGatewayService, *APIKey) {
 	u := &User{ID: 3, Status: StatusActive, Balance: 100}
 	k := &APIKey{ID: 11, UserID: 3, Status: StatusActive, GroupID: &g.ID, Group: g, User: u}
 	s := &OpenAIGatewayService{
-		cfg:      &config.Config{JWT: config.JWTConfig{Secret: strings.Repeat("test", 12)}},
+		cfg:            &config.Config{JWT: config.JWTConfig{Secret: strings.Repeat("test", 12)}},
 		billingService: &BillingService{},
-		userRepo: &videoQuoteUsers{user: u}, channelService: &ChannelService{groupRepo: &videoQuoteGroups{group: g}, repo: &videoQuoteChannels{}},
+		userRepo:       &videoQuoteUsers{user: u}, channelService: &ChannelService{groupRepo: &videoQuoteGroups{group: g}, repo: &videoQuoteChannels{}},
 		billingCacheService: &BillingCacheService{apiKeyRateLimitLoader: &videoQuoteKeys{key: k}},
 		usageBillingRepo:    &videoQuoteBilling{ready: true},
 		accountRepo: &videoQuoteAccounts{accounts: []Account{{ID: 30, Platform: PlatformOpenAI, Type: AccountTypeAPIKey,
@@ -187,6 +187,31 @@ func TestVideoQuoteLegacyRuleEstimateUsesConfiguredVideoPrice(t *testing.T) {
 	require.Equal(t, "USD", quote.Currency)
 	require.Equal(t, "job", quote.BillingUnit)
 	require.Equal(t, 1, quote.UnitCount)
+}
+
+func TestVideoQuoteLegacyEstimateConvertsAtlasSupplierPrice(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = nil
+	req := VideoQuoteRequest{
+		Model: "bytedance/seedance-2.5/text-to-video",
+		Mode:  "t2v",
+		Controls: map[string]any{
+			"generate_audio":    true,
+			"watermark":         false,
+			"return_last_frame": false,
+			"output_format":     "mp4",
+			"draft":             false,
+			"ratio":             "16:9",
+			"resolution":        "720p-esr",
+			"duration":          float64(15),
+		},
+	}
+
+	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
+	require.NoError(t, err)
+	require.False(t, quote.Enrolled)
+	require.True(t, quote.EstimateOnly)
+	require.Equal(t, "31.43367720", quote.TotalPrice)
 }
 
 func TestVideoTariffRawDecimalMutationDoesNotReuseStalePrice(t *testing.T) {
