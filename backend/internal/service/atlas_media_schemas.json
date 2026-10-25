@@ -12573,5 +12573,669 @@
       }
     },
     "mediaFields": {}
+  },
+
+  {
+    "id": "bytedance/seedance-2.0/reference-to-video",
+    "media": "video",
+    "mode": "r2v",
+    "source": "https://static.atlascloud.ai/model/schema/bytedance-seedance-2.0-reference-to-video.json",
+    "contractRevision": "c963691537cd513e150dce2e3080dcabba4494e2e1b778073b29698940f73116",
+    "referenceLimits": {
+      "image": 9,
+      "video": 3,
+      "audio": 3,
+      "duration": 15,
+      "budget": 15,
+      "audioOnly": false,
+      "perItemDurationSeconds": 15,
+      "jointAudioVideoDurationSeconds": 15,
+      "images": 9,
+      "videos": 3,
+      "audios": 3,
+      "audioOnlyAllowed": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "bytedance/seedance-2.0/reference-to-video"
+        },
+        "prompt": {
+          "type": "string",
+          "default": "The character in image 1 dances gracefully to the music",
+          "description": "Text prompt describing the desired video. References like 'image 1', 'video 1' refer to inputs in order."
+        },
+        "reference_images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 9,
+          "description": "Reference image URLs, Base64, or asset references (asset://<ASSET_ID>). Up to 9 images for character/style/scene references, video editing, or combined generation. Per-image limits: formats jpeg/png/webp/bmp/tiff/gif/heic/heif, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, size < 30MB."
+        },
+        "reference_videos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference video URLs or asset references for video editing, extension, or multimodal generation. Up to 3 videos, total duration <= 15s. Per-video limits: formats mp4/mov, resolution 480p/720p/1080p, duration [2,15]s, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, total pixels 409600-2086876, size <= 50MB, FPS [24,60]."
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "enum": [
+            -1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "description": "Video duration in seconds (4-15), or -1 for model to choose automatically.",
+          "x-ui-component": "slider"
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "480p",
+            "720p",
+            "720p-SR",
+            "1080p",
+            "1080p-SR",
+            "1440p-SR",
+            "4k"
+          ],
+          "description": "Video resolution. \"4k\" is native UHD (3840×2160, 16:9) available on the full Seedance 2.0 models only (not Fast/Mini); 4K output is 10-bit, H.265/HEVC encoded and may not play in all browsers."
+        },
+        "ratio": {
+          "type": "string",
+          "default": "adaptive",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9",
+            "adaptive"
+          ],
+          "description": "Aspect ratio. 'adaptive' uses primary media aspect ratio."
+        },
+        "bitrate_mode": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "standard",
+            "high"
+          ],
+          "description": "Output video bitrate mode. 'high' encodes at a higher bitrate for a crisper, larger file; 'standard' uses the normal bitrate. Does not affect token cost."
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate synchronized audio."
+        },
+        "seed": {
+          "type": "integer",
+          "default": -1,
+          "minimum": -1,
+          "maximum": 4294967295,
+          "description": "Seed integer used to control the randomness of generated content. Value range: [-1, 2^32-1]. The default -1 means a random seed is used. The same seed with the same request produces similar results, but complete consistency is not guaranteed."
+        },
+        "watermark": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add a watermark."
+        },
+        "return_last_frame": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to return the last frame as a separate image."
+        },
+        "reference_audios": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference audio URLs, Base64, or asset references. Must include at least 1 reference video or image. Formats: wav/mp3, duration [2,15]s, max 15MB each. Up to 3 audios, total duration <= 15s."
+        }
+      }
+    },
+    "mediaFields": {
+      "reference_images": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_videos": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_audios": {
+        "array": true,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "bytedance/seedance-2.5/reference-to-video",
+    "media": "video",
+    "mode": "r2v",
+    "source": "https://static.atlascloud.ai/model/schema/bytedance-seedance-2.5-reference-to-video.json",
+    "contractRevision": "37c4edc7d781370ed5606ef5c71da7532029dbfd1264f0fb1d2e364773e2509a",
+    "referenceLimits": {
+      "image": 30,
+      "video": 10,
+      "audio": 10,
+      "duration": 30,
+      "budget": 30,
+      "audioOnly": true,
+      "perItemDurationSeconds": 30,
+      "jointAudioVideoDurationSeconds": 30,
+      "images": 30,
+      "videos": 10,
+      "audios": 10,
+      "audioOnlyAllowed": true
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "bytedance/seedance-2.5/reference-to-video"
+        },
+        "prompt": {
+          "type": "string",
+          "default": "The character in image 1 dances gracefully to the music",
+          "description": "Text prompt describing the desired video. Cite reference inputs in submission order with @-syntax: @Image1, @Video1, @Audio1, etc. Prompts phrased as EDITING an input video (e.g. modifying/continuing @Video1's own scene) switch the model into video-editing mode, which requires duration -1 (output tracks the input video's length; the input clip must be 4-30s)."
+        },
+        "reference_images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0,
+          "maxItems": 30,
+          "description": "Reference image URLs, Base64, or asset references (asset://<ASSET_ID>). Up to 30 images for character/style/scene references, video editing, or combined generation. Per-image limits: formats jpeg/png/webp/bmp/tiff/gif/heic/heif, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, size < 30MB. Images of real people are supported: URL and Base64 inputs are automatically registered as assets before generation, so you don't need to upload assets yourself. Inputs still go through provider content review and can be rejected (for example, for copyright restrictions). Only use a real person's likeness if you have their authorization."
+        },
+        "reference_videos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0,
+          "maxItems": 10,
+          "description": "Reference video URLs or asset references for multimodal reference, video editing, or extension. Up to 10 videos. Per-video limits: formats mp4/mov (H.264/H.265 + AAC/MP3), resolution 480p-4k, duration [2,30]s, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px (W*H between 409,600 and 8,295,044), FPS [24,60], size <= 200MB. The combined duration of all reference videos must not exceed 30s per request. Videos of real people are supported: URL inputs are automatically registered as assets before generation, so you don't need to upload assets yourself. Inputs still go through provider content review and can be rejected (for example, for copyright restrictions). Only use a real person's likeness if you have their authorization."
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "enum": [
+            -1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "description": "Video duration in seconds (4-30), or -1 for the model to choose automatically. Video-EDITING prompts (operating on an input video) accept only -1: the output tracks the input video's length (may be ~0.4s shorter).",
+          "x-ui-component": "slider"
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "480p",
+            "720p",
+            "720p-sr",
+            "720p-esr",
+            "1080p",
+            "1080p-sr",
+            "1080p-esr",
+            "1080p-esr & 60fps",
+            "1440p-sr",
+            "1440p-esr",
+            "4k-esr"
+          ],
+          "description": "Video resolution. 480p, 720p, and 1080p are native Seedance outputs. Every -sr and -esr option first generates the nearest native source, then upscales or enhances it: 720p-sr and 720p-esr from 480p; 1080p-sr, 1080p-esr, and 1080p-esr & 60fps from 720p; 1440p-sr, 1440p-esr, and 4k-esr from 1080p. Example: 4k-esr enhances a native 1080p source, not 720p. Native 1080p, 1080p-sr, and 1080p-esr are different products and are priced differently. 4k-esr delivers a 2160-pixel short edge (3840x2160 at 16:9), not native 4K generation."
+        },
+        "ratio": {
+          "type": "string",
+          "default": "adaptive",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9",
+            "adaptive"
+          ],
+          "description": "Aspect ratio. 'adaptive' uses the primary media aspect ratio. Explicit ratios apply to reference-to-video generation; video editing and extension force 'adaptive' (the source video's ratio is preserved)."
+        },
+        "omni_reference_task_type": {
+          "type": "string",
+          "disabled": true,
+          "enum": [
+            "auto",
+            "reference",
+            "edit",
+            "extend"
+          ],
+          "description": "Subtask hint. Omni reference tasks cover three subtasks - reference-to-video, video editing, and video extension. Leave it unset - equivalent to the upstream default 'auto' - to let the model infer the subtask from the reference media and prompt, in which case an incompatible parameter surfaces as an asynchronous task failure. Setting an explicit subtask has its constraints validated when the task is submitted instead, so a bad request is rejected up front and no task is created. 'reference' generates a new video from reference images/videos/audio and puts no extra constraints on ratio or duration. 'edit' edits an existing video and requires exactly one reference_videos entry of 4-30s, ratio 'adaptive', and duration -1. 'extend' extends an existing video and requires exactly one reference_videos entry and ratio 'adaptive'. The explicit values apply only to requests that carry reference media - the upstream model rejects them on prompt-only, first-frame, and first+last-frame requests, so leave the field unset for those. The model still re-derives the task type from the prompt while processing, so a prompt that disagrees with the value you set still fails the task asynchronously. This property is only available through the API.",
+          "default": "reference"
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate synchronized audio."
+        },
+        "watermark": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add a watermark."
+        },
+        "return_last_frame": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to return the last frame as a separate image."
+        },
+        "reference_audios": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 0,
+          "maxItems": 10,
+          "description": "Reference audio URLs, Base64, or asset references. Formats: wav/mp3, duration [2,30]s per clip, max 15MB each. Up to 10 audios; combined duration of all reference audios must not exceed 30s per request. Audio-only referencing is supported (unique to Seedance 2.5): a single BGM, voice, or sound-effect track can drive visual pacing, beat matching, and lip-sync."
+        },
+        "output_format": {
+          "type": "string",
+          "default": "mp4",
+          "enum": [
+            "mp4",
+            "mov"
+          ],
+          "description": "Output video container format. 'mp4' is the default; 'mov' encodes yuv444p for higher color fidelity, suited to multi-round editing/extension pipelines where recompression loss accumulates."
+        },
+        "draft": {
+          "type": "boolean",
+          "default": false,
+          "description": "Generate a draft preview at 480p, overriding resolution. The response carries a draft_id for completing the draft at 1080p with bytedance/seedance-2.5/draft-complete within seven days. A draft is billed as a normal 480p render.",
+          "x-ui-component": "switch"
+        }
+      }
+    },
+    "mediaFields": {
+      "reference_images": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_videos": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_audios": {
+        "array": true,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "bytedance/seedance-2.0-mini/reference-to-video",
+    "media": "video",
+    "mode": "r2v",
+    "source": "https://static.atlascloud.ai/model/schema/bytedance-seedance-2.0-mini-reference-to-video.json",
+    "contractRevision": "2f4570cd124d103282489b03963454a00e66673c58abbfb496ebf5d0553a04b4",
+    "referenceLimits": {
+      "image": 9,
+      "video": 3,
+      "audio": 3,
+      "duration": 15,
+      "budget": 15,
+      "audioOnly": false,
+      "perItemDurationSeconds": 15,
+      "jointAudioVideoDurationSeconds": 15,
+      "images": 9,
+      "videos": 3,
+      "audios": 3,
+      "audioOnlyAllowed": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "bytedance/seedance-2.0-mini/reference-to-video"
+        },
+        "prompt": {
+          "type": "string",
+          "default": "The character in image 1 dances gracefully to the music",
+          "description": "Text prompt describing the desired video. References like 'image 1', 'video 1' refer to inputs in order."
+        },
+        "reference_images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 9,
+          "description": "Reference image URLs, Base64, or asset references (asset://<ASSET_ID>). Up to 9 images for character/style/scene references, video editing, or combined generation. Per-image limits: formats jpeg/png/webp/bmp/tiff/gif/heic/heif, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, size < 30MB."
+        },
+        "reference_videos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference video URLs or asset references for video editing, extension, or multimodal generation. Up to 3 videos, total duration <= 15s. Per-video limits: formats mp4/mov, resolution 480p/720p/1080p, duration [2,15]s, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, total pixels 409600-2086876, size <= 50MB, FPS [24,60]."
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "enum": [
+            -1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "description": "Video duration in seconds (4-15), or -1 for model to choose automatically.",
+          "x-ui-component": "slider"
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "480p",
+            "720p",
+            "720p-SR",
+            "1080p-SR",
+            "1440p-SR"
+          ],
+          "description": "Video resolution."
+        },
+        "ratio": {
+          "type": "string",
+          "default": "adaptive",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9",
+            "adaptive"
+          ],
+          "description": "Aspect ratio. 'adaptive' uses primary media aspect ratio."
+        },
+        "bitrate_mode": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "standard",
+            "high"
+          ],
+          "description": "Output video bitrate mode. 'high' encodes at a higher bitrate for a crisper, larger file; 'standard' uses the normal bitrate. Does not affect token cost."
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate synchronized audio."
+        },
+        "seed": {
+          "type": "integer",
+          "default": -1,
+          "minimum": -1,
+          "maximum": 4294967295,
+          "description": "Seed integer used to control the randomness of generated content. Value range: [-1, 2^32-1]. The default -1 means a random seed is used. The same seed with the same request produces similar results, but complete consistency is not guaranteed."
+        },
+        "watermark": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add a watermark."
+        },
+        "return_last_frame": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to return the last frame as a separate image."
+        },
+        "reference_audios": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference audio URLs, Base64, or asset references. Must include at least 1 reference video or image. Formats: wav/mp3, duration [2,15]s, max 15MB each. Up to 3 audios, total duration <= 15s."
+        }
+      }
+    },
+    "mediaFields": {
+      "reference_images": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_videos": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_audios": {
+        "array": true,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "bytedance/seedance-2.0-fast/reference-to-video",
+    "media": "video",
+    "mode": "r2v",
+    "source": "https://static.atlascloud.ai/model/schema/bytedance-seedance-2.0-fast-reference-to-video.json",
+    "contractRevision": "074eb3ea010fb481674be658d082e07ffbeb57e18af474a91c70adae6f8e6114",
+    "referenceLimits": {
+      "image": 9,
+      "video": 3,
+      "audio": 3,
+      "duration": 15,
+      "budget": 15,
+      "audioOnly": false,
+      "perItemDurationSeconds": 15,
+      "jointAudioVideoDurationSeconds": 15,
+      "images": 9,
+      "videos": 3,
+      "audios": 3,
+      "audioOnlyAllowed": false
+    },
+    "input": {
+      "type": "object",
+      "required": [
+        "model"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "bytedance/seedance-2.0-fast/reference-to-video"
+        },
+        "prompt": {
+          "type": "string",
+          "default": "The character in image 1 dances gracefully to the music",
+          "description": "Text prompt describing the desired video. References like 'image 1', 'video 1' refer to inputs in order."
+        },
+        "reference_images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 9,
+          "description": "Reference image URLs, Base64, or asset references (asset://<ASSET_ID>). Up to 9 images for character/style/scene references, video editing, or combined generation. Per-image limits: formats jpeg/png/webp/bmp/tiff/gif/heic/heif, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, size < 30MB."
+        },
+        "reference_videos": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference video URLs or asset references for video editing, extension, or multimodal generation. Up to 3 videos, total duration <= 15s. Per-video limits: formats mp4/mov, resolution 480p/720p/1080p, duration [2,15]s, aspect ratio (W/H) 0.4-2.5, width/height 300-6000px, total pixels 409600-2086876, size <= 50MB, FPS [24,60]."
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "enum": [
+            -1,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15
+          ],
+          "description": "Video duration in seconds (4-15), or -1 for model to choose automatically.",
+          "x-ui-component": "slider"
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "480p",
+            "720p",
+            "720p-SR",
+            "1080p-SR",
+            "1440p-SR"
+          ],
+          "description": "Video resolution."
+        },
+        "ratio": {
+          "type": "string",
+          "default": "adaptive",
+          "enum": [
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16",
+            "21:9",
+            "adaptive"
+          ],
+          "description": "Aspect ratio. 'adaptive' uses primary media aspect ratio."
+        },
+        "bitrate_mode": {
+          "type": "string",
+          "default": "standard",
+          "enum": [
+            "standard",
+            "high"
+          ],
+          "description": "Output video bitrate mode. 'high' encodes at a higher bitrate for a crisper, larger file; 'standard' uses the normal bitrate. Does not affect token cost."
+        },
+        "generate_audio": {
+          "type": "boolean",
+          "default": true,
+          "description": "Whether to generate synchronized audio."
+        },
+        "seed": {
+          "type": "integer",
+          "default": -1,
+          "minimum": -1,
+          "maximum": 4294967295,
+          "description": "Seed integer used to control the randomness of generated content. Value range: [-1, 2^32-1]. The default -1 means a random seed is used. The same seed with the same request produces similar results, but complete consistency is not guaranteed."
+        },
+        "watermark": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to add a watermark."
+        },
+        "return_last_frame": {
+          "type": "boolean",
+          "default": false,
+          "description": "Whether to return the last frame as a separate image."
+        },
+        "reference_audios": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "maxItems": 3,
+          "description": "Reference audio URLs, Base64, or asset references. Must include at least 1 reference video or image. Formats: wav/mp3, duration [2,15]s, max 15MB each. Up to 3 audios, total duration <= 15s."
+        }
+      }
+    },
+    "mediaFields": {
+      "reference_images": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_videos": {
+        "array": true,
+        "dataURI": false
+      },
+      "reference_audios": {
+        "array": true,
+        "dataURI": false
+      }
+    }
   }
+
 ]
