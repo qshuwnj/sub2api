@@ -182,7 +182,7 @@ func videoSchemaSupported(value any) bool {
 			if !ok || !slices.Contains([]string{"string", "number", "integer", "boolean", "array", "object"}, kind) {
 				return false
 			}
-		case "required", "enum", "const", "default", "minimum", "maximum", "minLength", "maxLength", "minItems", "maxItems", "pattern", "description", "title", "examples", "example", "deprecated":
+		case "required", "enum", "const", "default", "minimum", "maximum", "minLength", "maxLength", "minItems", "maxItems", "pattern", "description", "title", "examples", "example", "deprecated", "disabled":
 		case "format":
 			if v != "uri" {
 				return false
@@ -216,6 +216,9 @@ func videoSchemaSupported(value any) bool {
 				}
 			}
 		default:
+			if strings.HasPrefix(k, "x-") {
+				continue
+			}
 			return false
 		}
 	}

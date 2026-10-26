@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { parseVideoPricingJSON, stringifyVideoPricingJSON, validateNativeVideoCard, importNativeVideoDraft, nativeVideoCells, newNativeVideoAdditions } from '../videoTariffPricing'
 import profiles from '../atlasVideoTariffProfiles.json'
+import r2vDraft from '../atlasSeedanceR2VTariffDraft.json'
 import { createHash } from 'node:crypto'
 import { apiIntervalsToForm, formIntervalsToAPI } from '../types'
 
@@ -9,14 +10,37 @@ const controls = { aspect_ratio: '16:9', duration: 8, generate_audio: false, res
 const key = 'video:v1:' + btoa(JSON.stringify([model, 't2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
 const raw = `{"model_pricing":[{"platform":"openai","models":["${model}"],"billing_mode":"video","intervals":[{"tier_label":"${key}","per_request_price":9999999999.12345678}],"video_tariff":{"version":1,"contract_revision":"${'a'.repeat(64)}","cells":{"${key}":{"source":"https://api.atlascloud.ai/api/v1/model/calculate","checked_at":"2026-10-22T00:00:00Z","upstream_price":"1.6","supplier_estimated":true,"policy":"fixed-customer-price-platform-variance-v1"}}}}]}`
 describe('native video administrator money boundary', () => {
-  it('matches every Studio native key and typed control across all 87 endpoint profiles', () => {
+  it('matches every Studio native key and typed control across all 91 endpoint profiles', () => {
     let count = 0
     for (const [endpoint, profile] of Object.entries(profiles)) {
       const cells = nativeVideoCells(endpoint)
       count += cells.length
       expect(createHash('sha256').update(cells.map(cell => cell.key).sort().join('\n')).digest('hex')).toBe(profile.keysSHA256)
     }
-    expect(count).toBe(10751)
+    expect(count).toBe(13757)
+  })
+  it('includes complete fixed grids for all four Seedance R2V endpoints', () => {
+    const expected = {
+      'bytedance/seedance-2.0/reference-to-video': 504,
+      'bytedance/seedance-2.0-mini/reference-to-video': 360,
+      'bytedance/seedance-2.0-fast/reference-to-video': 360,
+      'bytedance/seedance-2.5/reference-to-video': 1782,
+    }
+    for (const [model, count] of Object.entries(expected)) {
+      const profile = profiles[model]
+      expect(profile?.mode).toBe('r2v')
+      expect(nativeVideoCells(model)).toHaveLength(count)
+      expect(nativeVideoCells(model).every(cell => Number(cell.controls.duration) > 0)).toBe(true)
+      expect(nativeVideoCells(model).every(cell => cell.controls.ratio !== 'adaptive')).toBe(true)
+    }
+  })
+  it('ships an importable fixed-price draft for each R2V endpoint', () => {
+    expect(r2vDraft.model_pricing).toHaveLength(4)
+    for (const card of r2vDraft.model_pricing) {
+      expect(validateNativeVideoCard(card)).toBeNull()
+      expect(card.video_tariff.cells).toHaveProperty(card.intervals[0].tier_label)
+      expect(card.video_tariff.cells[card.intervals[0].tier_label].supplier_estimated).toBe(true)
+    }
   })
   it('retains exact numeric eight-decimal wire amounts through editable form and back to numeric JSON', () => {
     const parsed = parseVideoPricingJSON(raw)

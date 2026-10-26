@@ -60,7 +60,7 @@ func TestVideoTariffExhaustiveAdministratorNativeParity(t *testing.T) {
 		} `json:"variants"`
 	}
 	require.NoError(t, json.Unmarshal(raw, &profiles))
-	require.Len(t, profiles, 87)
+	require.Len(t, profiles, 91)
 	total := 0
 	for model, profile := range profiles {
 		t.Run(model, func(t *testing.T) {
@@ -86,5 +86,5 @@ func TestVideoTariffExhaustiveAdministratorNativeParity(t *testing.T) {
 			total += len(keys)
 		})
 	}
-	require.Equal(t, 10751, total)
+	require.Equal(t, 13757, total)
 }
