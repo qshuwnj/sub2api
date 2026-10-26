@@ -482,9 +482,9 @@ func TestVideoQuoteReadinessFreshAdmissionAndExactEnrollment(t *testing.T) {
 	q, err := s.QuoteVideo(context.Background(), k, videoTestRequest(), time.Now())
 	require.NoError(t, err)
 	require.False(t, q.Enrolled)
-	require.False(t, q.EstimateOnly)
+	require.True(t, q.EstimateOnly)
 	require.Empty(t, q.Token)
-	require.Empty(t, q.TotalPrice)
+	require.NotEmpty(t, q.TotalPrice)
 }
 
 func TestVideoQuoteRefreshesUserAndGroupBeyondCachedKey(t *testing.T) {

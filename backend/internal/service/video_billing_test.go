@@ -1,10 +1,72 @@
 package service
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func atlasVideoBillingTestResolution(model string, contract *atlasMediaContract) string {
+	if contract != nil && contract.Input != nil {
+		if property := contract.Input.Properties["resolution"]; property != nil {
+			for _, candidate := range property.Enum {
+				if value, ok := candidate.(string); ok && value != "" {
+					return value
+				}
+			}
+			if value, ok := property.defaultString(); ok && value != "" {
+				return value
+			}
+		}
+	}
+	for _, candidate := range []string{"480p", "540p", "720p", "1080p", "1440p-sr", "2k", "4k", "native"} {
+		if _, ok := atlasMediaVideoResolution(model, candidate); ok {
+			return candidate
+		}
+	}
+	return "native"
+}
+
+func TestCalculateVideoCostCoversAllAtlasVideoContracts(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	var models []string
+	for model, contract := range atlasMediaContracts {
+		if contract.Media != "video" || contract.Blocked != "" || contract.Input == nil {
+			continue
+		}
+		models = append(models, model)
+		resolution := atlasVideoBillingTestResolution(model, contract)
+		cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+	}
+	sort.Strings(models)
+	require.Len(t, models, 91)
+}
+
+func TestCalculateVideoCostCoversEveryDeclaredAtlasVideoResolution(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	for model, contract := range atlasMediaContracts {
+		if contract.Media != "video" || contract.Blocked != "" || contract.Input == nil {
+			continue
+		}
+		property := contract.Input.Properties["resolution"]
+		if property != nil && len(property.Enum) > 0 {
+			for _, candidate := range property.Enum {
+				resolution, ok := candidate.(string)
+				require.True(t, ok, "non-string resolution for %s", model)
+				cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+				require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+			}
+			continue
+		}
+		resolution := atlasVideoBillingTestResolution(model, contract)
+		cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+	}
+}
 
 func TestCanonicalGrokImagineVideoPriceFamily(t *testing.T) {
 	t.Parallel()
