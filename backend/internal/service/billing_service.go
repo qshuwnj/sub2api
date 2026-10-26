@@ -2127,6 +2127,12 @@ type VideoPriceConfig struct {
 const (
 	defaultImageGenerationPrice = 0.134
 
+	// Atlas video fallback tariffs are published in supplier USD. Convert them
+	// to the gateway's retail ledger price with the configured FX rate and
+	// 1.2x markup (6.9436 * 1.2 = 8.33232). Explicit group prices are already
+	// retail values and are returned before this fallback.
+	atlasCloudVideoRetailFactor = 8.33232
+
 	defaultGrokImagineImagePrice1K        = 0.02
 	defaultGrokImagineImagePrice2K        = 0.02
 	defaultGrokImagineImageQualityPrice1K = 0.05
@@ -2296,7 +2302,7 @@ func (s *BillingService) CalculateVideoCost(model string, resolution string, vid
 		return &CostBreakdown{}
 	}
 	resolution = NormalizeVideoBillingResolutionForModel(model, resolution)
-	durationSeconds = NormalizeVideoBillingDurationSecondsOrDefault(durationSeconds)
+	durationSeconds = NormalizeVideoBillingDurationForModel(model, durationSeconds)
 
 	perSecondPrice := s.getVideoUnitPrice(model, resolution, groupConfig)
 	totalCost := perSecondPrice * float64(durationSeconds) * float64(videoCount)
@@ -2343,9 +2349,6 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 		if price := LookupVideoModelPrice(groupConfig.ModelPrices, model, resolution); price != nil {
 			return *price
 		}
-		if IsAtlasCloudVideoModel(model) {
-			return 0
-		}
 		switch NormalizeVideoBillingResolutionOrDefault(resolution) {
 		case VideoBillingResolution480P:
 			if groupConfig.Price480P != nil {
@@ -2363,9 +2366,270 @@ func (s *BillingService) getVideoUnitPrice(model string, resolution string, grou
 	}
 
 	if IsAtlasCloudVideoModel(model) {
-		return 0
+		return defaultAtlasCloudVideoPrice(model, resolution) * atlasCloudVideoRetailFactor
 	}
 	return s.getDefaultVideoPrice(model, resolution)
+}
+
+// defaultAtlasCloudVideoPrice contains the provider-published per-second
+// tariffs used when an operator has not configured an explicit group price.
+// Keep this fallback model-aware: Atlas exposes additional tiers that must not
+// be collapsed into the generic 480p/720p/1080p buckets.
+func defaultAtlasCloudVideoPrice(model, resolution string) float64 {
+	resolution = strings.ToLower(strings.TrimSpace(resolution))
+
+	if model == atlasCloudGeminiVideoModel {
+		switch resolution {
+		case "360p":
+			return 0.070
+		case "720p":
+			return 0.099
+		case "1080p":
+			return 0.144
+		case "4k":
+			return 0.279
+		default:
+			return 0
+		}
+	}
+
+	var prices map[string]float64
+	switch {
+	case strings.Contains(model, "bytedance/seedance-2.5/"):
+		prices = map[string]float64{
+			"480p":              0.13971204,
+			"720p":              0.3005,
+			"720p-sr":           0.2193,
+			"720p-esr":          0.2515,
+			"1080p":             0.5914,
+			"1080p-sr":          0.4056,
+			"1080p-esr":         0.4507,
+			"1080p-esr & 60fps": 0.4958,
+			"1440p-sr":          0.7000,
+			"1440p-esr":         0.7602,
+			"4k-esr":            1.7006,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0-mini/"):
+		prices = map[string]float64{
+			"480p":     0.04499712,
+			"720p":     0.0968,
+			"720p-sr":  0.081,
+			"1080p-sr": 0.1742,
+			"1440p-sr": 0.3097,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0-fast/"):
+		prices = map[string]float64{
+			"480p":     0.071995392,
+			"720p":     0.1548,
+			"720p-sr":  0.1296,
+			"1080p":    0.3484,
+			"1080p-sr": 0.2787,
+			"1440p-sr": 0.4955,
+		}
+	case strings.Contains(model, "bytedance/seedance-2.0/"):
+		prices = map[string]float64{
+			"480p":     0.08999424,
+			"720p":     0.1935,
+			"720p-sr":  0.162,
+			"1080p":    0.4355,
+			"1080p-sr": 0.3484,
+			"1440p-sr": 0.6193,
+			"4k":       0.9722,
+		}
+	case strings.HasPrefix(model, "bytedance/seedance-v1-pro-fast/"):
+		prices = map[string]float64{
+			"480p":  0.022,
+			"720p":  0.047,
+			"1080p": 0.110,
+		}
+	case strings.HasPrefix(model, "bytedance/seedance-v1-pro-i2v-480p"),
+		strings.HasPrefix(model, "bytedance/seedance-v1-pro-t2v-480p"):
+		prices = map[string]float64{"480p": 0.022}
+	case strings.HasPrefix(model, "bytedance/seedance-v1-pro-i2v-720p"),
+		strings.HasPrefix(model, "bytedance/seedance-v1-pro-t2v-720p"):
+		prices = map[string]float64{"720p": 0.047}
+	case strings.HasPrefix(model, "bytedance/seedance-v1-pro-i2v-1080p"),
+		strings.HasPrefix(model, "bytedance/seedance-v1-pro-t2v-1080p"):
+		prices = map[string]float64{"1080p": 0.110}
+	case strings.HasPrefix(model, "bytedance/seedance-v1.5-pro/"):
+		prices = map[string]float64{
+			"480p": 0.018,
+			"720p": 0.047,
+		}
+	case strings.HasPrefix(model, "google/gemini-omni-flash/"):
+		prices = map[string]float64{"720p": 0.125}
+	case strings.HasPrefix(model, "google/veo3.1-fast/"):
+		prices = map[string]float64{
+			"720p":  0.080,
+			"1080p": 0.100,
+			"4k":    0.250,
+		}
+	case strings.HasPrefix(model, "google/veo3.1-lite/"):
+		prices = map[string]float64{
+			"720p":  0.050,
+			"1080p": 0.050,
+		}
+	case strings.HasPrefix(model, "google/veo3.1/"):
+		prices = map[string]float64{
+			"720p":  0.200,
+			"1080p": 0.200,
+			"4k":    0.400,
+		}
+	case strings.HasPrefix(model, "kwaivgi/kling-v1.6-i2v-pro"),
+		strings.HasPrefix(model, "kwaivgi/kling-v1.6-multi-i2v-pro"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.1-i2v-pro"):
+		prices = map[string]float64{"native": 0.098}
+	case strings.HasPrefix(model, "kwaivgi/kling-v1.6-i2v-standard"),
+		strings.HasPrefix(model, "kwaivgi/kling-v1.6-multi-i2v-standard"),
+		strings.HasPrefix(model, "kwaivgi/kling-v1.6-t2v-standard"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.1-i2v-standard"):
+		prices = map[string]float64{"native": 0.056}
+	case strings.HasPrefix(model, "kwaivgi/kling-v2.0-i2v-master"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.0-t2v-master"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.1-i2v-master"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.1-t2v-master"):
+		prices = map[string]float64{"native": 0.280}
+	case strings.HasPrefix(model, "kwaivgi/kling-v2.5-turbo-pro/"),
+		strings.HasPrefix(model, "kwaivgi/kling-v2.6-pro/"):
+		prices = map[string]float64{"native": 0.070}
+	case strings.HasPrefix(model, "kwaivgi/kling-v3.0-4k/"),
+		strings.HasPrefix(model, "kwaivgi/kling-video-o3-4k/"):
+		prices = map[string]float64{"native": 0.140}
+	case strings.HasPrefix(model, "kwaivgi/kling-v3.0-pro/"):
+		prices = map[string]float64{
+			"native":   0.112,
+			"1080p":    0.112,
+			"1440p-sr": 0.140,
+		}
+	case strings.HasPrefix(model, "kwaivgi/kling-v3.0-std/"):
+		prices = map[string]float64{
+			"native":   0.084,
+			"720p":     0.084,
+			"1080p-sr": 0.100,
+			"1440p-sr": 0.112,
+		}
+	case strings.HasPrefix(model, "kwaivgi/kling-v3.0-turbo/"):
+		prices = map[string]float64{
+			"720p":  0.070,
+			"1080p": 0.090,
+		}
+	case strings.HasPrefix(model, "kwaivgi/kling-video-o1/"):
+		prices = map[string]float64{"native": 0.112}
+	case strings.HasPrefix(model, "minimax/h3-developer/"):
+		prices = map[string]float64{
+			"480p":     0.038,
+			"768p":     0.038,
+			"1440p-sr": 0.038,
+			"4k-sr":    0.038,
+		}
+	case strings.HasPrefix(model, "minimax/h3-fast/"):
+		prices = map[string]float64{"480p": 0.046}
+	case strings.HasPrefix(model, "minimax/h3-max-turbo/"):
+		prices = map[string]float64{
+			"480p": 0.025,
+			"768p": 0.025,
+		}
+	case strings.HasPrefix(model, "minimax/h3-max/"):
+		prices = map[string]float64{
+			"480p":     0.050,
+			"768p":     0.050,
+			"1440p-sr": 0.050,
+			"4k-sr":    0.050,
+		}
+	case strings.HasPrefix(model, "minimax/h3/"):
+		prices = map[string]float64{
+			"480p":      0.038,
+			"768p":      0.038,
+			"2k":        0.038,
+			"1080p-esr": 0.038,
+			"1440p-esr": 0.038,
+			"4k-esr":    0.038,
+		}
+	case model == "vidu/image-to-video-2.0":
+		prices = map[string]float64{"native": 0.075}
+	case strings.HasPrefix(model, "vidu/q1/"):
+		prices = map[string]float64{"1080p": 0.075}
+	case strings.HasPrefix(model, "vidu/q2-pro-fast/"),
+		strings.HasPrefix(model, "vidu/q2-pro/"):
+		prices = map[string]float64{
+			"540p":  0.040,
+			"720p":  0.040,
+			"1080p": 0.040,
+		}
+	case strings.HasPrefix(model, "vidu/q2-turbo/"):
+		prices = map[string]float64{
+			"540p":  0.030,
+			"720p":  0.030,
+			"1080p": 0.030,
+		}
+	case strings.HasPrefix(model, "vidu/q2/"):
+		prices = map[string]float64{
+			"540p":  0.050,
+			"720p":  0.050,
+			"1080p": 0.050,
+		}
+	case strings.HasPrefix(model, "vidu/q3-pro/"):
+		prices = map[string]float64{
+			"540p":     0.050,
+			"720p":     0.050,
+			"1080p":    0.050,
+			"1080p-sr": 0.050,
+			"1440p-sr": 0.050,
+		}
+	case strings.HasPrefix(model, "vidu/q3-turbo/"):
+		prices = map[string]float64{
+			"540p":     0.040,
+			"720p":     0.040,
+			"1080p":    0.040,
+			"1080p-sr": 0.040,
+			"1440p-sr": 0.040,
+		}
+	case strings.HasPrefix(model, "vidu/q4-preview/"):
+		prices = map[string]float64{
+			"540p":  0.075,
+			"720p":  0.075,
+			"1080p": 0.075,
+			"2k":    0.075,
+			"4k":    0.075,
+		}
+	case strings.HasPrefix(model, "xai/grok-imagine-video-v1.5-developer/"),
+		strings.HasPrefix(model, "xai/grok-imagine-video-v1.5-lite-developer/"):
+		prices = map[string]float64{
+			"480p":  0.028,
+			"720p":  0.028,
+			"1080p": 0.028,
+		}
+	case strings.HasPrefix(model, "xai/grok-imagine-video-v1.5-lite/"),
+		strings.HasPrefix(model, "xai/grok-imagine-video-v1.5/"):
+		prices = map[string]float64{
+			"480p":  0.080,
+			"720p":  0.140,
+			"1080p": 0.250,
+		}
+	case strings.HasPrefix(model, "xai/grok-imagine-video/"):
+		prices = map[string]float64{
+			"480p": 0.050,
+			"720p": 0.070,
+		}
+	default:
+		if IsAtlasCloudVideoModel(model) {
+			prices = map[string]float64{
+				"native": 0.050,
+				"480p":   0.050,
+				"720p":   0.080,
+				"1080p":  0.120,
+				"4k":     0.250,
+			}
+		}
+	}
+
+	if price, ok := prices[resolution]; ok {
+		return price
+	}
+	if price, ok := prices["native"]; ok {
+		return price
+	}
+	return 0
 }
 
 // getDefaultImagePrice 获取 LiteLLM 默认图片价格
