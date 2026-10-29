@@ -398,6 +398,55 @@ func TestOpenAIGatewayServiceParseOpenAIImagesRequest_JSONEditURLs(t *testing.T)
 	require.Equal(t, OpenAIImagesCapabilityNative, parsed.RequiredCapability)
 }
 
+func TestOpenAIGatewayServiceParseOpenAIImagesRequest_JSONEditImageValues(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	for _, model := range []string{"gpt-image-2", "openai/gpt-image-2-developer/edit"} {
+		for _, tc := range []struct {
+			name    string
+			images  string
+			want    []string
+			wantErr string
+		}{
+			{
+				name:   "string URL",
+				images: `["https://example.com/source.png"]`,
+				want:   []string{"https://example.com/source.png"},
+			},
+			{
+				name:   "mixed string and object URLs",
+				images: `["https://example.com/first.png",{"image_url":"https://example.com/second.png"}]`,
+				want:   []string{"https://example.com/first.png", "https://example.com/second.png"},
+			},
+			{
+				name:    "unsupported file ID",
+				images:  `[{"file_id":"file_123"}]`,
+				wantErr: "images[].file_id is not supported",
+			},
+			{
+				name:    "numeric value is not a URL",
+				images:  `[123]`,
+				wantErr: "images[].image_url is required",
+			},
+		} {
+			t.Run(model+"/"+tc.name, func(t *testing.T) {
+				body := []byte(fmt.Sprintf(`{"model":%q,"prompt":"edit","images":%s}`, model, tc.images))
+				c, _ := gin.CreateTestContext(httptest.NewRecorder())
+				c.Request = httptest.NewRequest(http.MethodPost, openAIImagesEditsEndpoint, bytes.NewReader(body))
+				c.Request.Header.Set("Content-Type", "application/json")
+
+				parsed, err := (&OpenAIGatewayService{}).ParseOpenAIImagesRequest(c, body)
+				if tc.wantErr != "" {
+					require.ErrorContains(t, err, tc.wantErr)
+					require.Nil(t, parsed)
+					return
+				}
+				require.NoError(t, err)
+				require.Equal(t, tc.want, parsed.InputImageURLs)
+			})
+		}
+	}
+}
+
 func TestCollectOpenAIImagePointers_RecognizesDirectAssets(t *testing.T) {
 	items := collectOpenAIImagePointers([]byte(`{
 		"revised_prompt": "cat astronaut",
