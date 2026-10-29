@@ -7,6 +7,7 @@ import (
 	"errors"
 	"math"
 	"os"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -212,6 +213,92 @@ func TestVideoQuoteLegacyEstimateConvertsAtlasSupplierPrice(t *testing.T) {
 	require.False(t, quote.Enrolled)
 	require.True(t, quote.EstimateOnly)
 	require.Equal(t, "31.43367720", quote.TotalPrice)
+}
+
+func TestVideoQuoteLegacyMiniReferencePriceMatchesSettlement(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = nil
+	flatPrice := 0.25
+	req := VideoQuoteRequest{
+		Model: "bytedance/seedance-2.0-mini/reference-to-video",
+		Mode:  "r2v",
+		Controls: map[string]any{
+			"resolution":        "480p",
+			"duration":          float64(5),
+			"ratio":             "16:9",
+			"bitrate_mode":      "standard",
+			"generate_audio":    true,
+			"seed":              float64(-1),
+			"watermark":         false,
+			"return_last_frame": false,
+		},
+	}
+	for _, tc := range []struct {
+		name     string
+		flat     *float64
+		perModel map[string]map[string]float64
+		want     string
+	}{
+		{name: "existing retail fallback", want: "1.87465201"},
+		{name: "flat override", flat: &flatPrice, want: "1.25000000"},
+		{name: "model override wins", flat: &flatPrice,
+			perModel: map[string]map[string]float64{req.Model: {"480p": 0.3}}, want: "1.50000000"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			key.Group.VideoPrice480P = tc.flat
+			key.Group.VideoModelPrices = tc.perModel
+			quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
+			require.NoError(t, err)
+			require.True(t, quote.EstimateOnly)
+			require.Equal(t, tc.want, quote.TotalPrice)
+			cost := s.calculateOpenAIVideoCost(context.Background(), req.Model, key,
+				&OpenAIForwardResult{VideoCount: 1, VideoResolution: "480p", VideoDurationSeconds: 5}, 1)
+			want, err := strconv.ParseFloat(tc.want, 64)
+			require.NoError(t, err)
+			require.InDelta(t, want, cost.ActualCost, 1e-8)
+		})
+	}
+}
+
+func TestVideoQuoteLegacyInvalidOverrideDoesNotFallBack(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = nil
+	req := videoTestRequest()
+	key.Group.VideoModelPrices = map[string]map[string]float64{req.Model: {"720p": -1}}
+	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
+	require.NoError(t, err)
+	require.False(t, quote.EstimateOnly, "an invalid override must not produce a usable fallback estimate")
+	require.Empty(t, quote.TotalPrice)
+}
+
+func TestVideoQuoteLegacyNativeResolutionMatchesGeneration(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = nil
+	req := VideoQuoteRequest{
+		Model: "kwaivgi/kling-v2.5-turbo-pro/text-to-video",
+		Mode:  "t2v",
+		Controls: map[string]any{
+			"duration":       float64(5),
+			"aspect_ratio":   "1:1",
+			"guidance_scale": 0.5,
+		},
+	}
+	for _, tc := range []struct {
+		name   string
+		prices map[string]map[string]float64
+		want   string
+	}{
+		{"native fallback", nil, "2.91631200"},
+		{"native override", map[string]map[string]float64{req.Model: {"native": 0.2}}, "1.00000000"},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			key.Group.VideoModelPrices = tc.prices
+			quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
+			require.NoError(t, err)
+			require.True(t, quote.EstimateOnly)
+			require.Equal(t, tc.want, quote.TotalPrice)
+		})
+	}
 }
 
 func TestVideoTariffRawDecimalMutationDoesNotReuseStalePrice(t *testing.T) {

@@ -6,7 +6,9 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"math"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -55,6 +57,9 @@ func TestAtlasCloudVideoHandlerLifecycleAndOwnership(t *testing.T) {
 			Body: io.NopCloser(strings.NewReader(`{"code":200,"data":{"id":"task-atlas","status":"processing"}}`))}, nil
 	}
 	c, w := atlasVideoContext(t, true, false)
+	unpricedKey, _ := middleware.GetAPIKeyFromContext(c)
+	invalidPrice := -1.0
+	unpricedKey.Group.VideoPrice480P = &invalidPrice
 	h.AtlasCloudVideoGeneration(c)
 	require.Equal(t, 400, w.Code, w.Body.String())
 	require.Zero(t, upstream.calls)
@@ -107,6 +112,83 @@ func TestAtlasCloudVideoHandlerLifecycleAndOwnership(t *testing.T) {
 		}
 	}
 	require.Len(t, bindings.billed, 1)
+}
+
+func TestAtlasCloudVideoHandlerUsesExistingFallbackThroughCompletion(t *testing.T) {
+	h, slots, bindings, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai/api/v1")
+	upstream.call = func(req *http.Request, _ int64) (*http.Response, error) {
+		raw := `{"data":{"id":"task-atlas","status":"processing"}}`
+		if req.Method == http.MethodGet {
+			raw = `{"data":{"id":"task-atlas","status":"completed","outputs":["https://cdn.example/paid.mp4"]}}`
+		}
+		return &http.Response{StatusCode: 200, Header: http.Header{"Content-Type": {"application/json"}},
+			Body: io.NopCloser(strings.NewReader(raw))}, nil
+	}
+	c, w := atlasVideoContext(t, true, false)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/videos/generations", strings.NewReader(
+		`{"model":"bytedance/seedance-2.0-mini/reference-to-video","prompt":"waves","duration":5,"resolution":"480p","reference_images":["https://assets.example/reference.png"]}`))
+	c.Request.Header.Set("Content-Type", "application/json")
+	h.AtlasCloudVideoGeneration(c)
+	require.Equal(t, 200, w.Code, w.Body.String())
+	require.Len(t, bindings.pending, 1)
+	slots.assertReleased(t)
+	for range 2 {
+		c, w = atlasVideoContext(t, false, false)
+		h.AtlasCloudVideoStatus(c)
+		require.Equal(t, 200, w.Code, w.Body.String())
+		require.Contains(t, w.Body.String(), "paid.mp4")
+		slots.assertReleased(t)
+	}
+	require.Len(t, bindings.billed, 1, "repeated polling must not claim a second charge")
+}
+
+func TestAtlasCloudVideoHandlerRejectsInvalidExplicitPrice(t *testing.T) {
+	for _, price := range []float64{-1, math.NaN(), math.Inf(1)} {
+		t.Run(fmt.Sprint(price), func(t *testing.T) {
+			h, slots, _, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai/api/v1")
+			c, w := atlasVideoContext(t, true, true)
+			key, _ := middleware.GetAPIKeyFromContext(c)
+			key.Group.VideoModelPrices["minimax/h3-developer/text-to-video"]["4k-sr"] = price
+			h.AtlasCloudVideoGeneration(c)
+			require.Equal(t, 400, w.Code, w.Body.String())
+			require.Contains(t, w.Body.String(), "pricing_not_configured")
+			require.Zero(t, upstream.calls)
+			slots.assertReleased(t)
+		})
+	}
+}
+
+func TestAtlasCloudVideoHandlerUnknownModelCannotBorrowKnownFallback(t *testing.T) {
+	h, slots, _, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai/api/v1")
+	c, w := atlasVideoContext(t, true, false)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/videos/generations", strings.NewReader(
+		`{"model":"bytedance/seedance-2.0-mini/unknown/text-to-video","prompt":"waves","duration":5,"resolution":"480p"}`))
+	c.Request.Header.Set("Content-Type", "application/json")
+	h.AtlasCloudVideoGeneration(c)
+	require.Equal(t, 400, w.Code, w.Body.String())
+	require.Contains(t, w.Body.String(), "pricing_not_configured")
+	require.Zero(t, upstream.calls)
+	slots.assertReleased(t)
+}
+
+func TestAtlasCloudVideoHandlerPollRejectsInvalidExplicitPrice(t *testing.T) {
+	h, slots, _, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai/api/v1")
+	upstream.call = func(*http.Request, int64) (*http.Response, error) {
+		return &http.Response{StatusCode: 200, Header: http.Header{"Content-Type": {"application/json"}},
+			Body: io.NopCloser(strings.NewReader(`{"data":{"id":"task-atlas","status":"processing"}}`))}, nil
+	}
+	c, w := atlasVideoContext(t, true, true)
+	h.AtlasCloudVideoGeneration(c)
+	require.Equal(t, 200, w.Code, w.Body.String())
+	before := upstream.calls
+	c, w = atlasVideoContext(t, false, true)
+	key, _ := middleware.GetAPIKeyFromContext(c)
+	key.Group.VideoModelPrices["minimax/h3-developer/text-to-video"]["4k-sr"] = math.NaN()
+	h.AtlasCloudVideoStatus(c)
+	require.Equal(t, 503, w.Code, w.Body.String())
+	require.Contains(t, w.Body.String(), "billing_state_unavailable")
+	require.Equal(t, before, upstream.calls)
+	slots.assertReleased(t)
 }
 
 func TestAtlasCloudImageHandlerMissingPriceNeverCallsUpstream(t *testing.T) {

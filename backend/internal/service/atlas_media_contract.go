@@ -369,13 +369,7 @@ func buildAtlasMediaVideoPayload(body []byte, contract *atlasMediaContract) (Gro
 		info.AspectRatio = ratio
 	}
 	info.Resolution, _ = payload["resolution"].(string)
-	if info.Resolution == "" {
-		info.Resolution = "native"
-		if match := regexp.MustCompile(`-(480p|720p|1080p)$`).FindStringSubmatch(contract.ID); len(match) == 2 {
-			info.Resolution = match[1]
-		}
-	}
-	info.Resolution = strings.ToLower(info.Resolution)
+	info.Resolution = atlasMediaVideoResolutionOrDefault(contract.ID, info.Resolution)
 	for key, ref := range contract.MediaFields {
 		if value, exists := payload[key]; exists {
 			if ref.Array {
@@ -443,6 +437,16 @@ func (s *atlasMediaSchema) defaultString() (string, bool) {
 	return value, ok
 }
 
+func atlasMediaVideoResolutionOrDefault(model, resolution string) string {
+	if resolution == "" {
+		resolution = "native"
+		if match := regexp.MustCompile(`-(480p|720p|1080p)$`).FindStringSubmatch(model); len(match) == 2 {
+			resolution = match[1]
+		}
+	}
+	return strings.ToLower(resolution)
+}
+
 func atlasMediaVideoResolution(model, resolution string) (string, bool) {
 	contract := atlasMediaModel(model, "video")
 	if contract == nil {
@@ -462,10 +466,7 @@ func atlasMediaVideoResolution(model, resolution string) (string, bool) {
 		}
 		return "", false
 	}
-	tier := "native"
-	if match := regexp.MustCompile(`-(480p|720p|1080p)$`).FindStringSubmatch(model); len(match) == 2 {
-		tier = match[1]
-	}
+	tier := atlasMediaVideoResolutionOrDefault(model, "")
 	return tier, strings.EqualFold(resolution, tier)
 }
 

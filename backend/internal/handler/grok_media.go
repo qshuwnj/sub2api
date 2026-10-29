@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"errors"
-	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -144,8 +143,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 			h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", err.Error())
 			return
 		}
-		price := apiKey.Group.GetVideoPriceForModel(requestInfo.Model, requestInfo.Resolution)
-		if price == nil || *price < 0 || math.IsNaN(*price) || math.IsInf(*price, 0) {
+		if !service.HasAtlasCloudVideoPrice(apiKey, requestInfo.Model, requestInfo.Resolution) {
 			h.errorResponse(c, http.StatusBadRequest, "pricing_not_configured", "Configure the exact AtlasCloud model and resolution price before generation")
 			return
 		}
@@ -257,7 +255,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video settlement confirmation is unavailable; retry this status request later")
 						return
 					}
-				} else if apiKey.Group.GetVideoPriceForModel(pending.BillingModel, pending.VideoResolution) == nil {
+				} else if !service.HasAtlasCloudVideoPrice(apiKey, pending.BillingModel, pending.VideoResolution) {
 					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video billing price is unavailable; retry this status request later")
 					return
 				}

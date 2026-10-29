@@ -1,11 +1,40 @@
 package service
 
 import (
+	"math"
 	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func TestHasAtlasCloudVideoPricePreservesOverridesAndRejectsUnknownFallbacks(t *testing.T) {
+	const model = "bytedance/seedance-2.0-mini/reference-to-video"
+	price := func(value float64) *float64 { return &value }
+	for _, tc := range []struct {
+		name       string
+		key        *APIKey
+		model      string
+		resolution string
+		want       bool
+	}{
+		{"existing fallback", &APIKey{Group: &Group{}}, model, "480p", true},
+		{"native higher tier", &APIKey{Group: &Group{}}, model, "1080p-SR", true},
+		{"explicit free", &APIKey{Group: &Group{VideoPrice480P: price(0)}}, model, "480p", true},
+		{"negative override", &APIKey{Group: &Group{VideoPrice480P: price(-1)}}, model, "480p", false},
+		{"nan override", &APIKey{Group: &Group{VideoPrice480P: price(math.NaN())}}, model, "480p", false},
+		{"infinite override", &APIKey{Group: &Group{VideoPrice480P: price(math.Inf(1))}}, model, "480p", false},
+		{"unknown tier cannot use flat price", &APIKey{Group: &Group{VideoPrice480P: price(1)}}, model, "8k", false},
+		{"unknown model cannot borrow fallback", &APIKey{Group: &Group{}}, "bytedance/seedance-2.0-mini/unknown/text-to-video", "480p", false},
+		{"other provider", &APIKey{Group: &Group{}}, "grok-imagine-video", "480p", false},
+		{"no key", nil, model, "480p", false},
+		{"no group", &APIKey{}, model, "480p", false},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			require.Equal(t, tc.want, HasAtlasCloudVideoPrice(tc.key, tc.model, tc.resolution))
+		})
+	}
+}
 
 func atlasVideoBillingTestResolution(model string, contract *atlasMediaContract) string {
 	if contract != nil && contract.Input != nil {
@@ -59,12 +88,16 @@ func TestCalculateVideoCostCoversEveryDeclaredAtlasVideoResolution(t *testing.T)
 				require.True(t, ok, "non-string resolution for %s", model)
 				cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
 				require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+				require.True(t, HasAtlasCloudVideoPrice(&APIKey{Group: &Group{}}, model, resolution),
+					"generation must accept the existing settlement price for %s at %s", model, resolution)
 			}
 			continue
 		}
 		resolution := atlasVideoBillingTestResolution(model, contract)
 		cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
 		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+		require.True(t, HasAtlasCloudVideoPrice(&APIKey{Group: &Group{}}, model, resolution),
+			"generation must accept the existing settlement price for %s at %s", model, resolution)
 	}
 }
 

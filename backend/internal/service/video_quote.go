@@ -677,6 +677,10 @@ func (s *OpenAIGatewayService) videoLegacyEstimate(ctx context.Context, key *API
 		return "", ErrVideoQuoteUnavailable
 	}
 	resolution, _ := req.Controls["resolution"].(string)
+	resolution = atlasMediaVideoResolutionOrDefault(req.Model, resolution)
+	if !HasAtlasCloudVideoPrice(key, req.Model, resolution) {
+		return "", fmt.Errorf("video tariff not configured")
+	}
 	durationValue := req.Controls["duration"]
 	var duration decimal.Decimal
 	switch value := durationValue.(type) {
@@ -698,7 +702,7 @@ func (s *OpenAIGatewayService) videoLegacyEstimate(ctx context.Context, key *API
 	if err != nil {
 		return "", err
 	}
-	cost := s.billingService.CalculateVideoCost(req.Model, resolution, 1, int(duration.IntPart()), key.Group.VideoPriceConfig(), rate)
+	cost := s.billingService.CalculateVideoCost(req.Model, resolution, 1, int(duration.IntPart()), videoPriceConfigFromAPIKey(key), rate)
 	if cost == nil || math.IsNaN(cost.ActualCost) || math.IsInf(cost.ActualCost, 0) || cost.ActualCost <= 0 {
 		return "", fmt.Errorf("video tariff not configured")
 	}

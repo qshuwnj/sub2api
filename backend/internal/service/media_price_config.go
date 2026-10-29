@@ -1,5 +1,7 @@
 package service
 
+import "math"
+
 // imageCountBillingEnabled 表示该分组强制按实际出图张数计费，即使渠道是 token 计费。
 func imageCountBillingEnabled(apiKey *APIKey) bool {
 	return apiKey != nil && apiKey.Group != nil && apiKey.Group.ImageCountBilling
@@ -41,6 +43,25 @@ func videoPriceConfigFromAPIKey(apiKey *APIKey) *VideoPriceConfig {
 
 func apiKeyHasConfiguredVideoPrice(apiKey *APIKey, model, resolution string) bool {
 	return apiKey != nil && apiKey.Group != nil && apiKey.Group.GetVideoPriceForModel(model, resolution) != nil
+}
+
+// HasAtlasCloudVideoPrice applies the same override/default precedence as legacy
+// settlement. Only exact supported models may use built-in fallback tariffs.
+func HasAtlasCloudVideoPrice(apiKey *APIKey, model, resolution string) bool {
+	if apiKey == nil || apiKey.Group == nil || !IsAtlasCloudVideoModel(model) {
+		return false
+	}
+	tier, ok := LookupVideoBillingResolutionForModel(model, resolution)
+	if !ok {
+		return false
+	}
+	configured := apiKey.Group.GetVideoPriceForModel(model, tier)
+	if configured == nil && atlasMediaModel(model, "video") == nil &&
+		model != atlasCloudGeminiVideoModel && model != atlasCloudMinimaxVideoModel && model != atlasCloudGrokVideoModel {
+		return false
+	}
+	price := (&BillingService{}).getVideoUnitPrice(model, tier, videoPriceConfigFromAPIKey(apiKey))
+	return !math.IsNaN(price) && !math.IsInf(price, 0) && price >= 0 && (price > 0 || configured != nil)
 }
 
 func webSearchPricePerCallFromAPIKey(apiKey *APIKey) *float64 {
