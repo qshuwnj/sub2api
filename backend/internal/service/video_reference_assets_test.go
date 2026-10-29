@@ -1,0 +1,172 @@
+package service
+
+import (
+	"context"
+	"io"
+	"math"
+	"strings"
+	"testing"
+	"time"
+)
+
+func TestVideoReferenceFFProbeParsesBoundedMetadata(t *testing.T) {
+	probe := NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
+		return []byte(`{"streams":[{"codec_type":"video","codec_name":"h264","width":1920,"height":1080,"duration":"8.25","r_frame_rate":"30000/1001"}],"format":{"duration":"8.25","format_name":"mov,mp4,m4a,3gp,3g2,mj2"}}`), nil
+	})
+	got, err := probe.Probe(context.Background(), "/tmp/reference.mp4")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if got.Kind != VideoReferenceVideo || got.MIME != "video/mp4" || got.Width != 1920 || got.Height != 1080 || got.Duration != 8.25 || got.FrameRate < 29.9 || got.FrameRate > 30.0 {
+		t.Fatalf("unexpected metadata: %+v", got)
+	}
+}
+
+func TestVideoReferenceFFProbeRejectsOversizedOutput(t *testing.T) {
+	probe := NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
+		return make([]byte, 2<<20), nil
+	})
+	probe.MaxOutputBytes = 1024
+	if _, err := probe.Probe(context.Background(), "reference.mp4"); err == nil {
+		t.Fatal("expected bounded ffprobe output rejection")
+	}
+}
+
+func TestVideoReferenceFFProbeStreamsAndCapsOutput(t *testing.T) {
+	probe := NewVideoReferenceFFProbe(nil)
+	probe.MaxOutputBytes = 8
+	probe.ReaderRunner = func(context.Context, ...string) (io.ReadCloser, error) {
+		return io.NopCloser(strings.NewReader(strings.Repeat("x", 1024))), nil
+	}
+	if _, err := probe.Probe(context.Background(), "reference.mp4"); err == nil || !strings.Contains(err.Error(), "bounded limit") {
+		t.Fatalf("expected streaming output cap, got %v", err)
+	}
+}
+
+func TestVideoReferenceAssetStoreEnforcesOwnershipExpiryAndAcceptedReplay(t *testing.T) {
+	now := time.Unix(1000, 0)
+	store := NewVideoReferenceAssetStore(func() time.Time { return now })
+	asset := &VideoReferenceAsset{ID: "asset-1", UserID: 7, APIKeyID: 8, EndpointFamily: "2.5", Kind: VideoReferenceImage, MIME: "image/png", Size: 4, Width: 300, Height: 300, ExpiresAt: now.Add(time.Minute), State: VideoReferenceStaged}
+	if err := store.Put(asset); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.GetOwned("asset-1", 7, 9); err == nil {
+		t.Fatal("cross-owner lookup unexpectedly succeeded")
+	}
+	asset.AccountID = 11
+	if err := store.Put(asset); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.GetOwned("asset-1", 7, 8, 12); err == nil {
+		t.Fatal("cross-account lookup unexpectedly succeeded")
+	}
+	if _, err := store.GetOwned("asset-1", 7, 8, 11); err != nil {
+		t.Fatal(err)
+	}
+	if _, err := store.GetOwned("asset-1", 7, 8); err == nil {
+		t.Fatal("bound account asset was accessible without matching account context")
+	}
+	if err := store.MarkAccepted("asset-1", "attempt-1"); err != nil {
+		t.Fatal(err)
+	}
+	if err := store.Put(asset); err == nil {
+		t.Fatal("accepted asset was unexpectedly replaced")
+	}
+	if err := store.MarkAccepted("asset-1", " "); err == nil {
+		t.Fatal("empty accepted attempt ID unexpectedly succeeded")
+	}
+	if removed := store.Cleanup(); removed != 0 {
+		t.Fatalf("accepted pending asset removed: %d", removed)
+	}
+	store.MarkAttemptFailed("attempt-1")
+	if removed := store.Cleanup(); removed != 1 {
+		t.Fatalf("failed attempt asset count = %d", removed)
+	}
+	if err := store.Put(&VideoReferenceAsset{ID: "expired", UserID: 7, APIKeyID: 8, EndpointFamily: "2.0", Kind: VideoReferenceImage, MIME: "image/png", Size: 4, Width: 300, Height: 300, ExpiresAt: now.Add(-time.Second), State: VideoReferenceStaged}); err != nil {
+		t.Fatal(err)
+	}
+	if removed := store.Cleanup(); removed != 1 {
+		t.Fatalf("expired asset count = %d", removed)
+	}
+}
+
+func TestVideoReferenceAssetServiceRequiresExplicitStore(t *testing.T) {
+	now := time.Now()
+	asset := &VideoReferenceAsset{
+		ID:             "asset-no-store",
+		UserID:         7,
+		APIKeyID:       8,
+		EndpointFamily: "2.5",
+		Kind:           VideoReferenceImage,
+		MIME:           "image/png",
+		Size:           4,
+		Width:          300,
+		Height:         300,
+		ExpiresAt:      now.Add(time.Minute),
+		State:          VideoReferenceStaged,
+	}
+
+	svc := NewVideoReferenceAssetService(nil, nil)
+	if err := svc.Admit(asset); err == nil || !strings.Contains(err.Error(), "unavailable") {
+		t.Fatalf("service without an explicit repository should fail closed, got %v", err)
+	}
+}
+
+func TestVideoReferenceFamilyForModelIsExact(t *testing.T) {
+	tests := map[string]string{
+		"bytedance/seedance-2.0/reference-to-video":      "2.0",
+		"bytedance/seedance-2.5/reference-to-video":      "2.5",
+		"bytedance/seedance-2.0-mini/reference-to-video": "2.0-mini",
+		"bytedance/seedance-2.0-fast/reference-to-video": "2.0-fast",
+	}
+	for model, want := range tests {
+		got, err := VideoReferenceFamilyForModel(model)
+		if err != nil || got != want {
+			t.Fatalf("%s: family=%q err=%v", model, got, err)
+		}
+	}
+	for _, model := range []string{
+		"bytedance/seedance-2.0/reference-to-video?family=2.5",
+		"other/seedance-2.0/reference-to-video",
+		"bytedance/seedance-2.0/reference-to-video-extra",
+	} {
+		if _, err := VideoReferenceFamilyForModel(model); err == nil {
+			t.Fatalf("expected %q to be rejected", model)
+		}
+	}
+}
+
+func TestVideoReferenceURLAdmissionRejectsCredentialsAndPrivateNetworks(t *testing.T) {
+	if err := ValidateVideoReferenceURL("http://example.com/a.mp4", nil); err == nil {
+		t.Fatal("expected HTTPS rejection")
+	}
+	if err := ValidateVideoReferenceURL("https://user:pass@example.com/a.mp4", nil); err == nil {
+		t.Fatal("expected credential rejection")
+	}
+	lookup := func(string) ([]string, error) { return []string{"127.0.0.1"}, nil }
+	if err := ValidateVideoReferenceURL("https://cdn.example/a.mp4", lookup); err == nil {
+		t.Fatal("expected DNS private-network rejection")
+	}
+}
+
+func TestVideoReferenceSetAppliesJointDurationAndAudioOnlyRules(t *testing.T) {
+	base := func(kind VideoReferenceKind, duration float64) *VideoReferenceAsset {
+		return &VideoReferenceAsset{ID: string(kind), UserID: 1, APIKeyID: 1, EndpointFamily: "2.0", Kind: kind, MIME: map[VideoReferenceKind]string{VideoReferenceImage: "image/png", VideoReferenceVideo: "video/mp4", VideoReferenceAudio: "audio/mpeg"}[kind], Size: 4, Width: 640, Height: 640, Duration: duration, FrameRate: 30, ExpiresAt: time.Now().Add(time.Hour)}
+	}
+	if err := ValidateVideoReferenceSet([]*VideoReferenceAsset{base(VideoReferenceAudio, 4)}, "2.0"); err == nil {
+		t.Fatal("expected 2.0 audio-only rejection")
+	}
+	if err := ValidateVideoReferenceSet([]*VideoReferenceAsset{base(VideoReferenceVideo, 10), base(VideoReferenceAudio, 6)}, "2.0"); err == nil {
+		t.Fatal("expected joint A/V duration rejection")
+	}
+	base25 := base(VideoReferenceAudio, 4)
+	base25.EndpointFamily = "2.5"
+	if err := ValidateVideoReferenceSet([]*VideoReferenceAsset{base25}, "2.5"); err != nil {
+		t.Fatal(err)
+	}
+	spoofedDuration := base(VideoReferenceVideo, 10)
+	spoofedDuration.Duration = math.NaN()
+	if err := ValidateVideoReferenceSet([]*VideoReferenceAsset{spoofedDuration}, "2.0"); err == nil {
+		t.Fatal("NaN duration unexpectedly succeeded")
+	}
+}

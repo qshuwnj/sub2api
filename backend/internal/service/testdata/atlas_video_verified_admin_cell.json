@@ -1,0 +1,40 @@
+{
+  "selection": {
+    "model": "google/veo3.1-lite/text-to-video",
+    "mode": "t2v",
+    "controls": {
+      "seed": -1,
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 4
+    }
+  },
+  "evidenceRevision": "8b8045b6df04deea4a9904109467baf4412ccaaa30a067c230b16be86a16472f",
+  "expectedPrice": "1.66646400",
+  "card": {
+    "platform": "openai",
+    "models": [
+      "google/veo3.1-lite/text-to-video"
+    ],
+    "billing_mode": "video",
+    "intervals": [
+      {
+        "tier_label": "video:v1:WyJnb29nbGUvdmVvMy4xLWxpdGUvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjQsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTF9XQ",
+        "per_request_price": 1.66646400
+      }
+    ],
+    "video_tariff": {
+      "version": 1,
+      "contract_revision": "5de7d053659c7b6dd12cdcb89f736f0321a17f22f61e5592e3473f4bcfec6437",
+      "cells": {
+        "video:v1:WyJnb29nbGUvdmVvMy4xLWxpdGUvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjQsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTF9XQ": {
+          "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+          "checked_at": "2026-10-22T10:42:21.778Z",
+          "upstream_price": "0.2",
+          "supplier_estimated": false,
+          "policy": "fixed-customer-price-platform-variance-v1"
+        }
+      }
+    }
+  }
+}

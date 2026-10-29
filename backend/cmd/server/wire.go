@@ -341,6 +341,7 @@ func provideCleanup(
 			}},
 			{"OpenAIWSPool", func() error {
 				if openAIGateway != nil {
+					openAIGateway.StopVideoReconciler()
 					openAIGateway.CloseOpenAIWSPool()
 				}
 				return nil

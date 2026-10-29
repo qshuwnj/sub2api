@@ -4,6 +4,7 @@
  */
 
 import { apiClient } from '../client'
+import { parseVideoPricingJSON, stringifyVideoPricingJSON } from '@/components/admin/channel/videoTariffPricing'
 import type {
   AdminGroup,
   GroupPlatform,
@@ -19,6 +20,13 @@ import type {
 export interface LiveCapability {
   supported: boolean
   reason?: string
+}
+const exactVideoResponse = {
+  transformResponse: [(data: unknown) => typeof data === 'string' ? parseVideoPricingJSON(data) : data],
+}
+const exactVideoRequest = {
+  ...exactVideoResponse,
+  transformRequest: [(data: unknown) => stringifyVideoPricingJSON(data)],
 }
 
 /**
@@ -49,7 +57,8 @@ export async function list(
       page_size: pageSize,
       ...filters
     },
-    signal: options?.signal
+    signal: options?.signal,
+    ...exactVideoResponse,
   })
   return data
 }
@@ -61,7 +70,8 @@ export async function list(
  */
 export async function getAll(platform?: GroupPlatform): Promise<AdminGroup[]> {
   const { data } = await apiClient.get<AdminGroup[]>('/admin/groups/all', {
-    params: platform ? { platform } : undefined
+    params: platform ? { platform } : undefined,
+    ...exactVideoResponse,
   })
   return data
 }
@@ -72,7 +82,8 @@ export async function getAll(platform?: GroupPlatform): Promise<AdminGroup[]> {
  */
 export async function getAllIncludingInactive(): Promise<AdminGroup[]> {
   const { data } = await apiClient.get<AdminGroup[]>('/admin/groups/all', {
-    params: { include_inactive: true }
+    params: { include_inactive: true },
+    ...exactVideoResponse,
   })
   return data
 }
@@ -98,7 +109,7 @@ export async function getLiveCapability(): Promise<LiveCapability> {
  * @returns Group details
  */
 export async function getById(id: number): Promise<AdminGroup> {
-  const { data } = await apiClient.get<AdminGroup>(`/admin/groups/${id}`)
+  const { data } = await apiClient.get<AdminGroup>(`/admin/groups/${id}`, exactVideoResponse)
   return data
 }
 
@@ -125,7 +136,7 @@ export async function getModelAllowlistCandidates(
  * @returns Created group
  */
 export async function create(groupData: CreateGroupRequest): Promise<AdminGroup> {
-  const { data } = await apiClient.post<AdminGroup>('/admin/groups', groupData)
+  const { data } = await apiClient.post<AdminGroup>('/admin/groups', groupData, exactVideoRequest)
   return data
 }
 
@@ -199,6 +210,7 @@ export async function duplicate(id: number): Promise<AdminGroup> {
   }
 
   const { data } = await apiClient.post<AdminGroup>(`/admin/groups/${id}/duplicate`, undefined, {
+    ...exactVideoResponse,
     headers: { 'Idempotency-Key': idempotencyKey }
   })
 
@@ -216,7 +228,7 @@ export async function duplicate(id: number): Promise<AdminGroup> {
  * @returns Updated group
  */
 export async function update(id: number, updates: UpdateGroupRequest): Promise<AdminGroup> {
-  const { data } = await apiClient.put<AdminGroup>(`/admin/groups/${id}`, updates)
+  const { data } = await apiClient.put<AdminGroup>(`/admin/groups/${id}`, updates, exactVideoRequest)
   return data
 }
 

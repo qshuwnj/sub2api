@@ -33,6 +33,12 @@ type ImageStorage interface {
 	Save(ctx context.Context, key, contentType string, data []byte) (url string, err error)
 }
 
+// ImageStorageDeleter is an optional capability used by short-lived staged
+// media. Existing image result stores do not need to implement it.
+type ImageStorageDeleter interface {
+	Delete(ctx context.Context, key string) error
+}
+
 // ImageResultUploader 是 ImageStorage 的上层编排器（与具体厂商无关）：
 // 把上游生图响应里的每张图片（b64_json 解码 / url 下载）转存到对象存储，
 // 并把响应结果改写为只含短链接的紧凑 JSON，从而避免大 base64 落 Redis。
@@ -57,6 +63,27 @@ func NewImageResultUploader(storage ImageStorage, prefix string, maxDownloadByte
 		prefix:           prefix,
 		maxDownloadBytes: maxDownloadBytes,
 	}
+}
+
+// Save writes a staged object through the currently selected image storage.
+// It is intentionally exposed on the uploader so dynamic admin storage
+// settings can be reused without exposing provider credentials to handlers.
+func (u *ImageResultUploader) Save(ctx context.Context, key, contentType string, data []byte) (string, error) {
+	if u == nil || u.storage == nil {
+		return "", errors.New("image storage is unavailable")
+	}
+	return u.storage.Save(ctx, key, contentType, data)
+}
+
+func (u *ImageResultUploader) Delete(ctx context.Context, key string) error {
+	if u == nil || u.storage == nil {
+		return errors.New("image storage is unavailable")
+	}
+	deleter, ok := u.storage.(ImageStorageDeleter)
+	if !ok {
+		return errors.New("image storage does not support deletion")
+	}
+	return deleter.Delete(ctx, key)
 }
 
 // defaultImageDownloadHTTPClient 是进程内共享的图片下载客户端，复用连接池。

@@ -880,6 +880,7 @@ var ProviderSet = wire.NewSet(
 	NewGatewayService,
 	NewOpenAIGatewayService,
 	ProvideImageStorageSettingService,
+	ProvideVideoReferenceAssetService,
 	ProvideImageTaskService,
 	ProvideBatchImageModelPricingResolver,
 	NewBatchImagePublicService,
@@ -989,6 +990,13 @@ var ProviderSet = wire.NewSet(
 	NewChannelMonitorRequestTemplateService,
 	ProvideUserPlatformQuotaUsageFlusher,
 )
+
+// ProvideVideoReferenceAssetService binds the durable repository to the
+// admission service. ffprobe is intentionally constructed here so the
+// runtime command wrapper is explicit and test replacements remain injectable.
+func ProvideVideoReferenceAssetService(repo VideoReferenceAssetRepository) *VideoReferenceAssetService {
+	return NewVideoReferenceAssetServiceWithRepository(repo, NewVideoReferenceFFProbe(nil))
+}
 
 // ProvideUserPlatformQuotaUsageFlusher 创建并启动 UserPlatformQuotaUsageFlusher。
 func ProvideUserPlatformQuotaUsageFlusher(cfg *config.Config, cache BillingCache, quotaRepo UserPlatformQuotaRepository, tw *TimingWheelService) *UserPlatformQuotaUsageFlusher {

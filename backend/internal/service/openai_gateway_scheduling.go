@@ -1626,6 +1626,9 @@ func (s *OpenAIGatewayService) recheckSelectedOpenAIAccountFromDBBeforeProfit(ct
 		if s.isOpenAIProxyStreamQuarantined(ctx, account) {
 			return nil
 		}
+		if !videoAccountHasReservationHeadroom(ctx, s.accountRepo, account) {
+			return nil
+		}
 		return account
 	}
 
@@ -1652,6 +1655,9 @@ func (s *OpenAIGatewayService) recheckSelectedOpenAIAccountFromDBBeforeProfit(ct
 		return nil
 	}
 	if s.isOpenAIProxyStreamQuarantined(ctx, latest) {
+		return nil
+	}
+	if !videoAccountHasReservationHeadroom(ctx, s.accountRepo, latest) {
 		return nil
 	}
 	return latest

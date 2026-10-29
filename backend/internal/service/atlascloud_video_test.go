@@ -58,8 +58,8 @@ func TestAtlasCloudGenericVideoDefaults(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, model, info.Model)
 	require.Equal(t, "720p", info.Resolution)
-	require.Equal(t, "16:9", info.AspectRatio)
-	require.Equal(t, 8, info.DurationSeconds)
+	require.Equal(t, "adaptive", info.AspectRatio)
+	require.Equal(t, 5, info.DurationSeconds)
 }
 
 func TestAtlasCloudVideoValidation(t *testing.T) {
@@ -106,7 +106,7 @@ func TestAtlasCloudGenericVideoForwardPreservesModel(t *testing.T) {
 	}}
 	svc, c, _, account, _ := atlasImageFixture(t, upstream)
 	model := "bytedance/seedance-2.0-fast/text-to-video"
-	body := []byte(`{"model":"bytedance/seedance-2.0-fast/text-to-video","prompt":"a paper boat on a stream","duration":8,"resolution":"720p","aspect_ratio":"16:9"}`)
+	body := []byte(`{"model":"bytedance/seedance-2.0-fast/text-to-video","prompt":"a paper boat on a stream","duration":8,"resolution":"720p","ratio":"16:9"}`)
 	account.Credentials["model_mapping"] = map[string]any{model: model}
 	result, err := svc.ForwardAtlasCloudVideo(context.Background(), c, account, AtlasCloudEndpointVideoCreate, "", body)
 	require.NoError(t, err)

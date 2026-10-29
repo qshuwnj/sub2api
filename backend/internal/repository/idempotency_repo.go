@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"time"
 
 	dbent "github.com/Wei-Shaw/sub2api/ent"
@@ -24,8 +25,8 @@ func (r *idempotencyRepository) CreateProcessing(ctx context.Context, record *se
 	}
 	query := `
 		INSERT INTO idempotency_records (
-			scope, idempotency_key_hash, request_fingerprint, status, locked_until, expires_at
-		) VALUES ($1, $2, $3, $4, $5, $6)
+			scope, idempotency_key_hash, request_fingerprint, status, locked_until, expires_at, response_body
+		) VALUES ($1, $2, $3, $4, $5, $6, $7)
 		ON CONFLICT (scope, idempotency_key_hash) DO NOTHING
 		RETURNING id, created_at, updated_at
 	`
@@ -38,6 +39,7 @@ func (r *idempotencyRepository) CreateProcessing(ctx context.Context, record *se
 		record.Status,
 		record.LockedUntil,
 		record.ExpiresAt,
+		record.ResponseBody,
 	}, &record.ID, &createdAt, &updatedAt)
 	if errors.Is(err, sql.ErrNoRows) {
 		return false, nil
@@ -191,6 +193,21 @@ func (r *idempotencyRepository) MarkSucceeded(ctx context.Context, id int64, res
 		responseBody,
 		expiresAt,
 	)
+	return err
+}
+
+func (r *idempotencyRepository) UpdateImageQualityClaim(ctx context.Context, id int64, body string, expiresAt time.Time) error {
+	result, err := r.sql.ExecContext(ctx, `
+		UPDATE idempotency_records SET response_body = $2, expires_at = $3, updated_at = NOW()
+		WHERE id = $1 AND scope = 'image-quality-quote-v1' AND status = 'processing'
+	`, id, body, expiresAt)
+	if err != nil {
+		return err
+	}
+	n, err := result.RowsAffected()
+	if err == nil && n != 1 {
+		return fmt.Errorf("image claim is unavailable")
+	}
 	return err
 }
 

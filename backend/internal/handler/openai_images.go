@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"strconv"
@@ -74,6 +75,13 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		return
 	}
 	requestModel := parsed.Model
+	apiKey, err = h.gatewayService.RefreshImageQualityKey(c.Request.Context(), apiKey, requestModel)
+	if err != nil {
+		h.errorResponse(c, http.StatusServiceUnavailable, "pricing_unavailable", err.Error())
+		return
+	}
+	// Keep downstream adapters on the same fresh enrollment decision.
+	c.Set(string(middleware2.ContextKeyAPIKey), apiKey)
 	ensureCompositeTargetPlatform(c, apiKey, requestModel)
 	clientRequestModel := clientRequestedModel(c, requestModel)
 	routingModel := requestModel
@@ -98,6 +106,29 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 	if !service.GroupAllowsImageGeneration(apiKey.Group) {
 		h.errorResponse(c, http.StatusForbidden, "permission_error", service.ImageGenerationPermissionMessage())
 		return
+	}
+	if apiKey.Group.ModelAllowlistEnabled() && !apiKey.Group.ModelAllowlist.Allows(requestModel) {
+		h.errorResponse(c, http.StatusNotFound, "model_not_found", "Model is not available for this group")
+		return
+	}
+	var imagePricing *service.ImageQualityPriceSnapshot
+	enrolled, pricingErr := h.gatewayService.ImageQualityPricingEnrolled(apiKey, requestModel)
+	if pricingErr != nil {
+		h.errorResponse(c, http.StatusBadRequest, "pricing_not_configured", pricingErr.Error())
+		return
+	}
+	if enrolled || c.GetHeader("X-Image-Quote") != "" {
+		index, err := strconv.Atoi(c.GetHeader("X-Image-Quote-Index"))
+		if err != nil || !h.gatewayService.ImageQualitySettlementReady() {
+			h.errorResponse(c, http.StatusServiceUnavailable, "pricing_unavailable", "Quoted image settlement is unavailable")
+			return
+		}
+		imagePricing, err = h.gatewayService.AcceptImageQualityQuote(c.Request.Context(), apiKey, parsed, c.GetHeader("X-Image-Quote"), index, time.Now())
+		if err != nil {
+			h.errorResponse(c, http.StatusConflict, "image_quote_refresh_required", err.Error())
+			return
+		}
+		c.Request = c.Request.WithContext(service.WithImageQualityPricing(c.Request.Context(), imagePricing))
 	}
 	if decision := h.checkSecurityAudit(c, reqLog, apiKey, subject, service.ContentModerationProtocolOpenAIImages, requestModel, parsed.ModerationBody()); decision != nil && !decision.AllowNextStage {
 		h.openAISecurityAuditError(c, decision)
@@ -135,6 +166,10 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 
 	if err := h.billingCacheService.CheckBillingEligibility(c.Request.Context(), apiKey.User, apiKey, apiKey.Group, subscription, service.QuotaPlatform(c.Request.Context(), apiKey)); err != nil {
 		reqLog.Info("openai.images.billing_eligibility_check_failed", zap.Error(err))
+		if imagePricing != nil && errors.Is(err, service.ErrInsufficientBalance) {
+			h.errorResponse(c, http.StatusForbidden, "insufficient_balance", "Insufficient balance; no supplier request was made")
+			return
+		}
 		status, code, message, retryAfter := billingErrorDetails(err)
 		if retryAfter > 0 {
 			c.Header("Retry-After", strconv.Itoa(retryAfter))
@@ -144,8 +179,23 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 	}
 
 	// 余额模式在途预留（与计费同口径估算；计费任务扣减余额缓存后才释放）。
-	inflightDone, inflightErr := reserveInflightBalance(c, h.billingCacheService, h.gatewayService, apiKey, subscription, service.InflightEstimateRequest{Model: routingModel, BodyBytes: len(body), Kind: service.InflightEstimateImage, Units: parsed.N})
+	inflightDone := inflightNoop
+	var inflightErr error
+	if imagePricing != nil {
+		var reservation *service.InflightReservation
+		reservation, inflightErr = h.billingCacheService.ReserveQuotedImageCharge(c.Request.Context(), apiKey.User, apiKey, apiKey.Group, subscription, imagePricing.Amount())
+		if inflightErr == nil {
+			c.Request = c.Request.WithContext(service.WithInflightReservation(c.Request.Context(), reservation))
+			inflightDone = reservation.HandlerDone
+		}
+	} else {
+		inflightDone, inflightErr = reserveInflightBalance(c, h.billingCacheService, h.gatewayService, apiKey, subscription, service.InflightEstimateRequest{Model: routingModel, BodyBytes: len(body), Kind: service.InflightEstimateImage, Units: parsed.N})
+	}
 	if inflightErr != nil {
+		if imagePricing != nil && errors.Is(inflightErr, service.ErrInsufficientBalance) {
+			h.errorResponse(c, http.StatusForbidden, "insufficient_balance", "Insufficient balance for the quoted image; no supplier request was made")
+			return
+		}
 		status, code, message, retryAfter := billingErrorDetails(inflightErr)
 		if retryAfter > 0 {
 			c.Header("Retry-After", strconv.Itoa(retryAfter))
@@ -168,6 +218,7 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 	jsonKeepaliveStarted := false
 	defer func() { stopJSONKeepalive() }()
 	var oauth429FailoverState service.OpenAIOAuth429FailoverState
+	var imageClaimID int64
 
 	for {
 		reqLog.Debug("openai.images.account_selecting", zap.Int("excluded_account_count", len(failedAccountIDs)))
@@ -256,6 +307,21 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		}
 
 		service.SetOpsLatencyMs(c, service.OpsRoutingLatencyMsKey, time.Since(routingStart).Milliseconds())
+		if imagePricing != nil {
+			claimID, err := imagePricing.Claim(requestCtx, service.HashUsageRequestPayload(body))
+			if err != nil {
+				if accountReleaseFunc != nil {
+					accountReleaseFunc()
+				}
+				if errors.Is(err, service.ErrIdempotencyStoreUnavail) {
+					h.errorResponse(c, http.StatusServiceUnavailable, "image_claim_unavailable", "Image submission storage is unavailable; no supplier request was made")
+				} else {
+					h.errorResponse(c, http.StatusConflict, "image_quote_already_submitted", "This quoted image cannot be resubmitted; check the existing result before creating a new request")
+				}
+				return
+			}
+			imageClaimID = claimID
+		}
 		// A previous non-Atlas account attempt must not commit keepalive headers
 		// before failover to a priced AtlasCloud image account.
 		atlasCloudImage := service.IsAtlasCloudPricedImageModel(parsed.Model) ||
@@ -287,6 +353,20 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 			service.SetOpsLatencyMs(c, service.OpsTimeToFirstTokenMsKey, int64(*result.FirstTokenMs))
 		}
 		if err != nil {
+			if imagePricing != nil && (result == nil || result.ImageCount == 0) {
+				// Never fail over a paid, quoted child after its upstream outcome becomes uncertain.
+				if auditErr := imagePricing.MarkForwardFailure(requestCtx); auditErr != nil {
+					reqLog.Error("openai.images.outcome_persistence_failed", zap.Any("image_outcome", imagePricing.Outcome()), zap.Error(auditErr))
+				}
+				if !c.Writer.Written() {
+					code, message := "image_outcome_unknown", "Generation outcome is uncertain; do not resubmit this image"
+					if state := imagePricing.Outcome().Status; state == "failed" || state == "not_submitted" {
+						code, message = "image_generation_failed", "Image generation failed; this image was not charged to your balance"
+					}
+					h.imageQualityErrorResponse(c, http.StatusBadGateway, code, message, imagePricing)
+				}
+				return
+			}
 			if result != nil && result.ImageCount > 0 {
 				reqLog.Warn("openai.images.forward_partial_error_with_image_result",
 					zap.Int64("account_id", account.ID),
@@ -404,6 +484,9 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		}
 
 		userAgent := c.GetHeader("User-Agent")
+		if result != nil && imagePricing != nil {
+			result.ImageQualityPricing = imagePricing
+		}
 		clientIP := ip.GetClientIP(c)
 		requestPayloadHash := service.HashUsageRequestPayload(body)
 		if parsed.Multipart {
@@ -449,10 +532,42 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		}
 		if result != nil && len(result.AtlasCloudImageResponse) > 0 {
 			ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request.Context()), time.Minute)
+			if imagePricing != nil {
+				if err := imagePricing.MarkSettlementPending(ctx); err != nil {
+					cancel()
+					h.imageQualityErrorResponse(c, http.StatusServiceUnavailable, "image_audit_unavailable", "Image generated but settlement was not started; do not resubmit", imagePricing)
+					return
+				}
+			}
 			billingErr := record(ctx)
-			cancel()
 			if billingErr != nil {
-				h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Image settlement is unavailable; do not resubmit generation")
+				if imagePricing != nil {
+					_ = imagePricing.MarkSettlementUnknown(ctx)
+					h.imageQualityErrorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Image settlement needs reconciliation; do not resubmit generation", imagePricing)
+				} else {
+					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Image settlement is unavailable; do not resubmit generation")
+				}
+				cancel()
+				return
+			}
+			cancel()
+			if imagePricing != nil {
+				ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request.Context()), 10*time.Second)
+				err := imagePricing.MarkSettled(ctx, imageClaimID, result.RequestID)
+				cancel()
+				if err != nil {
+					_ = imagePricing.MarkReceiptUnavailable(c.Request.Context())
+					reqLog.Error("openai.images.receipt_persistence_failed", zap.Any("image_outcome", imagePricing.Outcome()), zap.Error(err))
+					h.imageQualityErrorResponse(c, http.StatusServiceUnavailable, "image_receipt_unavailable", "Image charged but receipt persistence is unavailable; do not resubmit", imagePricing)
+					return
+				}
+				var response map[string]any
+				if err := json.Unmarshal(result.AtlasCloudImageResponse, &response); err != nil {
+					h.imageQualityErrorResponse(c, http.StatusServiceUnavailable, "image_delivery_unavailable", "Image charged but response is unavailable; do not resubmit", imagePricing)
+					return
+				}
+				response["billing"] = imagePricing.Receipt()
+				c.JSON(http.StatusOK, response)
 				return
 			}
 			c.Data(http.StatusOK, "application/json", result.AtlasCloudImageResponse)
@@ -466,6 +581,17 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		)
 		return
 	}
+}
+
+func (h *OpenAIGatewayHandler) imageQualityErrorResponse(c *gin.Context, status int, code, message string, snapshot *service.ImageQualityPriceSnapshot) {
+	response := gin.H{
+		"error":         gin.H{"type": code, "code": code, "message": message},
+		"image_outcome": snapshot.Outcome(),
+	}
+	if snapshot.Outcome().BillingStatus == "settled" {
+		response["billing"] = snapshot.Receipt()
+	}
+	c.JSON(status, response)
 }
 
 func (h *OpenAIGatewayHandler) openAIImagesJSONKeepaliveInterval() time.Duration {

@@ -4,11 +4,13 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
 	"strings"
 
 	dbent "github.com/Wei-Shaw/sub2api/ent"
 	"github.com/Wei-Shaw/sub2api/internal/pkg/logger"
 	"github.com/Wei-Shaw/sub2api/internal/service"
+	"github.com/shopspring/decimal"
 )
 
 type usageBillingRepository struct {
@@ -231,7 +233,7 @@ func (r *usageBillingRepository) applyUsageBillingEffects(ctx context.Context, t
 	return nil
 }
 
-func incrementUsageBillingSubscription(ctx context.Context, tx *sql.Tx, subscriptionID int64, costUSD float64) error {
+func incrementUsageBillingSubscription(ctx context.Context, tx *sql.Tx, subscriptionID int64, costUSD any) error {
 	const updateSQL = `
 		UPDATE user_subscriptions us
 		SET
@@ -432,7 +434,7 @@ func userExistsForBilling(ctx context.Context, tx *sql.Tx, userID int64) (bool, 
 	return true, nil
 }
 
-func incrementUsageBillingAPIKeyQuota(ctx context.Context, tx *sql.Tx, apiKeyID int64, amount float64) (bool, error) {
+func incrementUsageBillingAPIKeyQuota(ctx context.Context, tx *sql.Tx, apiKeyID int64, amount any) (bool, error) {
 	var exhausted bool
 	err := tx.QueryRowContext(ctx, `
 		UPDATE api_keys
@@ -458,7 +460,7 @@ func incrementUsageBillingAPIKeyQuota(ctx context.Context, tx *sql.Tx, apiKeyID 
 	return exhausted, nil
 }
 
-func incrementUsageBillingAPIKeyRateLimit(ctx context.Context, tx *sql.Tx, apiKeyID int64, cost float64) error {
+func incrementUsageBillingAPIKeyRateLimit(ctx context.Context, tx *sql.Tx, apiKeyID int64, cost any) error {
 	res, err := tx.ExecContext(ctx, `
 		UPDATE api_keys SET
 			usage_5h = CASE WHEN window_5h_start IS NOT NULL AND window_5h_start + INTERVAL '5 hours' <= NOW() THEN $1 ELSE usage_5h + $1 END,
@@ -592,14 +594,24 @@ func buildAccountQuotaIncrementSQLs() [4]string {
 // incrementUsageBillingAccountQuota 累加账号配额并返回累加后的状态。hasDaily/hasWeekly 是调用方所见的
 // 账号日/周上限设置，只决定先执行哪条语句；该语句的附加条件不成立而命中 0 行时，再执行同时包含日、周维度的语句。
 func incrementUsageBillingAccountQuota(ctx context.Context, tx *sql.Tx, accountID int64, amount float64, hasDaily, hasWeekly bool) (*service.AccountQuotaState, error) {
+	return incrementUsageBillingAccountQuotaWithAmount(ctx, tx, accountID, amount, hasDaily, hasWeekly)
+}
+
+// Reserved video capture passes its locked amount as a decimal string so the
+// SQL update never rounds it through a float.
+func incrementUsageBillingAccountQuotaAmount(ctx context.Context, tx *sql.Tx, accountID int64, amount any) (*service.AccountQuotaState, error) {
+	return incrementUsageBillingAccountQuotaWithAmount(ctx, tx, accountID, amount, true, true)
+}
+
+func incrementUsageBillingAccountQuotaWithAmount(ctx context.Context, tx *sql.Tx, accountID int64, amount any, hasDaily, hasWeekly bool) (*service.AccountQuotaState, error) {
 	index := accountQuotaIncrementSQLIndex(hasDaily, hasWeekly)
 	fullIndex := accountQuotaIncrementSQLIndex(true, true)
-	state, err := execAccountQuotaIncrement(ctx, tx, accountQuotaIncrementSQLs[index], accountID, amount)
+	state, exact, err := execAccountQuotaIncrementExact(ctx, tx, accountQuotaIncrementSQLs[index], accountID, amount)
 	if err != nil {
 		return nil, err
 	}
 	if state == nil && index != fullIndex {
-		state, err = execAccountQuotaIncrement(ctx, tx, accountQuotaIncrementSQLs[fullIndex], accountID, amount)
+		state, exact, err = execAccountQuotaIncrementExact(ctx, tx, accountQuotaIncrementSQLs[fullIndex], accountID, amount)
 		if err != nil {
 			return nil, err
 		}
@@ -607,14 +619,25 @@ func incrementUsageBillingAccountQuota(ctx context.Context, tx *sql.Tx, accountI
 	if state == nil {
 		return nil, service.ErrAccountNotFound
 	}
-	// 任意维度额度在本次递增中从"未超"跨越到"已超"时，必须刷新调度快照，
-	// 否则 Redis 中缓存的 Account 仍显示旧的 used 值，后续请求会继续选中本账号，
-	// 最终观察到 daily_used / weekly_used 大幅超过配置的 limit。
-	// 对于日/周额度，即使本次触发了周期重置（pre=0、post=amount），
-	// 判定式 (post-amount) < limit 同样成立，逻辑与总额度保持一致。
-	crossedTotal := state.TotalLimit > 0 && state.TotalUsed >= state.TotalLimit && (state.TotalUsed-amount) < state.TotalLimit
-	crossedDaily := state.DailyLimit > 0 && state.DailyUsed >= state.DailyLimit && (state.DailyUsed-amount) < state.DailyLimit
-	crossedWeekly := state.WeeklyLimit > 0 && state.WeeklyUsed >= state.WeeklyLimit && (state.WeeklyUsed-amount) < state.WeeklyLimit
+	noticeAmount, parseErr := decimal.NewFromString(fmt.Sprint(amount))
+	if parseErr != nil {
+		return nil, parseErr
+	}
+	var amounts [6]decimal.Decimal
+	presentation := []*float64{&state.TotalUsed, &state.TotalLimit, &state.DailyUsed, &state.DailyLimit, &state.WeeklyUsed, &state.WeeklyLimit}
+	for i, raw := range exact {
+		amounts[i], parseErr = decimal.NewFromString(raw)
+		if parseErr != nil {
+			return nil, parseErr
+		}
+		*presentation[i], _ = amounts[i].Float64()
+	}
+	crossed := func(used, limit decimal.Decimal) bool {
+		return limit.IsPositive() && used.GreaterThanOrEqual(limit) && used.Sub(noticeAmount).LessThan(limit)
+	}
+	crossedTotal := crossed(amounts[0], amounts[1])
+	crossedDaily := crossed(amounts[2], amounts[3])
+	crossedWeekly := crossed(amounts[4], amounts[5])
 	if crossedTotal || crossedDaily || crossedWeekly {
 		if err := enqueueSchedulerOutbox(ctx, tx, service.SchedulerOutboxEventAccountChanged, &accountID, nil, nil); err != nil {
 			logger.LegacyPrintf("repository.usage_billing", "[SchedulerOutbox] enqueue quota exceeded failed: account=%d err=%v", accountID, err)
@@ -626,32 +649,45 @@ func incrementUsageBillingAccountQuota(ctx context.Context, tx *sql.Tx, accountI
 
 // execAccountQuotaIncrement 执行一条账号配额累加语句，未命中任何行时返回 nil 状态。
 func execAccountQuotaIncrement(ctx context.Context, tx *sql.Tx, query string, accountID int64, amount float64) (*service.AccountQuotaState, error) {
+	state, _, err := execAccountQuotaIncrementExact(ctx, tx, query, accountID, amount)
+	return state, err
+}
+
+func execAccountQuotaIncrementExact(ctx context.Context, tx *sql.Tx, query string, accountID int64, amount any) (*service.AccountQuotaState, [6]string, error) {
+	var exact [6]string
 	rows, err := tx.QueryContext(ctx, query, amount, accountID)
 	if err != nil {
-		return nil, err
+		return nil, exact, err
 	}
 
 	var state *service.AccountQuotaState
 	if rows.Next() {
 		state = &service.AccountQuotaState{}
 		if err := rows.Scan(
-			&state.TotalUsed, &state.TotalLimit,
-			&state.DailyUsed, &state.DailyLimit,
-			&state.WeeklyUsed, &state.WeeklyLimit,
+			&exact[0], &exact[1], &exact[2], &exact[3], &exact[4], &exact[5],
 		); err != nil {
 			_ = rows.Close()
-			return nil, err
+			return nil, exact, err
+		}
+		values := []*float64{&state.TotalUsed, &state.TotalLimit, &state.DailyUsed, &state.DailyLimit, &state.WeeklyUsed, &state.WeeklyLimit}
+		for i, raw := range exact {
+			value, err := decimal.NewFromString(raw)
+			if err != nil {
+				_ = rows.Close()
+				return nil, exact, err
+			}
+			*values[i], _ = value.Float64()
 		}
 	}
 	if err := rows.Err(); err != nil {
 		_ = rows.Close()
-		return nil, err
+		return nil, exact, err
 	}
 	// 必须在执行下一条 SQL 前显式关闭 rows：pq 驱动在同一连接上
 	// 不允许前一条查询的结果集未耗尽时启动新查询，否则会返回
 	// "unexpected Parse response" 错误。
 	if err := rows.Close(); err != nil {
-		return nil, err
+		return nil, exact, err
 	}
-	return state, nil
+	return state, exact, nil
 }

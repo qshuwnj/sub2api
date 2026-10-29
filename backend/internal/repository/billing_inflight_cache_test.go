@@ -40,6 +40,25 @@ func inflightCount(t *testing.T, cache *billingCache, userID int64) int64 {
 	return n
 }
 
+func TestImageQualityQuoteBalanceRegistrationSharesLegacyHolds(t *testing.T) {
+	_, cache, _ := newInflightTestEnv(t, true, 60)
+	ctx := context.Background()
+	pending, err := cache.RegisterInflightBalance(ctx, 42, "quoted", 0.6, time.Minute)
+	require.NoError(t, err)
+	require.Zero(t, pending)
+	require.EqualValues(t, 1, inflightCount(t, cache, 42))
+	allowed, pending, err := cache.ReserveInflightBalance(ctx, 42, "legacy", 0.6, 1, time.Minute)
+	require.NoError(t, err)
+	require.False(t, allowed, "legacy admission must see the strict quote hold")
+	require.InDelta(t, 0.6, pending, 1e-10)
+	pending, err = cache.RegisterInflightBalance(ctx, 42, "quoted-2", 0.6, time.Minute)
+	require.NoError(t, err)
+	require.InDelta(t, 0.6, pending, 1e-10)
+	require.NoError(t, cache.ReleaseInflightBalance(ctx, 42, "quoted"))
+	require.NoError(t, cache.ReleaseInflightBalance(ctx, 42, "quoted-2"))
+	require.Zero(t, inflightCount(t, cache, 42))
+}
+
 func TestInflightReservation_ConcurrentAdmitsOnlyWhatBalanceCovers(t *testing.T) {
 	_, cache, svc := newInflightTestEnv(t, true, 60)
 	ctx := context.Background()

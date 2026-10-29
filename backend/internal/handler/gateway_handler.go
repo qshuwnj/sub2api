@@ -60,6 +60,28 @@ type GatewayHandler struct {
 	maxAccountSwitchesGemini   int
 	cfg                        *config.Config
 	settingService             *service.SettingService
+	videoReferenceAssets       *VideoReferenceAssetHandler
+}
+
+func (h *GatewayHandler) SetVideoReferenceAssetHandler(handler *VideoReferenceAssetHandler) {
+	if h != nil {
+		h.videoReferenceAssets = handler
+	}
+}
+
+func (h *GatewayHandler) VideoReferenceAssets(c *gin.Context) {
+	if h == nil || h.videoReferenceAssets == nil {
+		c.JSON(http.StatusServiceUnavailable, gin.H{"error": gin.H{"message": "video reference storage is unavailable"}})
+		return
+	}
+	switch c.Request.Method {
+	case http.MethodPost:
+		h.videoReferenceAssets.Upload(c)
+	case http.MethodDelete:
+		h.videoReferenceAssets.Delete(c)
+	default:
+		c.JSON(http.StatusMethodNotAllowed, gin.H{"error": gin.H{"message": "method not allowed"}})
+	}
 }
 
 // NewGatewayHandler creates a new GatewayHandler

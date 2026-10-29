@@ -110,7 +110,8 @@ func TestAtlasCloudVideoHandlerLifecycleAndOwnership(t *testing.T) {
 }
 
 func TestAtlasCloudImageHandlerMissingPriceNeverCallsUpstream(t *testing.T) {
-	for _, model := range []string{"openai/gpt-image-2.5-flare/text-to-image", "xai/grok-imagine-image-2.0-developer/text-to-image", "openai/gpt-image-2/text-to-image"} {
+	for _, model := range []string{"openai/gpt-image-2.5-flare/text-to-image", "xai/grok-imagine-image-2.0-developer/text-to-image", "openai/gpt-image-2/text-to-image",
+		"qwen/qwen-image-2.0-pro/text-to-image", "openai/gpt-image-1-mini/text-to-image", "google/nano-banana-2/text-to-image"} {
 		h, slots, _, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai/api/v1")
 		c, w := atlasVideoContext(t, true, false)
 		c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", strings.NewReader(`{"model":"`+model+`","prompt":"draw"}`))

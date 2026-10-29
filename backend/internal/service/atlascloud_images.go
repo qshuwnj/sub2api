@@ -46,6 +46,9 @@ func atlasCloudImagePreset(size string) (string, string) {
 }
 
 func atlasCloudImageSize(model, size string) (string, string) {
+	if model == "bytedance-seedream-v4.5" {
+		model = "bytedance/seedream-v4.5"
+	}
 	if model == atlasCloudFlareImageModel {
 		return atlasCloudFlareSize(size)
 	}
@@ -53,6 +56,9 @@ func atlasCloudImageSize(model, size string) (string, string) {
 		return "", ""
 	}
 	if model != atlasCloudGPTImageModel {
+		if model != "bytedance/seedream-v4.5" {
+			return atlasMediaImageSize(model, size)
+		}
 		return atlasCloudImagePreset(size)
 	}
 	size = strings.ReplaceAll(strings.ToLower(strings.TrimSpace(size)), "*", "x")
@@ -69,42 +75,28 @@ func atlasCloudImageSize(model, size string) (string, string) {
 }
 
 func buildAtlasCloudImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
+	if parsed != nil && model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel && !isAtlasCloudNewImageModel(model) {
+		if contract := atlasMediaModel(model, "image"); contract != nil {
+			if parsed.Multipart || parsed.Stream || parsed.N != 1 {
+				return nil, fmt.Errorf("AtlasCloud media requires JSON, n=1 and stream=false")
+			}
+			payload, err := buildAtlasMediaContractPayload(parsed.Body, contract, true)
+			if err != nil {
+				return nil, err
+			}
+			return json.Marshal(payload)
+		}
+		if !IsAtlasCloudGenericImageModel(model) {
+			return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
+		}
+	}
 	if parsed == nil || (model != "bytedance/seedream-v4.5" && model != atlasCloudGPTImageModel &&
-		!isAtlasCloudNewImageModel(model) && !isAtlasCloudImageEditModel(model) && !IsAtlasCloudGenericImageModel(model)) {
+		!isAtlasCloudNewImageModel(model) && !IsAtlasCloudGenericImageModel(model) &&
+		atlasMediaModel(model, "image") == nil) {
 		return nil, fmt.Errorf("unsupported AtlasCloud text-to-image model mapping")
 	}
 	if parsed.Multipart || parsed.HasMask {
 		return nil, fmt.Errorf("AtlasCloud image edits are not supported")
-	}
-	if isAtlasCloudImageEditModel(model) {
-		if strings.TrimSpace(parsed.Prompt) == "" {
-			return nil, fmt.Errorf("prompt is required")
-		}
-		if len(parsed.InputImageURLs) == 0 {
-			return nil, fmt.Errorf("images[].image_url is required")
-		}
-		if parsed.N != 1 {
-			return nil, fmt.Errorf("AtlasCloud image edits require n=1")
-		}
-		if parsed.ResponseFormat != "" && parsed.ResponseFormat != "url" {
-			return nil, fmt.Errorf("AtlasCloud image edits currently require response_format=url")
-		}
-		size, _ := atlasCloudImageSize(atlasCloudGPTImageModel, parsed.Size)
-		if size == "" {
-			return nil, fmt.Errorf("unsupported AtlasCloud image edit size")
-		}
-		quality := parsed.Quality
-		switch quality {
-		case "", "auto":
-			quality = "medium"
-		case "low", "medium", "high":
-		default:
-			return nil, fmt.Errorf("AtlasCloud GPT Image edit quality must be low, medium, high, or auto")
-		}
-		return json.Marshal(map[string]any{
-			"model": model, "prompt": parsed.Prompt, "n": 1,
-			"images": parsed.InputImageURLs, "size": size, "quality": quality,
-		})
 	}
 	if parsed.IsEdits() || len(parsed.InputImageURLs) > 0 {
 		return nil, fmt.Errorf("AtlasCloud image edits are not supported for this model")
@@ -212,6 +204,10 @@ func atlasCloudImagesError(c *gin.Context, status int, message string) (*OpenAIF
 		errorType = "invalid_request_error"
 	}
 	err := &OpenAIImagesUpstreamError{StatusCode: status, ErrorType: errorType, Message: message}
+	if snapshot, _ := c.Request.Context().Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot); snapshot != nil {
+		// Quoted requests add their durable per-child outcome in the handler.
+		return nil, err
+	}
 	// The Images handler assumes typed upstream errors have already been written.
 	writeOpenAIImagesUpstreamErrorResponse(c, err)
 	return nil, err
@@ -221,6 +217,25 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	ctx context.Context, c *gin.Context, account *Account, parsed *OpenAIImagesRequest, upstreamModel string,
 ) (*OpenAIForwardResult, error) {
 	started := time.Now()
+	quoted, _ := ctx.Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot)
+	if quoted != nil {
+		defer func() {
+			if state := quoted.Outcome().Status; state == "submitting" || state == "pending" {
+				_ = quoted.markOutcome(ctx, "unknown", "")
+			}
+		}()
+	}
+	if raw, exists := c.Get("api_key"); exists && imageQualityEndpoint(upstreamModel) {
+		if key, ok := raw.(*APIKey); ok {
+			fresh, err := s.RefreshImageQualityKey(ctx, key, upstreamModel)
+			if err != nil {
+				return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image tariff unavailable")
+			}
+			if err := s.ValidateAtlasCloudImagePricing(ctx, fresh, parsed, upstreamModel); err != nil {
+				return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
+			}
+		}
+	}
 	payload, err := buildAtlasCloudImagePayload(parsed, upstreamModel)
 	if err != nil {
 		return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
@@ -248,8 +263,18 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	}
 	ctx, cancel := context.WithDeadline(context.WithoutCancel(ctx), deadline)
 	defer cancel()
+	payload, err = s.prepareAtlasCloudImageReferences(ctx, account, token, upstreamModel, payload)
+	if err != nil {
+		return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
+	}
 	method, target, body := http.MethodPost, base+atlasCloudImagesPath, payload
 	predictionID := ""
+	if quoted != nil {
+		if err := quoted.markSubmitting(ctx, account.ID); err != nil {
+			_ = quoted.markOutcome(ctx, "not_submitted", "")
+			return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image submission audit is unavailable; no supplier request was made")
+		}
+	}
 	for {
 		raw, statusCode, requestErr := s.doAtlasCloudImagesRequest(ctx, account, method, target, token, body)
 		if requestErr != nil {
@@ -263,6 +288,9 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if statusCode == http.StatusTooManyRequests {
 				status = statusCode
 			}
+			if quoted != nil && method == http.MethodPost && statusCode >= 400 && statusCode < 500 && statusCode != http.StatusRequestTimeout {
+				_ = quoted.markOutcome(ctx, "failed", "")
+			}
 			return atlasCloudImagesError(c, status, "AtlasCloud rejected the image request")
 		}
 		if !gjson.ValidBytes(raw) {
@@ -270,6 +298,11 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 		}
 		if predictionID == "" {
 			predictionID = strings.TrimSpace(atlasCloudValue(raw, "id").String())
+			if quoted != nil && predictionID != "" {
+				if err := quoted.markOutcome(ctx, "pending", predictionID); err != nil {
+					return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image accepted but audit persistence is unavailable; do not resubmit")
+				}
+			}
 		}
 		status := strings.ToLower(strings.TrimSpace(atlasCloudValue(raw, "status").String()))
 		switch status {
@@ -278,6 +311,14 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if len(outputs) == 0 {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no image output")
 			}
+			if quoted != nil {
+				if predictionID == "" {
+					return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no prediction ID; do not resubmit")
+				}
+				if err := quoted.markOutcome(ctx, "generated", predictionID); err != nil {
+					return atlasCloudImagesError(c, http.StatusServiceUnavailable, "Image generated but audit persistence is unavailable; do not resubmit")
+				}
+			}
 			images := make([]map[string]string, len(outputs))
 			for i, output := range outputs {
 				images[i] = map[string]string{"url": output}
@@ -285,14 +326,9 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			responseBody, _ := json.Marshal(map[string]any{"id": predictionID, "created": time.Now().Unix(), "data": images})
 			synthetic := &http.Response{StatusCode: http.StatusOK, Header: http.Header{"Content-Type": {"application/json"}},
 				Body: io.NopCloser(bytes.NewReader(responseBody))}
-			sizeModel := upstreamModel
-			if isAtlasCloudImageEditModel(upstreamModel) {
-				sizeModel = atlasCloudGPTImageModel
-			}
-			size, tier := atlasCloudImageSize(sizeModel, parsed.Size)
-			if IsAtlasCloudGenericImageModel(upstreamModel) {
-				tier = ImageBillingSize1K
-				size = ""
+			size, tier := atlasCloudRequestedImageSize(parsed, upstreamModel)
+			if IsAtlasCloudGenericImageModel(upstreamModel) && atlasMediaModel(upstreamModel, "image") == nil {
+				size, tier = "", ImageBillingSize1K
 			}
 			if upstreamModel == atlasCloudGrokImageModel {
 				tier = ImageBillingSize1K
@@ -330,6 +366,11 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if predictionID == "" {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no prediction ID")
 			}
+		case "failed", "error", "cancelled", "canceled":
+			if quoted != nil {
+				_ = quoted.markOutcome(ctx, "failed", predictionID)
+			}
+			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed")
 		default:
 			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed or returned an unsupported status")
 		}
@@ -345,7 +386,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 }
 
 func (s *OpenAIGatewayService) doAtlasCloudImagesRequest(
-	ctx context.Context, account *Account, method, target, token string, body []byte,
+	ctx context.Context, account *Account, method, target, token string, body []byte, contentTypes ...string,
 ) ([]byte, int, error) {
 	req, err := http.NewRequestWithContext(ctx, method, target, bytes.NewReader(body))
 	if err != nil {
@@ -354,7 +395,11 @@ func (s *OpenAIGatewayService) doAtlasCloudImagesRequest(
 	req.Header.Set("Authorization", "Bearer "+token)
 	req.Header.Set("Accept", "application/json")
 	if body != nil {
-		req.Header.Set("Content-Type", "application/json")
+		contentType := "application/json"
+		if len(contentTypes) > 0 {
+			contentType = contentTypes[0]
+		}
+		req.Header.Set("Content-Type", contentType)
 	}
 	proxyURL := ""
 	if account.ProxyID != nil && account.Proxy != nil {

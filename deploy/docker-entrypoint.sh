@@ -13,6 +13,11 @@ if [ "$(id -u)" = "0" ]; then
     exec su-exec sub2api "$0" "$@"
 fi
 
+ffprobe -version >/dev/null 2>&1 || {
+    echo "ffprobe runtime is required for admitted reference media" >&2
+    exit 1
+}
+
 # Compatibility: if the first arg looks like a flag (e.g. --help),
 # prepend the default binary so it behaves the same as the old
 # ENTRYPOINT ["/app/sub2api"] style.

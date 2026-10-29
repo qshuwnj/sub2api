@@ -241,9 +241,7 @@ func (s *OpenAIGatewayService) ParseOpenAIImagesRequest(c *gin.Context, body []b
 	}
 	req.SizeTier = normalizeOpenAIImageSizeTier(req.Size)
 	if isAtlasCloudImageModel(req.Model) {
-		if _, tier := atlasCloudImageSize(req.Model, req.Size); tier != "" {
-			req.SizeTier = tier
-		}
+		_, req.SizeTier = atlasCloudRequestedImageSize(req, req.Model)
 		if req.Model == atlasCloudGrokImageModel {
 			req.SizeTier = ImageBillingSize1K
 			if gjson.GetBytes(body, "resolution").String() == "2k" {
@@ -315,8 +313,10 @@ func parseOpenAIImagesJSONRequest(body []byte, req *OpenAIImagesRequest) error {
 				var imageURL string
 				if item.Type == gjson.String {
 					imageURL = strings.TrimSpace(item.String())
-				} else {
+				} else if item.IsObject() {
 					imageURL = strings.TrimSpace(item.Get("image_url").String())
+				} else {
+					return fmt.Errorf("images entries must be URLs or image_url objects")
 				}
 				if imageURL != "" {
 					req.InputImageURLs = append(req.InputImageURLs, imageURL)
@@ -334,7 +334,9 @@ func parseOpenAIImagesJSONRequest(body []byte, req *OpenAIImagesRequest) error {
 		if gjson.GetBytes(body, "mask.file_id").Exists() {
 			return fmt.Errorf("mask.file_id is not supported (use mask.image_url instead)")
 		}
-		if len(req.InputImageURLs) == 0 {
+		// Atlas contracts validate their own image/images_list/images fields
+		// later; native OpenAI edits require the Images API envelope here.
+		if len(req.InputImageURLs) == 0 && atlasMediaModel(req.Model, "image") == nil {
 			return fmt.Errorf("images[].image_url is required")
 		}
 	}
@@ -529,7 +531,7 @@ func isAtlasCloudImageModel(model string) bool {
 	model = strings.TrimSpace(model)
 	return model == "bytedance-seedream-v4.5" || model == "bytedance/seedream-v4.5" ||
 		model == atlasCloudGPTImageModel || model == atlasCloudFlareImageModel || model == atlasCloudGrokImageModel ||
-		isAtlasCloudImageEditModel(model) || IsAtlasCloudGenericImageModel(model)
+		IsAtlasCloudGenericImageModel(model) || atlasMediaModel(model, "image") != nil
 }
 
 // Keep this separate from isOpenAIImageGenerationModel: that predicate also
@@ -667,7 +669,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	SetOpsUpstreamModel(c, upstreamModel)
-	if (isAtlasCloudNewImageModel(upstreamModel) || IsAtlasCloudGenericImageModel(upstreamModel)) && (account.Platform != PlatformOpenAI ||
+	if isAtlasCloudImageModel(upstreamModel) && (account.Platform != PlatformOpenAI ||
 		account.Type != AccountTypeAPIKey || !atlasCloudAPIBaseValid(account.GetOpenAIBaseURL())) {
 		return atlasCloudImagesError(c, http.StatusBadRequest, "Use an AtlasCloud API-key account for this model")
 	}

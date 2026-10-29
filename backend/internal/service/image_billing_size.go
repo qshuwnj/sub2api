@@ -125,6 +125,16 @@ func ApplyOpenAIImageBillingResolution(result *OpenAIForwardResult) {
 		outputSizes = []string{result.ImageOutputSize}
 	}
 	resolved := ResolveImageBillingSize(inputSize, outputSizes)
+	// Seedream sells documented aspect-ratio presets by tier, not long edge.
+	// Keep native OpenAI and actual returned image dimensions unchanged.
+	if result.UpstreamModel == "bytedance/seedream-v4.5" &&
+		result.UpstreamEndpoint == "/api/v1"+atlasCloudImagesPath && len(outputSizes) == 0 {
+		if _, tier := atlasCloudImagePreset(inputSize); tier != "" {
+			resolved.BillingSize = tier
+			resolved.Source = ImageSizeSourceInput
+			resolved.Breakdown = map[string]int{tier: result.ImageCount}
+		}
+	}
 	applyImageBillingResolution(
 		&result.ImageSize,
 		&result.ImageInputSize,

@@ -1,10 +1,72 @@
 package service
 
 import (
+	"sort"
 	"testing"
 
 	"github.com/stretchr/testify/require"
 )
+
+func atlasVideoBillingTestResolution(model string, contract *atlasMediaContract) string {
+	if contract != nil && contract.Input != nil {
+		if property := contract.Input.Properties["resolution"]; property != nil {
+			for _, candidate := range property.Enum {
+				if value, ok := candidate.(string); ok && value != "" {
+					return value
+				}
+			}
+			if value, ok := property.defaultString(); ok && value != "" {
+				return value
+			}
+		}
+	}
+	for _, candidate := range []string{"480p", "540p", "720p", "1080p", "1440p-sr", "2k", "4k", "native"} {
+		if _, ok := atlasMediaVideoResolution(model, candidate); ok {
+			return candidate
+		}
+	}
+	return "native"
+}
+
+func TestCalculateVideoCostCoversAllAtlasVideoContracts(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	var models []string
+	for model, contract := range atlasMediaContracts {
+		if contract.Media != "video" || contract.Blocked != "" || contract.Input == nil {
+			continue
+		}
+		models = append(models, model)
+		resolution := atlasVideoBillingTestResolution(model, contract)
+		cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+	}
+	sort.Strings(models)
+	require.Len(t, models, 91)
+}
+
+func TestCalculateVideoCostCoversEveryDeclaredAtlasVideoResolution(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	for model, contract := range atlasMediaContracts {
+		if contract.Media != "video" || contract.Blocked != "" || contract.Input == nil {
+			continue
+		}
+		property := contract.Input.Properties["resolution"]
+		if property != nil && len(property.Enum) > 0 {
+			for _, candidate := range property.Enum {
+				resolution, ok := candidate.(string)
+				require.True(t, ok, "non-string resolution for %s", model)
+				cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+				require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+			}
+			continue
+		}
+		resolution := atlasVideoBillingTestResolution(model, contract)
+		cost := service.CalculateVideoCost(model, resolution, 1, 1, nil, 1)
+		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
+	}
+}
 
 func TestCanonicalGrokImagineVideoPriceFamily(t *testing.T) {
 	t.Parallel()
@@ -46,6 +108,60 @@ func TestNormalizeAndLookupVideoModelPrices(t *testing.T) {
 
 	// Unmatched model → nil (caller falls back to flat columns / defaults).
 	require.Nil(t, LookupVideoModelPrice(norm, "unknown-model", "480p"))
+}
+
+func TestCalculateVideoCostUsesFlatGroupPriceForAtlasModel(t *testing.T) {
+	price := 0.25
+	cost := (&BillingService{}).CalculateVideoCost(
+		"bytedance/seedance-2.5/text-to-video",
+		"720p",
+		1,
+		8,
+		&VideoPriceConfig{Price720P: &price},
+		1,
+	)
+	require.InDelta(t, 2.0, cost.ActualCost, 1e-9)
+}
+
+func TestCalculateVideoCostUsesAtlasPublishedVideoDefaults(t *testing.T) {
+	t.Parallel()
+	service := &BillingService{}
+	for _, tc := range []struct {
+		name       string
+		model      string
+		resolution string
+		want       float64
+	}{
+		{"seedance 2.5 native 480p", "bytedance/seedance-2.5/text-to-video", "480p", 1.1641254251328},
+		{"seedance 2.5 1080p esr", "bytedance/seedance-2.5/text-to-video", "1080p-esr", 3.755376624},
+		{"seedance 2.5 4k esr", "bytedance/seedance-2.5/reference-to-video", "4k-esr", 14.169943392},
+		{"seedance 2.0 mini native 480p", "bytedance/seedance-2.0-mini/text-to-video", "480p", 0.3749304029184},
+		{"seedance 2.0 mini 1080p sr", "bytedance/seedance-2.0-mini/image-to-video", "1080p-sr", 1.451490144},
+		{"seedance 2.0 native 4k", "bytedance/seedance-2.0/text-to-video", "4k", 8.100681504},
+		{"seedance 2.0 fast 1440p sr", "bytedance/seedance-2.0-fast/text-to-video", "1440p-sr", 4.12866456},
+		{"gemini omni 720p", atlasCloudGeminiVideoModel, "720p", 0.82489968},
+		{"gemini omni 4k", atlasCloudGeminiVideoModel, "4k", 2.32471728},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			cost := service.CalculateVideoCost(tc.model, tc.resolution, 1, 1, nil, 1)
+			require.InDelta(t, tc.want, cost.TotalCost, 1e-9)
+			require.InDelta(t, tc.want, cost.ActualCost, 1e-9)
+		})
+	}
+}
+
+func TestCalculateVideoCostAppliesGroupMultiplierAfterAtlasRetailConversion(t *testing.T) {
+	t.Parallel()
+	cost := (&BillingService{}).CalculateVideoCost(
+		"bytedance/seedance-2.5/text-to-video",
+		"720p",
+		1,
+		1,
+		nil,
+		1.2,
+	)
+	require.InDelta(t, 2.50386216, cost.TotalCost, 1e-9)
+	require.InDelta(t, 3.0046345919999995, cost.ActualCost, 1e-9)
 }
 
 func TestNormalizeVideoModelPricesDropsUnknownResolutions(t *testing.T) {

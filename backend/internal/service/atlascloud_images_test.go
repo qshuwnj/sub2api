@@ -55,7 +55,7 @@ func TestAtlasCloudGenericImagePayload(t *testing.T) {
 	}
 	payload, err := buildAtlasCloudImagePayload(parsed, model)
 	require.NoError(t, err)
-	require.JSONEq(t, `{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","n":1,"response_format":"url"}`, string(payload))
+	require.JSONEq(t, `{"model":"google/nano-banana-2-lite/text-to-image","prompt":"draw a quiet mountain lake","aspect_ratio":"auto","resolution":"1k","seed":-1,"temperature":1,"top_p":0.95,"thinking_level":"default","enable_base64_output":false,"enable_sync_mode":false}`, string(payload))
 }
 
 func TestAtlasCloudGPTImageEditPayload(t *testing.T) {
@@ -68,7 +68,7 @@ func TestAtlasCloudGPTImageEditPayload(t *testing.T) {
 	}
 	payload, err := buildAtlasCloudImagePayload(parsed, model)
 	require.NoError(t, err)
-	require.JSONEq(t, `{"model":"openai/gpt-image-2-developer/edit","prompt":"edit the background","n":1,"images":["data:image/png;base64,AA=="],"size":"2048x1152","quality":"medium"}`, string(payload))
+	require.JSONEq(t, `{"model":"openai/gpt-image-2-developer/edit","prompt":"edit the background","images":["data:image/png;base64,AA=="],"size":"2048x1152","quality":"medium","moderation":"low","output_format":"jpeg","enable_base64_output":false,"enable_sync_mode":false}`, string(payload))
 }
 
 func TestAtlasCloudGPTImageEditJSONParsesInlineImageArray(t *testing.T) {
@@ -166,7 +166,8 @@ func TestAtlasCloudImagesForwardPollsAndReturnsActualImageCount(t *testing.T) {
 	require.Equal(t, "prediction-1", result.RequestID)
 	require.Equal(t, "bytedance/seedream-v4.5", result.UpstreamModel)
 	require.Greater(t, result.Duration, time.Duration(0))
-	require.Len(t, gjson.Get(rec.Body.String(), "data").Array(), 2)
+	require.Empty(t, rec.Body.String(), "paid output remains private until settlement")
+	require.Len(t, gjson.GetBytes(result.AtlasCloudImageResponse, "data").Array(), 2)
 	require.Equal(t, []string{"POST", "GET"}, upstream.methods)
 	require.Equal(t, []string{
 		"https://api.atlascloud.ai/api/v1/model/generateImage",
@@ -263,7 +264,7 @@ func TestAtlasCloudImagesRejectInvalidConfigurationBeforeSubmission(t *testing.T
 			account.Credentials["base_url"] = base
 			_, err := svc.ForwardImages(context.Background(), c, account, parsed.Body, parsed, "")
 			require.Error(t, err)
-			require.Equal(t, 502, rec.Code)
+			require.Equal(t, http.StatusBadRequest, rec.Code)
 			require.Empty(t, upstream.methods)
 		})
 	}

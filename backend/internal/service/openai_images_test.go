@@ -425,7 +425,7 @@ func TestOpenAIGatewayServiceParseOpenAIImagesRequest_JSONEditImageValues(t *tes
 			{
 				name:    "numeric value is not a URL",
 				images:  `[123]`,
-				wantErr: "images[].image_url is required",
+				wantErr: "images entries must be URLs or image_url objects",
 			},
 		} {
 			t.Run(model+"/"+tc.name, func(t *testing.T) {
