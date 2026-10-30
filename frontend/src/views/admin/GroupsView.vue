@@ -4344,7 +4344,7 @@ import ReasoningEffortPolicyFields from "@/components/admin/group/ReasoningEffor
 import CodexManifestAccountsField from "@/components/admin/group/CodexManifestAccountsField.vue";
 import PricingEntryCard from "@/components/admin/channel/PricingEntryCard.vue";
 import type { PricingFormEntry } from "@/components/admin/channel/types";
-import { copyVideoMetadata, importNativeVideoDraft, newNativeVideoAdditions, validateNativeVideoCard } from "@/components/admin/channel/videoTariffPricing";
+import { copyVideoMetadata, importNativeVideoDraft, newNativeVideoAdditions, validateNativeVideoCardUpdate } from "@/components/admin/channel/videoTariffPricing";
 import {
   apiIntervalsToForm,
   createDefaultTimePricingForm,
@@ -4454,7 +4454,10 @@ async function importVideoPricing(event: Event, form: { platform: string; model_
     for (const card of refreshed) {
       const target = form.model_pricing.find(entry => entry.billing_mode === "video" &&
         entry.models.length === 1 && entry.models[0] === card.models[0]);
-      if (target) target.video_tariff = copyVideoMetadata(card.video_tariff);
+      if (target) {
+        target.video_tariff = copyVideoMetadata(card.video_tariff);
+        target.intervals = apiIntervalsToForm(card.intervals);
+      }
     }
     const additions = groupPricingFromAPI(newNativeVideoAdditions(merged, current));
     form.model_pricing.push(...additions);
@@ -5952,15 +5955,19 @@ const validateProfitControlForm = (form: ProfitControlFormState): boolean => {
   return true;
 };
 
-const validateGroupReasoningMultipliers = (pricing: PricingFormEntry[]): boolean => {
-  for (const entry of pricing) {
+const validateGroupReasoningMultipliers = (pricing: PricingFormEntry[], existing: ChannelModelPricing[] = []): boolean => {
+  const baseline = groupPricingToAPI(groupPricingFromAPI(existing), "openai");
+  const normalized = groupPricingToAPI(pricing, "openai");
+  for (const entry of normalized) {
     if (entry.video_tariff) {
-      const videoError = validateNativeVideoCard(entry);
+      const videoError = validateNativeVideoCardUpdate(entry, baseline);
       if (videoError) {
         appStore.showError(`${entry.models.join(", ")}: ${videoError}`);
         return false;
       }
     }
+  }
+  for (const entry of pricing) {
     const error = validateReasoningEffortMultipliers(entry.reasoning_effort_multipliers, t);
     if (error) {
       appStore.showError(`${entry.models.join(", ") || t("admin.channels.form.unnamed")}: ${error}`);
@@ -6325,7 +6332,7 @@ const handleUpdateGroup = async () => {
   if (!validateProfitControlForm(editForm)) {
     return;
   }
-  if (!validateGroupReasoningMultipliers(editForm.model_pricing)) return;
+  if (!validateGroupReasoningMultipliers(editForm.model_pricing, editingGroup.value.model_pricing)) return;
   // 模型白名单：开启且没有任何条目时阻止提交，与后端 400 对齐。
   if (
     editModelAllowlistState.enabled &&

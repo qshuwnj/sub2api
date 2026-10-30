@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { parseVideoPricingJSON, stringifyVideoPricingJSON, validateNativeVideoCard, importNativeVideoDraft, nativeVideoCells, newNativeVideoAdditions } from '../videoTariffPricing'
+import { parseVideoPricingJSON, stringifyVideoPricingJSON, validateNativeVideoCard, validateNativeVideoCardUpdate, importNativeVideoDraft, nativeVideoCells, newNativeVideoAdditions } from '../videoTariffPricing'
 import profiles from '../atlasVideoTariffProfiles.json'
 import r2vDraft from '../atlasSeedanceR2VTariffDraft.json'
 import { createHash } from 'node:crypto'
@@ -10,6 +10,47 @@ const controls = { aspect_ratio: '16:9', duration: 8, generate_audio: false, res
 const key = 'video:v1:' + btoa(JSON.stringify([model, 't2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
 const raw = `{"model_pricing":[{"platform":"openai","models":["${model}"],"billing_mode":"video","intervals":[{"tier_label":"${key}","per_request_price":9999999999.12345678}],"video_tariff":{"version":1,"contract_revision":"${'a'.repeat(64)}","cells":{"${key}":{"source":"https://api.atlascloud.ai/api/v1/model/calculate","checked_at":"2026-10-22T00:00:00Z","upstream_price":"1.6","supplier_estimated":true,"policy":"fixed-customer-price-platform-variance-v1"}}}}]}`
 describe('native video administrator money boundary', () => {
+  it('migrates only the reviewed Kling removed-default contracts while preserving exact retail prices', () => {
+    for (const [endpoint, revision, removed] of [
+      ['kwaivgi/kling-v2.5-turbo-pro/text-to-video', 'cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a', 'guidance_scale'],
+      ['kwaivgi/kling-v2.6-pro/text-to-video', '4f4ea4b379e006c25c1b636801f7ea48b141f806aa985fd0f214809252d4cd4b', 'cfg_scale'],
+    ]) {
+      const incoming = parseVideoPricingJSON(raw).model_pricing[0]
+      const evidence = Object.values(incoming.video_tariff.cells)[0]
+      incoming.models = [endpoint]
+      incoming.video_tariff.contract_revision = profiles[endpoint].contractRevision
+      incoming.intervals = nativeVideoCells(endpoint).map(cell => ({ tier_label: cell.key, per_request_price: '2.47886520' }))
+      incoming.video_tariff.cells = Object.fromEntries(incoming.intervals.map((row: any) => [row.tier_label, { ...evidence }]))
+      const prior = structuredClone(incoming)
+      prior.video_tariff.contract_revision = revision
+      prior.intervals = nativeVideoCells(endpoint).map(cell => {
+        const controls = Object.fromEntries(Object.entries({ ...cell.controls, [removed]: 0.5 }).sort(([a], [b]) => a.localeCompare(b)))
+        const oldKey = 'video:v1:' + btoa(JSON.stringify([endpoint, 't2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
+        return { tier_label: oldKey, per_request_price: '7.12345678' }
+      })
+      prior.video_tariff.cells = Object.fromEntries(prior.intervals.map((row: any) => [row.tier_label, { ...evidence }]))
+      const before = structuredClone(prior)
+      const merged = importNativeVideoDraft(stringifyVideoPricingJSON([incoming]), [prior])
+      expect(validateNativeVideoCard(merged[0])).toBeNull()
+      expect(merged[0].intervals.every((row: any) => row.per_request_price === '7.12345678')).toBe(true)
+      expect(prior).toEqual(before)
+      const altered = structuredClone(prior)
+      altered.intervals[0].tier_label = altered.intervals[1].tier_label
+      expect(() => importNativeVideoDraft(stringifyVideoPricingJSON([incoming]), [altered])).toThrow()
+      const unknown = structuredClone(prior)
+      unknown.video_tariff.contract_revision = 'a'.repeat(64)
+      expect(() => importNativeVideoDraft(stringifyVideoPricingJSON([incoming]), [unknown])).toThrow()
+    }
+  })
+  it('permits an unchanged stored stale card during another card repair but rejects edits or new stale cards', () => {
+    const stale = parseVideoPricingJSON(raw).model_pricing[0]
+    expect(validateNativeVideoCardUpdate(stale, [structuredClone(stale)])).toBeNull()
+    expect(validateNativeVideoCardUpdate(stale, [])).not.toBeNull()
+    const edited = structuredClone(stale)
+    edited.intervals[0].per_request_price = '1'
+    expect(validateNativeVideoCardUpdate(edited, [stale])).not.toBeNull()
+    expect(validateNativeVideoCard(stale)).not.toBeNull()
+  })
   it('matches every Studio native key and typed control across all 91 endpoint profiles', () => {
     let count = 0
     for (const [endpoint, profile] of Object.entries(profiles)) {

@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -817,7 +818,7 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 		group.LongContextPricingEnabled = *input.LongContextPricingEnabled
 	}
 	if input.ModelPricing != nil {
-		modelPricing, normalizeErr := normalizeGroupModelPricing(group.Platform, *input.ModelPricing)
+		modelPricing, normalizeErr := normalizeGroupModelPricing(group.Platform, *input.ModelPricing, group.ModelPricing)
 		if normalizeErr != nil {
 			return nil, normalizeErr
 		}
@@ -1170,7 +1171,7 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	return group, nil
 }
 
-func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) ([]ChannelModelPricing, error) {
+func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing, existing ...[]ChannelModelPricing) ([]ChannelModelPricing, error) {
 	out := make([]ChannelModelPricing, len(pricing))
 	for i := range pricing {
 		out[i] = pricing[i].Clone()
@@ -1196,10 +1197,22 @@ func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) 
 		return nil, err
 	}
 	qualityModels := map[string]bool{}
+	preserved := map[int]bool{}
 	for _, card := range out {
 		if videoCardEnrolled(card) {
 			if err := validateVideoTariffCard(card); err != nil {
-				return nil, infraerrors.BadRequest("INVALID_VIDEO_TARIFF", err.Error())
+				unchanged := false
+				if len(existing) == 1 {
+					for i, prior := range existing[0] {
+						if !preserved[i] && sameStoredVideoPricing(card, prior) {
+							preserved[i], unchanged = true, true
+							break
+						}
+					}
+				}
+				if !unchanged {
+					return nil, infraerrors.BadRequest("INVALID_VIDEO_TARIFF", err.Error())
+				}
 			}
 		}
 		hasQuality := false
@@ -1229,6 +1242,23 @@ func normalizeGroupModelPricing(platform string, pricing []ChannelModelPricing) 
 		}
 	}
 	return out, nil
+}
+
+// Preservation is not enrollment: runtime quote validation still rejects stale cards.
+func sameStoredVideoPricing(a, b ChannelModelPricing) bool {
+	clean := func(card ChannelModelPricing) ChannelModelPricing {
+		card = card.Clone()
+		card.ID, card.ChannelID = 0, 0
+		card.CreatedAt, card.UpdatedAt = time.Time{}, time.Time{}
+		for i := range card.Intervals {
+			card.Intervals[i].ID, card.Intervals[i].PricingID = 0, 0
+			card.Intervals[i].CreatedAt, card.Intervals[i].UpdatedAt = time.Time{}, time.Time{}
+		}
+		return card
+	}
+	left, leftErr := json.Marshal(clean(a))
+	right, rightErr := json.Marshal(clean(b))
+	return leftErr == nil && rightErr == nil && string(left) == string(right)
 }
 
 func (s *adminServiceImpl) DeleteGroup(ctx context.Context, id int64) error {
