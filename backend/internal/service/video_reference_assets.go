@@ -41,6 +41,25 @@ func VideoReferenceFamilyForModel(model string) (string, error) {
 	return family, nil
 }
 
+// Frames use the exact verified image-to-video contract, never an inferred
+// reference-to-video sibling. Their storage grant accepts images only.
+func VideoFrameFamilyForModel(model string) (string, error) {
+	model = strings.TrimSpace(model)
+	switch model {
+	case "grok-imagine-video", "doubao-seedance-1-0-pro-250528", "doubao-seedance-2-0-260128":
+		return "frame:" + model, nil
+	}
+	contract := atlasMediaModel(model, "video")
+	if contract != nil && contract.Mode == "i2v" {
+		for _, field := range []string{"image", "image_url", "images", "image_urls"} {
+			if _, ok := contract.MediaFields[field]; ok {
+				return "frame:" + model, nil
+			}
+		}
+	}
+	return "", errors.New("unsupported frame image model")
+}
+
 type VideoReferenceCleanupState string
 
 const (
@@ -259,6 +278,10 @@ type videoReferenceLimits struct {
 }
 
 func videoReferenceLimit(family string, kind VideoReferenceKind) (videoReferenceLimits, bool) {
+	if strings.HasPrefix(family, "frame:") {
+		_, err := VideoFrameFamilyForModel(strings.TrimPrefix(family, "frame:"))
+		return videoReferenceLimits{MaxBytes: 30 << 20}, err == nil && kind == VideoReferenceImage
+	}
 	if kind == VideoReferenceImage {
 		return videoReferenceLimits{MaxBytes: 30 << 20}, family == "2.0" || family == "2.5" || family == "2.0-mini" || family == "2.0-fast"
 	}
@@ -286,7 +309,12 @@ func ValidateVideoReferenceDescriptor(asset *VideoReferenceAsset) error {
 	}
 	if asset.Kind == VideoReferenceImage {
 		aspect := float64(asset.Width) / float64(asset.Height)
-		if asset.Width < 300 || asset.Height < 300 || asset.Width > 6000 || asset.Height > 6000 || aspect < 0.4 || aspect > 2.5 {
+		minimum := 300
+		frame := strings.HasPrefix(asset.EndpointFamily, "frame:")
+		if frame {
+			minimum = 1
+		}
+		if asset.Width < minimum || asset.Height < minimum || asset.Width > 6000 || asset.Height > 6000 || !frame && (aspect < 0.4 || aspect > 2.5) {
 			return errors.New("invalid image dimensions")
 		}
 		if asset.MIME != "image/png" && asset.MIME != "image/jpeg" && asset.MIME != "image/webp" {

@@ -47,12 +47,28 @@ func (h *VideoReferenceAssetHandler) Upload(c *gin.Context) {
 		c.JSON(http.StatusRequestEntityTooLarge, gin.H{"error": gin.H{"message": "reference upload exceeds 220 MiB"}})
 		return
 	}
+	c.Request.Body = http.MaxBytesReader(c.Writer, c.Request.Body, maxVideoReferenceUploadBytes)
+	defer func() {
+		if c.Request.MultipartForm != nil {
+			_ = c.Request.MultipartForm.RemoveAll()
+		}
+	}()
 	if err := c.Request.ParseMultipartForm(8 << 20); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"message": "reference upload must be multipart/form-data"}})
 		return
 	}
 	model := strings.TrimSpace(c.PostForm("model"))
-	family, err := service.VideoReferenceFamilyForModel(model)
+	purpose := strings.TrimSpace(c.PostForm("purpose"))
+	var family string
+	var err error
+	switch purpose {
+	case "":
+		family, err = service.VideoReferenceFamilyForModel(model)
+	case "frame":
+		family, err = service.VideoFrameFamilyForModel(model)
+	default:
+		err = errors.New("unsupported upload purpose")
+	}
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"message": err.Error()}})
 		return
@@ -75,6 +91,10 @@ func (h *VideoReferenceAssetHandler) Upload(c *gin.Context) {
 	metadata, err := inspectVideoReference(data, header.Filename, h.assets.FFProbe())
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"message": err.Error()}})
+		return
+	}
+	if purpose == "frame" && metadata.Kind != service.VideoReferenceImage {
+		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"message": "frames require PNG, JPEG, or WebP images"}})
 		return
 	}
 	requestedKind := strings.TrimSpace(c.PostForm("kind"))
