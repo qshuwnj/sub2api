@@ -190,6 +190,58 @@ func TestVideoQuoteLegacyRuleEstimateUsesConfiguredVideoPrice(t *testing.T) {
 	require.Equal(t, 1, quote.UnitCount)
 }
 
+func TestVideoQuoteUnrelatedStaleTariffDoesNotBlockGrok(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing[0].VideoTariff.ContractRevision = strings.Repeat("0", 64)
+	price := 0.25
+	key.Group.VideoPrice480P = &price
+	req := VideoQuoteRequest{
+		Model: "xai/grok-imagine-video/text-to-video",
+		Mode:  "t2v",
+		Controls: map[string]any{
+			"aspect_ratio": "16:9",
+			"resolution":   "480p",
+			"duration":     float64(5),
+		},
+	}
+	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
+	require.NoError(t, err, "a stale Veo tariff must not disable an unrelated Grok estimate")
+	require.True(t, quote.EstimateOnly)
+	require.Equal(t, "1.25000000", quote.TotalPrice)
+	_, err = s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
+	require.Error(t, err, "the affected model must still fail closed")
+}
+
+func TestVideoQuoteUnrelatedMalformedTariffDoesNotBlockSignedQuote(t *testing.T) {
+	s, key := videoFixture(t)
+	key.Group.ModelPricing = append(key.Group.ModelPricing, ChannelModelPricing{
+		Platform: PlatformOpenAI, BillingMode: BillingModeVideo,
+		Models:      []string{"xai/grok-imagine-video/text-to-video"},
+		VideoTariff: &VideoTariffMetadata{Version: 1},
+	})
+	quote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
+	require.NoError(t, err)
+	require.True(t, quote.Enrolled)
+	require.NotEmpty(t, quote.Token)
+	require.Equal(t, "13.33171200", quote.TotalPrice)
+}
+
+func TestVideoPricingMatchingMalformedTariffsCannotFallBack(t *testing.T) {
+	for _, models := range [][]string{
+		{"google/*"},
+		{"*"},
+		{"google/veo3.1/text-to-video", "xai/grok-imagine-video/text-to-video"},
+		nil,
+	} {
+		t.Run(strings.Join(models, ","), func(t *testing.T) {
+			s, key := videoFixture(t)
+			key.Group.ModelPricing[0].Models = models
+			_, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
+			require.Error(t, err, "a matching or unscoped malformed tariff must never become legacy billing")
+		})
+	}
+}
+
 func TestVideoQuoteLegacyEstimateConvertsAtlasSupplierPrice(t *testing.T) {
 	s, key := videoFixture(t)
 	key.Group.ModelPricing = nil

@@ -536,6 +536,17 @@ func (s *OpenAIGatewayService) VideoPricingEnrolled(key *APIKey, model string) (
 		if !videoCardEnrolled(c) {
 			continue
 		}
+		// Stale tariffs for other models must not disable this model. Keep
+		// matching wildcard/multi-model and unscoped malformed cards fail-closed.
+		matches := len(c.Models) == 0
+		for _, pattern := range c.Models {
+			if groupAllowlistPatternMatches(strings.TrimSpace(pattern), model) {
+				matches = true
+			}
+		}
+		if !matches {
+			continue
+		}
 		if err := validateVideoTariffCard(c); err != nil {
 			return false, err
 		}
@@ -658,7 +669,7 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 	}
 	var card *ChannelModelPricing
 	for i := range key.Group.ModelPricing {
-		if videoCardEnrolled(key.Group.ModelPricing[i]) && key.Group.ModelPricing[i].Models[0] == req.Model {
+		if len(key.Group.ModelPricing[i].Models) == 1 && key.Group.ModelPricing[i].Models[0] == req.Model && videoCardEnrolled(key.Group.ModelPricing[i]) {
 			card = &key.Group.ModelPricing[i]
 		}
 	}
