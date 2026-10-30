@@ -11238,8 +11238,16 @@
   "kwaivgi/kling-video-o1/image-to-video": {
     "mode": "i2v",
     "contractRevision": "8f999555b2239e4d3e318ce959fecbf6312e1cf8b5fea392216e73a97efa171c",
-    "variants": [],
-    "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    "variants": [
+      {
+        "controls": {},
+        "durations": [
+          5,
+          10
+        ]
+      }
+    ],
+    "keysSHA256": "1f466c440ea8ce98b60833b1aa9fdd3fc119fe05c3aa1bbc63fe240adcb07228"
   },
   "kwaivgi/kling-video-o1/text-to-video": {
     "mode": "t2v",

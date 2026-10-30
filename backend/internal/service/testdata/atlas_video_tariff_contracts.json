@@ -1107,6 +1107,28 @@
   },
   {
     "selection": {
+      "model": "kwaivgi/kling-video-o1/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5
+      }
+    },
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImR1cmF0aW9uIjo1fV0",
+    "revision": "8f999555b2239e4d3e318ce959fecbf6312e1cf8b5fea392216e73a97efa171c"
+  },
+  {
+    "selection": {
+      "model": "kwaivgi/kling-video-o1/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 10
+      }
+    },
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImR1cmF0aW9uIjoxMH1d",
+    "revision": "8f999555b2239e4d3e318ce959fecbf6312e1cf8b5fea392216e73a97efa171c"
+  },
+  {
+    "selection": {
       "model": "kwaivgi/kling-video-o1/text-to-video",
       "mode": "t2v",
       "controls": {

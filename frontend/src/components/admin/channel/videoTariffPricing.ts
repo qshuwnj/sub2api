@@ -147,6 +147,51 @@ function migrateReviewedKlingDefaults(prior: ChannelModelPricing): ChannelModelP
     return validateNativeVideoCard(migrated) ? null : migrated
   } catch { return null }
 }
+
+function migrateReviewedKlingO1(prior: ChannelModelPricing): ChannelModelPricing | null {
+  const model = 'kwaivgi/kling-video-o1/image-to-video'
+  if (prior.models.length !== 1 || prior.models[0] !== model || prior.video_tariff?.version !== 1 ||
+      prior.video_tariff.contract_revision !== '149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132' ||
+      prior.intervals.length !== 6 || Object.keys(prior.video_tariff.cells).length !== 6) return null
+  try {
+    const seen = new Set<string>()
+    const projected = ['16:9', '9:16', '1:1'].map(aspect_ratio => {
+      const cells: NonNullable<ChannelModelPricing['video_tariff']>['cells'] = {}
+      const intervals = nativeVideoCells(model).map(cell => {
+        const oldKey = keyFor(model, 'i2v', { aspect_ratio, ...cell.controls })
+        const rows = prior.intervals.filter(row => row.tier_label === oldKey)
+        if (rows.length !== 1 || !prior.video_tariff!.cells[oldKey]) throw new Error('Incomplete prior O1 grid')
+        seen.add(oldKey)
+        cells[cell.key] = { ...prior.video_tariff!.cells[oldKey] }
+        return { ...rows[0], tier_label: cell.key }
+      })
+      const migrated = { ...prior, intervals, video_tariff: {
+        ...prior.video_tariff!, contract_revision: profiles[model].contractRevision, cells,
+      } }
+      if (validateNativeVideoCard(migrated)) throw new Error('Invalid prior O1 card')
+      return migrated
+    })
+    if (seen.size !== 6 || Object.keys(prior.video_tariff.cells).some(key => !seen.has(key))) return null
+    const baseline = projected[0]
+    for (const candidate of projected.slice(1)) {
+      for (const [index, row] of candidate.intervals.entries()) {
+        const price = (value: unknown) => {
+          const [whole, fraction = ''] = exactVideoPrice(value).split('.')
+          return whole + '.' + fraction.padEnd(8, '0')
+        }
+        const metadata = (card: ChannelModelPricing) => {
+          const { checked_at: _checkedAt, ...evidence } = card.video_tariff!.cells[row.tier_label]
+          return canonical(evidence)
+        }
+        // A many-to-one projection is safe only when no retail or cost distinction is lost.
+        if (price(row.per_request_price) !== price(baseline.intervals[index].per_request_price) ||
+            metadata(candidate) !== metadata(baseline)) return null
+      }
+    }
+    return baseline
+  } catch { return null }
+}
+
 export function importNativeVideoDraft(text: string, existing: ChannelModelPricing[]): ChannelModelPricing[] {
   const document = parseVideoPricingJSON(text)
   const cards = Array.isArray(document) ? document : document.model_pricing
@@ -166,7 +211,8 @@ export function importNativeVideoDraft(text: string, existing: ChannelModelPrici
     if (exactExisting.length > 1) throw new Error(`Overlapping existing video cards: ${model}`)
     if (exactExisting.length === 1) {
       const original = exactExisting[0]
-      const prior = validateNativeVideoCard(original) ? migrateReviewedKlingDefaults(original) || original : original
+      const prior = validateNativeVideoCard(original)
+        ? migrateReviewedKlingO1(original) || migrateReviewedKlingDefaults(original) || original : original
       const priorError = validateNativeVideoCard(prior)
       if (priorError) throw new Error(`Existing video card is invalid: ${priorError}`)
       const oldPrices = new Map(prior.intervals.map((row: ChannelModelPricing['intervals'][number]) => [row.tier_label, exactVideoPrice(row.per_request_price)]))

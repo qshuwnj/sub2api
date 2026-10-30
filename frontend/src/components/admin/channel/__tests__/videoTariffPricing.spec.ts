@@ -10,6 +10,56 @@ const controls = { aspect_ratio: '16:9', duration: 8, generate_audio: false, res
 const key = 'video:v1:' + btoa(JSON.stringify([model, 't2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
 const raw = `{"model_pricing":[{"platform":"openai","models":["${model}"],"billing_mode":"video","intervals":[{"tier_label":"${key}","per_request_price":9999999999.12345678}],"video_tariff":{"version":1,"contract_revision":"${'a'.repeat(64)}","cells":{"${key}":{"source":"https://api.atlascloud.ai/api/v1/model/calculate","checked_at":"2026-10-22T00:00:00Z","upstream_price":"1.6","supplier_estimated":true,"policy":"fixed-customer-price-platform-variance-v1"}}}}]}`
 describe('native video administrator money boundary', () => {
+  it('collapses only the reviewed O1 ratio grid when exact stored prices and cost provenance agree', () => {
+    const endpoint = 'kwaivgi/kling-video-o1/image-to-video'
+    const encode = (controls: Record<string, unknown>) => 'video:v1:' +
+      btoa(JSON.stringify([endpoint, 'i2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
+    const incoming = parseVideoPricingJSON(raw).model_pricing[0]
+    const evidence = Object.values(incoming.video_tariff.cells)[0] as Record<string, unknown>
+    incoming.models = [endpoint]
+    incoming.video_tariff.contract_revision = profiles[endpoint].contractRevision
+    incoming.intervals = [5, 10].map(duration => ({
+      tier_label: encode({ duration }), per_request_price: duration === 5 ? '3.96618432' : '7.93236864',
+    }))
+    incoming.video_tariff.cells = Object.fromEntries(incoming.intervals.map((row: any) => [
+      row.tier_label, { ...evidence, checked_at: '2026-10-30T20:30:00Z' },
+    ]))
+    const prior = structuredClone(incoming)
+    prior.video_tariff.contract_revision = '149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132'
+    prior.intervals = ['16:9', '9:16', '1:1'].flatMap(aspect_ratio => [5, 10].map(duration => ({
+      tier_label: encode({ aspect_ratio, duration }),
+      per_request_price: duration === 5 ? '8.12345678' : '9.87654321',
+    })))
+    prior.video_tariff.cells = Object.fromEntries(prior.intervals.map((row: any, index: number) => [
+      row.tier_label, { ...evidence, checked_at: `2026-10-25T00:00:0${index}Z` },
+    ]))
+    const before = structuredClone(prior)
+    const unrelated = { models: ['unrelated'], billing_mode: 'image' }
+    const merged = importNativeVideoDraft(stringifyVideoPricingJSON([incoming]), [prior, unrelated] as never)
+    expect(validateNativeVideoCard(merged[0])).toBeNull()
+    expect(merged[0].intervals.map(row => row.per_request_price)).toEqual(['8.12345678', '9.87654321'])
+    expect(merged[0].intervals.map(row => row.tier_label)).toEqual(incoming.intervals.map((row: any) => row.tier_label))
+    expect(merged[0].video_tariff).toEqual(incoming.video_tariff)
+    expect(merged[1]).toBe(unrelated)
+    expect(prior).toEqual(before)
+    for (const mutate of [
+      (card: any) => { card.intervals[2].per_request_price = '8.12345679' },
+      (card: any) => { card.intervals.pop() },
+      (card: any) => { card.intervals[0].tier_label = card.intervals[2].tier_label },
+      (card: any) => { card.intervals[0].tier_label = encode({ aspect_ratio: '4:3', duration: 5 }) },
+      (card: any) => { card.intervals[0].tier_label = encode({ aspect_ratio: '16:9', duration: '5' }) },
+      (card: any) => { card.intervals[0].tier_label = encode({ aspect_ratio: '16:9', duration: 5, sound: true }) },
+      (card: any) => { card.video_tariff.contract_revision = 'a'.repeat(64) },
+      (card: any) => { delete card.video_tariff.cells[card.intervals[0].tier_label] },
+      (card: any) => { card.video_tariff.cells[card.intervals[2].tier_label].upstream_price = '1.5' },
+      (card: any) => { card.video_tariff.cells[card.intervals[2].tier_label].supplier_estimated = false },
+      (card: any) => { card.intervals[2].input_price = 1 },
+    ]) {
+      const altered = structuredClone(prior)
+      mutate(altered)
+      expect(() => importNativeVideoDraft(stringifyVideoPricingJSON([incoming]), [altered])).toThrow()
+    }
+  })
   it('migrates only the reviewed Kling removed-default contracts while preserving exact retail prices', () => {
     for (const [endpoint, revision, removed] of [
       ['kwaivgi/kling-v2.5-turbo-pro/text-to-video', 'cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a', 'guidance_scale'],
@@ -58,7 +108,7 @@ describe('native video administrator money boundary', () => {
       count += cells.length
       expect(createHash('sha256').update(cells.map(cell => cell.key).sort().join('\n')).digest('hex')).toBe(profile.keysSHA256)
     }
-    expect(count).toBe(13751)
+    expect(count).toBe(13753)
   })
   it('includes complete fixed grids for all four Seedance R2V endpoints', () => {
     const expected = {
