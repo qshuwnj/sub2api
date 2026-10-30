@@ -173,7 +173,7 @@ func TestVideoTariffRawDecimalStorageAndQuote(t *testing.T) {
 	}
 }
 
-func TestVideoQuoteLegacyRuleEstimateUsesConfiguredVideoPrice(t *testing.T) {
+func TestVideoQuoteConfiguredRuleLocksExistingVideoPrice(t *testing.T) {
 	s, key := videoFixture(t)
 	key.Group.ModelPricing = nil
 	price := 0.25
@@ -182,8 +182,9 @@ func TestVideoQuoteLegacyRuleEstimateUsesConfiguredVideoPrice(t *testing.T) {
 
 	quote, err := s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
 	require.NoError(t, err)
-	require.False(t, quote.Enrolled)
-	require.True(t, quote.EstimateOnly)
+	require.True(t, quote.Enrolled)
+	require.False(t, quote.EstimateOnly)
+	require.NotEmpty(t, quote.Token)
 	require.Equal(t, "2.00000000", quote.TotalPrice)
 	require.Equal(t, "USD", quote.Currency)
 	require.Equal(t, "job", quote.BillingUnit)
@@ -205,8 +206,9 @@ func TestVideoQuoteUnrelatedStaleTariffDoesNotBlockGrok(t *testing.T) {
 		},
 	}
 	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
-	require.NoError(t, err, "a stale Veo tariff must not disable an unrelated Grok estimate")
-	require.True(t, quote.EstimateOnly)
+	require.NoError(t, err, "a stale Veo tariff must not disable an unrelated Grok quote")
+	require.True(t, quote.Enrolled)
+	require.False(t, quote.EstimateOnly)
 	require.Equal(t, "1.25000000", quote.TotalPrice)
 	_, err = s.QuoteVideo(context.Background(), key, videoTestRequest(), time.Now())
 	require.Error(t, err, "the affected model must still fail closed")
@@ -262,8 +264,8 @@ func TestVideoQuoteLegacyEstimateConvertsAtlasSupplierPrice(t *testing.T) {
 
 	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
 	require.NoError(t, err)
-	require.False(t, quote.Enrolled)
-	require.True(t, quote.EstimateOnly)
+	require.True(t, quote.Enrolled)
+	require.False(t, quote.EstimateOnly)
 	require.Equal(t, "31.43367720", quote.TotalPrice)
 }
 
@@ -301,7 +303,8 @@ func TestVideoQuoteLegacyMiniReferencePriceMatchesSettlement(t *testing.T) {
 			key.Group.VideoModelPrices = tc.perModel
 			quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
 			require.NoError(t, err)
-			require.True(t, quote.EstimateOnly)
+			require.True(t, quote.Enrolled)
+			require.False(t, quote.EstimateOnly)
 			require.Equal(t, tc.want, quote.TotalPrice)
 			cost := s.calculateOpenAIVideoCost(context.Background(), req.Model, key,
 				&OpenAIForwardResult{VideoCount: 1, VideoResolution: "480p", VideoDurationSeconds: 5}, 1)
@@ -318,9 +321,8 @@ func TestVideoQuoteLegacyInvalidOverrideDoesNotFallBack(t *testing.T) {
 	req := videoTestRequest()
 	key.Group.VideoModelPrices = map[string]map[string]float64{req.Model: {"720p": -1}}
 	quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
-	require.NoError(t, err)
-	require.False(t, quote.EstimateOnly, "an invalid override must not produce a usable fallback estimate")
-	require.Empty(t, quote.TotalPrice)
+	require.Error(t, err)
+	require.Nil(t, quote, "an invalid override must not produce a usable fallback quote")
 }
 
 func TestVideoQuoteLegacyNativeResolutionMatchesGeneration(t *testing.T) {
@@ -346,7 +348,8 @@ func TestVideoQuoteLegacyNativeResolutionMatchesGeneration(t *testing.T) {
 			key.Group.VideoModelPrices = tc.prices
 			quote, err := s.QuoteVideo(context.Background(), key, req, time.Now())
 			require.NoError(t, err)
-			require.True(t, quote.EstimateOnly)
+			require.True(t, quote.Enrolled)
+			require.False(t, quote.EstimateOnly)
 			require.Equal(t, tc.want, quote.TotalPrice)
 		})
 	}
@@ -618,11 +621,8 @@ func TestVideoQuoteReadinessFreshAdmissionAndExactEnrollment(t *testing.T) {
 	k.Group.ModelPricing = nil
 	s.usageBillingRepo = nil
 	q, err := s.QuoteVideo(context.Background(), k, videoTestRequest(), time.Now())
-	require.NoError(t, err)
-	require.False(t, q.Enrolled)
-	require.True(t, q.EstimateOnly)
-	require.Empty(t, q.Token)
-	require.NotEmpty(t, q.TotalPrice)
+	require.Error(t, err)
+	require.Nil(t, q, "rule quotes also require durable billing")
 }
 
 func TestVideoQuoteRefreshesUserAndGroupBeyondCachedKey(t *testing.T) {

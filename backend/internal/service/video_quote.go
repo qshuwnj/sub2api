@@ -106,6 +106,7 @@ type VideoQuote struct {
 	BillingUnit       string    `json:"billing_unit,omitempty"`
 	UnitCount         int       `json:"unit_count,omitempty"`
 	TotalPrice        string    `json:"total_price,omitempty"`
+	PriceSource       string    `json:"price_source,omitempty"`
 	SupplierEstimated bool      `json:"supplier_estimated"`
 }
 type videoQuoteClaims struct {
@@ -292,9 +293,6 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 	} else if p["aspect_ratio"] != nil {
 		ratio = "aspect_ratio"
 	}
-	if req.Mode == "i2v" && ratio == "" {
-		return req, fmt.Errorf("input ratio cost is unverified")
-	}
 	expected := map[string]bool{"duration": true}
 	optional := map[string]bool{}
 	for _, field := range []string{ratio, "resolution"} {
@@ -334,7 +332,7 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 			continue
 		}
 		v := controls[field]
-		if text, ok := v.(string); ok && (strings.EqualFold(text, "auto") || strings.EqualFold(text, "adaptive")) {
+		if text, ok := v.(string); ok && (strings.EqualFold(text, "auto") || strings.EqualFold(text, "adaptive")) && field != ratio {
 			return req, fmt.Errorf("automatic video controls are not fixed-price")
 		}
 		if len(p[field].Enum) == 0 && p[field].Default == nil {
@@ -664,8 +662,7 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		return
 	}
 	if !enrolled {
-		err = fmt.Errorf("video tariff not configured")
-		return
+		return s.videoConfiguredRuleTariff(ctx, key, req)
 	}
 	var card *ChannelModelPricing
 	for i := range key.Group.ModelPricing {
@@ -705,6 +702,61 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 	raw, _ := videoCanonical([]any{label, base, total, multiplier, card.VideoTariff.ContractRevision, metadata})
 	hash := sha256.Sum256(raw)
 	revision = hex.EncodeToString(hash[:])
+	return
+}
+
+// Existing per-second customer prices can be locked without claiming that they
+// are verified supplier invoices. Non-default cost settings still need a native
+// tariff cell, and an enrolled native card never falls back to these rules.
+func (s *OpenAIGatewayService) videoConfiguredRuleTariff(ctx context.Context, key *APIKey, req VideoQuoteRequest) (base, total, revision, multiplier string, estimated bool, err error) {
+	if s == nil || s.billingService == nil || key == nil || key.Group == nil {
+		err = ErrVideoQuoteUnavailable
+		return
+	}
+	if err = videoLegacySettings(atlasMediaModel(req.Model, "video"), req.Controls); err != nil {
+		return
+	}
+	resolution, _ := req.Controls["resolution"].(string)
+	resolution = atlasMediaVideoResolutionOrDefault(req.Model, resolution)
+	if !HasAtlasCloudVideoPrice(key, req.Model, resolution) {
+		err = fmt.Errorf("video tariff not configured")
+		return
+	}
+	unit := s.billingService.getVideoUnitPrice(req.Model, resolution, videoPriceConfigFromAPIKey(key))
+	duration, e := decimal.NewFromString(fmt.Sprint(req.Controls["duration"]))
+	if e != nil || !duration.IsPositive() || !duration.Equal(duration.Truncate(0)) || duration.GreaterThan(decimal.NewFromInt(120)) {
+		err = fmt.Errorf("invalid native video duration")
+		return
+	}
+	rate, e := s.videoCustomerRate(ctx, key)
+	if e != nil {
+		err = e
+		return
+	}
+	baseAmount := decimal.NewFromFloat(unit).Mul(duration).Round(8)
+	totalAmount := baseAmount.Mul(decimal.NewFromFloat(rate)).Round(8)
+	if baseAmount.GreaterThanOrEqual(decimal.NewFromInt(1e10)) || totalAmount.GreaterThanOrEqual(decimal.NewFromInt(1e10)) ||
+		(unit > 0 && baseAmount.IsZero()) || (baseAmount.IsPositive() && rate > 0 && totalAmount.IsZero()) {
+		err = fmt.Errorf("video total outside ledger range")
+		return
+	}
+	base, total, multiplier = baseAmount.StringFixed(8), totalAmount.StringFixed(8), decimal.NewFromFloat(rate).String()
+	label, e := VideoTariffKey(req)
+	if e != nil {
+		err = e
+		return
+	}
+	contract, e := VideoContractRevision(req.Model)
+	if e != nil {
+		err = e
+		return
+	}
+	// Bind the source and unrounded unit as well as the exact native controls,
+	// so even a price edit below display precision invalidates an unused quote.
+	raw, _ := videoCanonical([]any{"configured-rule-v1", label, resolution, decimal.NewFromFloat(unit).String(), base, total, multiplier, contract})
+	hash := sha256.Sum256(raw)
+	revision = hex.EncodeToString(hash[:])
+	estimated = true
 	return
 }
 
@@ -797,25 +849,6 @@ func (s *OpenAIGatewayService) QuoteVideo(ctx context.Context, key *APIKey, req 
 	if err != nil {
 		return nil, err
 	}
-	if !enrolled {
-		total, estimateErr := s.videoLegacyEstimate(ctx, key, req)
-		if estimateErr != nil {
-			if errors.Is(estimateErr, ErrVideoSettingsQuoteRequired) {
-				return nil, estimateErr
-			}
-			return &VideoQuote{Enrolled: false, VideoQuoteRequest: VideoQuoteRequest{Model: req.Model, Mode: req.Mode}}, nil
-		}
-		return &VideoQuote{
-			Enrolled:          false,
-			EstimateOnly:      true,
-			VideoQuoteRequest: req,
-			Currency:          "USD",
-			BillingUnit:       "job",
-			UnitCount:         1,
-			TotalPrice:        total,
-			SupplierEstimated: false,
-		}, nil
-	}
 	if !s.VideoQuotedBillingReady() {
 		return nil, ErrVideoQuoteUnavailable
 	}
@@ -835,7 +868,11 @@ func (s *OpenAIGatewayService) QuoteVideo(ctx context.Context, key *APIKey, req 
 	if err != nil {
 		return nil, err
 	}
-	return &VideoQuote{Enrolled: true, VideoQuoteRequest: req, ID: claims.ID, Token: payload + "." + base64.RawURLEncoding.EncodeToString(mac), TariffRevision: revision, ContractRevision: contract, ExpiresAt: expires, Currency: "USD", BillingUnit: "job", UnitCount: 1, TotalPrice: total, SupplierEstimated: estimated}, nil
+	source := "configured_rule"
+	if enrolled {
+		source = "native_tariff"
+	}
+	return &VideoQuote{Enrolled: true, VideoQuoteRequest: req, ID: claims.ID, Token: payload + "." + base64.RawURLEncoding.EncodeToString(mac), TariffRevision: revision, ContractRevision: contract, ExpiresAt: expires, Currency: "USD", BillingUnit: "job", UnitCount: 1, TotalPrice: total, PriceSource: source, SupplierEstimated: estimated}, nil
 }
 
 // AcceptVideoQuote verifies the actual native serialized payload. It does not

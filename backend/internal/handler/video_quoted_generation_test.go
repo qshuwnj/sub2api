@@ -314,7 +314,7 @@ func (*quotedAdmissionChannels) GetChannelIDByGroupID(context.Context, int64) (i
 func (*quotedAdmissionChannels) ListAll(context.Context) ([]service.Channel, error) { return nil, nil }
 
 func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
-	for _, scenario := range []string{"processing", "completed", "body mismatch", "platform quota"} {
+	for _, scenario := range []string{"processing", "completed", "body mismatch", "platform quota", "configured rule"} {
 		t.Run(scenario, func(t *testing.T) {
 			repo := &quotedHandlerRepository{}
 			h, slots, _, upstream := newGrokMediaSlotHandlerWithBilling(t, false, false, repo, service.PlatformOpenAI, "https://api.atlascloud.ai")
@@ -334,6 +334,13 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 				VideoTariff: &service.VideoTariffMetadata{Version: 1, ContractRevision: revision, Cells: map[string]service.VideoTariffProvenance{
 					cell: {Source: service.VideoCalculatorURL, CheckedAt: "2026-10-22T00:00:00Z", UpstreamPrice: "1.60", Policy: service.VideoRetailPolicy},
 				}}}}
+			wantPrice := "13.33171200"
+			if scenario == "configured rule" {
+				key.Group.ModelPricing = nil
+				perSecond := 0.25
+				key.Group.VideoPrice720P = &perSecond
+				wantPrice = "2.00000000"
+			}
 			cfg := &config.Config{RunMode: config.RunModeSimple, JWT: config.JWTConfig{Secret: strings.Repeat("test", 12)}}
 			cfg.Gateway.Scheduling.StickySessionWaitTimeout = 20 * time.Millisecond
 			keyRepo := &quotedAdmissionKeys{key: key}
@@ -346,7 +353,7 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 				GroupIDs: []int64{24}, Credentials: map[string]any{"api_key": "supplier-only", "base_url": "https://api.atlascloud.ai"},
 			}}}}
 			concurrency := h.concurrencyHelper.concurrencyService
-			gateway := service.NewOpenAIGatewayService(accounts, nil, repo, users, nil, nil, nil, cfg, nil, concurrency, nil, nil, billing, upstream, nil, nil, nil, nil, channel, nil, nil, nil)
+			gateway := service.NewOpenAIGatewayService(accounts, nil, repo, users, nil, nil, nil, cfg, nil, concurrency, &service.BillingService{}, nil, billing, upstream, nil, nil, nil, nil, channel, nil, nil, nil)
 			h.gatewayService, h.billingCacheService = gateway, billing
 			quote, err := gateway.QuoteVideo(context.Background(), key, input, time.Now())
 			require.NoError(t, err)
@@ -356,11 +363,11 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 			upstream.call = func(req *http.Request, accountID int64) (*http.Response, error) {
 				require.Equal(t, 1, repo.reserves, "price must be locked before supplier POST")
 				require.Equal(t, service.VideoAttemptSubmitting, repo.attempt.State)
-				require.Equal(t, "13.33171200", repo.attempt.TotalPrice)
+				require.Equal(t, wantPrice, repo.attempt.TotalPrice)
 				require.Empty(t, req.Header.Get("X-Video-Quote"))
 				require.Empty(t, req.Header.Get("Idempotency-Key"))
 				status := "processing"
-				if scenario == "completed" {
+				if scenario == "completed" || scenario == "configured rule" {
 					status = "completed"
 				}
 				return &http.Response{StatusCode: 200, Header: http.Header{}, Body: io.NopCloser(strings.NewReader(`{"data":{"id":"job","status":"` + status + `","outputs":["https://cdn.example/result.mp4"]}}`))}, nil
@@ -385,7 +392,7 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 				require.Zero(t, upstream.calls)
 			default:
 				want := 202
-				if scenario == "completed" {
+				if scenario == "completed" || scenario == "configured rule" {
 					want = 200
 					require.Equal(t, 1, repo.captures)
 				}
@@ -393,7 +400,14 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 				require.Equal(t, 1, upstream.calls)
 				var response map[string]any
 				require.NoError(t, json.Unmarshal(w.Body.Bytes(), &response))
-				require.Equal(t, scenario, response["status"])
+				wantStatus := scenario
+				if scenario == "configured rule" {
+					wantStatus = "completed"
+					require.Equal(t, "configured_rule", quote.PriceSource)
+					require.Contains(t, w.Body.String(), `"amount":"2.00000000"`)
+					require.True(t, repo.attempt.SupplierEstimated)
+				}
+				require.Equal(t, wantStatus, response["status"])
 				if scenario == "processing" {
 					require.NotContains(t, response, "outputs")
 					require.NotContains(t, response, "receipt")
