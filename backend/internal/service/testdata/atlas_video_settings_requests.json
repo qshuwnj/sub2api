@@ -1,0 +1,2474 @@
+[
+  {
+    "model": "bytedance/seedance-2.0-fast/image-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/image-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/image-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/text-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/text-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/text-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/image-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/image-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/image-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/text-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/text-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/text-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/image-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/image-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/image-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/text-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/text-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/text-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/image-to-video",
+    "field": "watermark",
+    "body": {
+      "generate_audio": true,
+      "watermark": true,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/image-to-video",
+    "field": "output_format",
+    "body": {
+      "generate_audio": true,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mov",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/text-to-video",
+    "field": "watermark",
+    "body": {
+      "generate_audio": true,
+      "watermark": true,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/text-to-video",
+    "field": "output_format",
+    "body": {
+      "generate_audio": true,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mov",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-fast/image-to-video",
+    "field": "camera_fixed",
+    "body": {
+      "camera_fixed": true,
+      "seed": -1,
+      "model": "bytedance/seedance-v1-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "resolution": "480p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-fast/image-to-video",
+    "field": "seed",
+    "body": {
+      "camera_fixed": false,
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "resolution": "480p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-fast/text-to-video",
+    "field": "camera_fixed",
+    "body": {
+      "camera_fixed": true,
+      "seed": -1,
+      "model": "bytedance/seedance-v1-pro-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "480p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-fast/text-to-video",
+    "field": "seed",
+    "body": {
+      "camera_fixed": false,
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "480p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-i2v-1080p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-i2v-1080p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-i2v-480p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-i2v-480p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-i2v-720p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-i2v-720p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-t2v-1080p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "camera_fixed": false,
+      "model": "bytedance/seedance-v1-pro-t2v-1080p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-t2v-1080p",
+    "field": "camera_fixed",
+    "body": {
+      "seed": -1,
+      "camera_fixed": true,
+      "model": "bytedance/seedance-v1-pro-t2v-1080p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-t2v-480p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-t2v-480p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1-pro-t2v-720p",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "bytedance/seedance-v1-pro-t2v-720p",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/image-to-video",
+    "field": "camera_fixed",
+    "body": {
+      "camera_fixed": true,
+      "generate_audio": true,
+      "seed": -1,
+      "model": "bytedance/seedance-v1.5-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "camera_fixed": false,
+      "generate_audio": false,
+      "seed": -1,
+      "model": "bytedance/seedance-v1.5-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/image-to-video",
+    "field": "seed",
+    "body": {
+      "camera_fixed": false,
+      "generate_audio": true,
+      "seed": 0,
+      "model": "bytedance/seedance-v1.5-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "21:9",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/text-to-video",
+    "field": "camera_fixed",
+    "body": {
+      "camera_fixed": true,
+      "generate_audio": true,
+      "seed": -1,
+      "model": "bytedance/seedance-v1.5-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "camera_fixed": false,
+      "generate_audio": false,
+      "seed": -1,
+      "model": "bytedance/seedance-v1.5-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "bytedance/seedance-v1.5-pro/text-to-video",
+    "field": "seed",
+    "body": {
+      "camera_fixed": false,
+      "generate_audio": true,
+      "seed": 0,
+      "model": "bytedance/seedance-v1.5-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "google/gemini-omni-1.1-flash/image-to-video",
+    "field": "thinking_level",
+    "body": {
+      "thinking_level": "high",
+      "seed": -1,
+      "model": "google/gemini-omni-1.1-flash/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/gemini-omni-1.1-flash/image-to-video",
+    "field": "seed",
+    "body": {
+      "thinking_level": "default",
+      "seed": 0,
+      "model": "google/gemini-omni-1.1-flash/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/gemini-omni-1.1-flash/text-to-video",
+    "field": "thinking_level",
+    "body": {
+      "thinking_level": "high",
+      "seed": -1,
+      "model": "google/gemini-omni-1.1-flash/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10
+    }
+  },
+  {
+    "model": "google/gemini-omni-1.1-flash/text-to-video",
+    "field": "seed",
+    "body": {
+      "thinking_level": "default",
+      "seed": 0,
+      "model": "google/gemini-omni-1.1-flash/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10
+    }
+  },
+  {
+    "model": "google/gemini-omni-flash/image-to-video",
+    "field": "thinking_level",
+    "body": {
+      "thinking_level": "high",
+      "seed": -1,
+      "model": "google/gemini-omni-flash/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/gemini-omni-flash/image-to-video",
+    "field": "seed",
+    "body": {
+      "thinking_level": "default",
+      "seed": 0,
+      "model": "google/gemini-omni-flash/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/gemini-omni-flash/text-to-video",
+    "field": "thinking_level",
+    "body": {
+      "thinking_level": "high",
+      "seed": -1,
+      "model": "google/gemini-omni-flash/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10
+    }
+  },
+  {
+    "model": "google/gemini-omni-flash/text-to-video",
+    "field": "seed",
+    "body": {
+      "thinking_level": "default",
+      "seed": 0,
+      "model": "google/gemini-omni-flash/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 10
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": true,
+      "model": "google/veo3.1-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/image-to-video",
+    "field": "negative_prompt",
+    "body": {
+      "generate_audio": false,
+      "negative_prompt": "unwanted camera movement",
+      "model": "google/veo3.1-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/image-to-video",
+    "field": "seed",
+    "body": {
+      "generate_audio": false,
+      "seed": 1,
+      "model": "google/veo3.1-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": true,
+      "model": "google/veo3.1-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/text-to-video",
+    "field": "negative_prompt",
+    "body": {
+      "generate_audio": false,
+      "negative_prompt": "unwanted camera movement",
+      "model": "google/veo3.1-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1-fast/text-to-video",
+    "field": "seed",
+    "body": {
+      "generate_audio": false,
+      "seed": 1,
+      "model": "google/veo3.1-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1-lite/image-to-video",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "google/veo3.1-lite/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1-lite/text-to-video",
+    "field": "seed",
+    "body": {
+      "seed": 0,
+      "model": "google/veo3.1-lite/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": true,
+      "model": "google/veo3.1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1/image-to-video",
+    "field": "negative_prompt",
+    "body": {
+      "generate_audio": false,
+      "negative_prompt": "unwanted camera movement",
+      "model": "google/veo3.1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1/image-to-video",
+    "field": "seed",
+    "body": {
+      "generate_audio": false,
+      "seed": 1,
+      "model": "google/veo3.1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "google/veo3.1/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": true,
+      "model": "google/veo3.1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1/text-to-video",
+    "field": "negative_prompt",
+    "body": {
+      "generate_audio": false,
+      "negative_prompt": "unwanted camera movement",
+      "model": "google/veo3.1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "google/veo3.1/text-to-video",
+    "field": "seed",
+    "body": {
+      "generate_audio": false,
+      "seed": 1,
+      "model": "google/veo3.1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-i2v-pro",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v1.6-i2v-pro",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-i2v-pro",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v1.6-i2v-pro",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-i2v-standard",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v1.6-i2v-standard",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-i2v-standard",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v1.6-i2v-standard",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-multi-i2v-pro",
+    "field": "negative_prompt",
+    "body": {
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v1.6-multi-i2v-pro",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "1:1",
+      "duration": 5,
+      "images": [
+        "https://assets.example/start.png"
+      ]
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-multi-i2v-standard",
+    "field": "negative_prompt",
+    "body": {
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v1.6-multi-i2v-standard",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "1:1",
+      "duration": 5,
+      "images": [
+        "https://assets.example/start.png"
+      ]
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-t2v-standard",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v1.6-t2v-standard",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v1.6-t2v-standard",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v1.6-t2v-standard",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.0-i2v-master",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v2.0-i2v-master",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.0-i2v-master",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.0-i2v-master",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.0-t2v-master",
+    "field": "negative_prompt",
+    "body": {
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.0-t2v-master",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": "5"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-master",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v2.1-i2v-master",
+      "prompt": "An offline settings verification scene",
+      "duration": "5",
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-master",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.1-i2v-master",
+      "prompt": "An offline settings verification scene",
+      "duration": "5",
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-pro",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v2.1-i2v-pro",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-pro",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.1-i2v-pro",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-standard",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v2.1-i2v-standard",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-i2v-standard",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.1-i2v-standard",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-t2v-master",
+    "field": "guidance_scale",
+    "body": {
+      "guidance_scale": 0.6,
+      "model": "kwaivgi/kling-v2.1-t2v-master",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": "5"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.1-t2v-master",
+    "field": "negative_prompt",
+    "body": {
+      "guidance_scale": 0.5,
+      "negative_prompt": "unwanted camera movement",
+      "model": "kwaivgi/kling-v2.1-t2v-master",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": "5"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.6-pro/image-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "model": "kwaivgi/kling-v2.6-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v2.6-pro/text-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "model": "kwaivgi/kling-v2.6-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "1:1",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-4k/image-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-4k/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-4k/text-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-4k/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-pro/image-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-pro/text-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-std/image-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-std/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-v3.0-std/text-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-v3.0-std/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "kwaivgi/kling-video-o3-4k/image-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-video-o3-4k/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "kwaivgi/kling-video-o3-4k/text-to-video",
+    "field": "sound",
+    "body": {
+      "sound": false,
+      "multi_shot": false,
+      "model": "kwaivgi/kling-video-o3-4k/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "duration": 5
+    }
+  },
+  {
+    "model": "minimax/h3-developer/image-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-developer/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "768P",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "minimax/h3-developer/text-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-developer/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "1:1",
+      "resolution": "768P",
+      "duration": 8
+    }
+  },
+  {
+    "model": "minimax/h3-fast/image-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "480P",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "minimax/h3-fast/text-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-fast/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "1:1",
+      "resolution": "480P",
+      "duration": 8
+    }
+  },
+  {
+    "model": "minimax/h3-max/image-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-max/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "768P",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "minimax/h3-max/text-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3-max/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "1:1",
+      "resolution": "768P",
+      "duration": 8
+    }
+  },
+  {
+    "model": "minimax/h3/image-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "2K",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "minimax/h3/text-to-video",
+    "field": "prompt_expansion",
+    "body": {
+      "prompt_expansion": true,
+      "model": "minimax/h3/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "1:1",
+      "resolution": "2K",
+      "duration": 8
+    }
+  },
+  {
+    "model": "vidu/image-to-video-2.0",
+    "field": "seed",
+    "body": {
+      "seed": 1,
+      "movement_amplitude": "auto",
+      "model": "vidu/image-to-video-2.0",
+      "prompt": "An offline settings verification scene",
+      "duration": 4,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/image-to-video-2.0",
+    "field": "movement_amplitude",
+    "body": {
+      "seed": 0,
+      "movement_amplitude": "small",
+      "model": "vidu/image-to-video-2.0",
+      "prompt": "An offline settings verification scene",
+      "duration": 4,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q1/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "movement_amplitude": "small",
+      "generate_audio": true,
+      "bgm": true,
+      "model": "vidu/q1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "1080p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q1/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": false,
+      "bgm": true,
+      "model": "vidu/q1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "1080p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q1/image-to-video",
+    "field": "bgm",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": false,
+      "model": "vidu/q1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "1080p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q1/image-to-video",
+    "field": "seed",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": true,
+      "seed": 1,
+      "model": "vidu/q1/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "1080p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q1/text-to-video",
+    "field": "style",
+    "body": {
+      "style": "anime",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "model": "vidu/q1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "1080p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q1/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "style": "general",
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "model": "vidu/q1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "1080p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q1/text-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "bgm": true,
+      "model": "vidu/q1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "1080p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q1/text-to-video",
+    "field": "bgm",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": false,
+      "model": "vidu/q1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "1080p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q1/text-to-video",
+    "field": "seed",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "seed": 1,
+      "model": "vidu/q1/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "1080p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q2-pro-fast/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "movement_amplitude": "small",
+      "generate_audio": true,
+      "bgm": true,
+      "model": "vidu/q2-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro-fast/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": false,
+      "bgm": true,
+      "model": "vidu/q2-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro-fast/image-to-video",
+    "field": "bgm",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": false,
+      "model": "vidu/q2-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro-fast/image-to-video",
+    "field": "seed",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": true,
+      "seed": 1,
+      "model": "vidu/q2-pro-fast/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "movement_amplitude": "small",
+      "generate_audio": true,
+      "bgm": false,
+      "model": "vidu/q2-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": false,
+      "bgm": false,
+      "model": "vidu/q2-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro/image-to-video",
+    "field": "bgm",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": true,
+      "model": "vidu/q2-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-pro/image-to-video",
+    "field": "seed",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": false,
+      "seed": 1,
+      "model": "vidu/q2-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-turbo/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "movement_amplitude": "small",
+      "generate_audio": true,
+      "bgm": true,
+      "model": "vidu/q2-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-turbo/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": false,
+      "bgm": true,
+      "model": "vidu/q2-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-turbo/image-to-video",
+    "field": "bgm",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": false,
+      "model": "vidu/q2-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2-turbo/image-to-video",
+    "field": "seed",
+    "body": {
+      "movement_amplitude": "auto",
+      "generate_audio": true,
+      "bgm": true,
+      "seed": 1,
+      "model": "vidu/q2-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q2/text-to-video",
+    "field": "style",
+    "body": {
+      "style": "anime",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "model": "vidu/q2/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q2/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "style": "general",
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "model": "vidu/q2/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q2/text-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "bgm": true,
+      "model": "vidu/q2/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q2/text-to-video",
+    "field": "bgm",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": false,
+      "model": "vidu/q2/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q2/text-to-video",
+    "field": "seed",
+    "body": {
+      "style": "general",
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "bgm": true,
+      "seed": 1,
+      "model": "vidu/q2/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-pro/image-to-video",
+    "field": "bgm",
+    "body": {
+      "bgm": false,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "model": "vidu/q3-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-pro/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bgm": true,
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "model": "vidu/q3-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-pro/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "model": "vidu/q3-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-pro/image-to-video",
+    "field": "seed",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "seed": 1,
+      "model": "vidu/q3-pro/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-pro/text-to-video",
+    "field": "bgm",
+    "body": {
+      "bgm": false,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "model": "vidu/q3-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-pro/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bgm": true,
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "model": "vidu/q3-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-pro/text-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "style": "general",
+      "model": "vidu/q3-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-pro/text-to-video",
+    "field": "seed",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "seed": 1,
+      "model": "vidu/q3-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-pro/text-to-video",
+    "field": "style",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "anime",
+      "model": "vidu/q3-pro/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/image-to-video",
+    "field": "bgm",
+    "body": {
+      "bgm": false,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "model": "vidu/q3-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bgm": true,
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "model": "vidu/q3-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/image-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "model": "vidu/q3-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/image-to-video",
+    "field": "seed",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "seed": 1,
+      "model": "vidu/q3-turbo/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/text-to-video",
+    "field": "bgm",
+    "body": {
+      "bgm": false,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "model": "vidu/q3-turbo/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bgm": true,
+      "generate_audio": false,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "model": "vidu/q3-turbo/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/text-to-video",
+    "field": "movement_amplitude",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "small",
+      "style": "general",
+      "model": "vidu/q3-turbo/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/text-to-video",
+    "field": "seed",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "general",
+      "seed": 1,
+      "model": "vidu/q3-turbo/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q3-turbo/text-to-video",
+    "field": "style",
+    "body": {
+      "bgm": true,
+      "generate_audio": true,
+      "movement_amplitude": "auto",
+      "style": "anime",
+      "model": "vidu/q3-turbo/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "4:3",
+      "resolution": "720p",
+      "duration": 5
+    }
+  },
+  {
+    "model": "vidu/q4-preview/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "enable_prompt_expansion": false,
+      "seed": -1,
+      "model": "vidu/q4-preview/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q4-preview/image-to-video",
+    "field": "enable_prompt_expansion",
+    "body": {
+      "generate_audio": true,
+      "enable_prompt_expansion": true,
+      "seed": -1,
+      "model": "vidu/q4-preview/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "vidu/q4-preview/image-to-video",
+    "field": "seed",
+    "body": {
+      "generate_audio": true,
+      "enable_prompt_expansion": false,
+      "seed": 0,
+      "model": "vidu/q4-preview/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "resolution": "720p",
+      "duration": 5,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "xai/grok-imagine-video-v1.5-lite/image-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "model": "xai/grok-imagine-video-v1.5-lite/image-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "auto",
+      "resolution": "720p",
+      "duration": 8,
+      "image": "https://assets.example/start.png"
+    }
+  },
+  {
+    "model": "xai/grok-imagine-video-v1.5-lite/text-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "model": "xai/grok-imagine-video-v1.5-lite/text-to-video",
+      "prompt": "An offline settings verification scene",
+      "aspect_ratio": "16:9",
+      "resolution": "720p",
+      "duration": 8
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/reference-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/reference-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/reference-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0/reference-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/reference-to-video",
+    "field": "generate_audio",
+    "body": {
+      "generate_audio": false,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/reference-to-video",
+    "field": "watermark",
+    "body": {
+      "generate_audio": true,
+      "watermark": true,
+      "return_last_frame": false,
+      "output_format": "mp4",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.5/reference-to-video",
+    "field": "output_format",
+    "body": {
+      "generate_audio": true,
+      "watermark": false,
+      "return_last_frame": false,
+      "output_format": "mov",
+      "draft": false,
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/reference-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/reference-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/reference-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-mini/reference-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/reference-to-video",
+    "field": "bitrate_mode",
+    "body": {
+      "bitrate_mode": "high",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/reference-to-video",
+    "field": "generate_audio",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": false,
+      "seed": -1,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/reference-to-video",
+    "field": "seed",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": 0,
+      "watermark": false,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  },
+  {
+    "model": "bytedance/seedance-2.0-fast/reference-to-video",
+    "field": "watermark",
+    "body": {
+      "bitrate_mode": "standard",
+      "generate_audio": true,
+      "seed": -1,
+      "watermark": true,
+      "return_last_frame": false,
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "prompt": "An offline settings verification scene",
+      "ratio": "adaptive",
+      "resolution": "720p",
+      "duration": 5,
+      "reference_images": [
+        "https://assets.example/reference.png"
+      ]
+    }
+  }
+]

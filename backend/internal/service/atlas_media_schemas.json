@@ -8060,19 +8060,10 @@
           ],
           "type": "integer"
         },
-        "guidance_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "image": {
           "type": "string"
         },
         "last_image": {
-          "type": "string"
-        },
-        "negative_prompt": {
           "type": "string"
         },
         "prompt": {
@@ -8092,8 +8083,7 @@
         "dataURI": false
       },
       "last_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -8125,15 +8115,6 @@
           ],
           "type": "integer"
         },
-        "guidance_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string"
         }
@@ -8153,12 +8134,6 @@
     "source": "https://static.atlascloud.ai/model/schema/kwaivgi-kling-v2.6-pro-image-to-video.json",
     "input": {
       "properties": {
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -8168,9 +8143,6 @@
           "type": "integer"
         },
         "image": {
-          "type": "string"
-        },
-        "negative_prompt": {
           "type": "string"
         },
         "prompt": {
@@ -8183,10 +8155,14 @@
         "model": {
           "type": "string",
           "const": "kwaivgi/kling-v2.6-pro/image-to-video"
+        },
+        "last_image": {
+          "type": "string"
         }
       },
       "required": [
-        "model"
+        "model",
+        "image"
       ],
       "type": "object"
     },
@@ -8194,6 +8170,9 @@
       "image": {
         "array": false,
         "dataURI": false
+      },
+      "last_image": {
+        "array": false
       }
     }
   },
@@ -8213,12 +8192,6 @@
           ],
           "type": "string"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -8226,9 +8199,6 @@
             10
           ],
           "type": "integer"
-        },
-        "negative_prompt": {
-          "type": "string"
         },
         "prompt": {
           "type": "string"
@@ -8261,12 +8231,6 @@
           "type": "string",
           "const": "kwaivgi/kling-v3.0-4k/image-to-video"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -8292,9 +8256,6 @@
         "image": {
           "type": "string"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string"
         },
@@ -8302,20 +8263,9 @@
           "type": "boolean",
           "default": true
         },
-        "resolution": {
-          "default": "1080P",
-          "type": "string"
-        },
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -8341,7 +8291,7 @@
         },
         "elements": {
           "type": "array",
-          "maxItems": 6,
+          "maxItems": 3,
           "items": {
             "type": "object",
             "properties": {
@@ -8433,53 +8383,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -8501,8 +8405,7 @@
         "dataURI": false
       },
       "end_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -8526,12 +8429,6 @@
           ],
           "type": "string"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -8551,9 +8448,6 @@
           ],
           "type": "integer"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string",
           "minLength": 0,
@@ -8566,13 +8460,6 @@
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -8609,53 +8496,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -8683,12 +8524,6 @@
           "type": "string",
           "const": "kwaivgi/kling-v3.0-pro/image-to-video"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -8714,9 +8549,6 @@
         "image": {
           "type": "string"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string",
           "maxLength": 2500
@@ -8725,24 +8557,9 @@
           "type": "boolean",
           "default": true
         },
-        "resolution": {
-          "default": "1080P",
-          "type": "string",
-          "enum": [
-            "1080P",
-            "1440P-SR"
-          ]
-        },
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -8772,7 +8589,7 @@
         },
         "elements": {
           "type": "array",
-          "maxItems": 6,
+          "maxItems": 3,
           "items": {
             "type": "object",
             "properties": {
@@ -8892,53 +8709,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -8960,8 +8731,7 @@
         "dataURI": false
       },
       "end_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -8985,12 +8755,6 @@
           ],
           "type": "string"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -9010,9 +8774,6 @@
           ],
           "type": "integer"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string",
           "minLength": 0,
@@ -9025,13 +8786,6 @@
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -9072,53 +8826,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -9146,12 +8854,6 @@
           "type": "string",
           "const": "kwaivgi/kling-v3.0-std/image-to-video"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -9177,9 +8879,6 @@
         "image": {
           "type": "string"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string",
           "maxLength": 2500
@@ -9188,25 +8887,9 @@
           "type": "boolean",
           "default": true
         },
-        "resolution": {
-          "default": "720P",
-          "type": "string",
-          "enum": [
-            "720P",
-            "1080P-SR",
-            "1440P-SR"
-          ]
-        },
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -9236,7 +8919,7 @@
         },
         "elements": {
           "type": "array",
-          "maxItems": 6,
+          "maxItems": 3,
           "items": {
             "type": "object",
             "properties": {
@@ -9356,53 +9039,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -9424,8 +9061,7 @@
         "dataURI": false
       },
       "end_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -9449,12 +9085,6 @@
           ],
           "type": "string"
         },
-        "cfg_scale": {
-          "default": 0.5,
-          "maximum": 1,
-          "minimum": 0,
-          "type": "number"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -9474,9 +9104,6 @@
           ],
           "type": "integer"
         },
-        "negative_prompt": {
-          "type": "string"
-        },
         "prompt": {
           "type": "string",
           "minLength": 0,
@@ -9489,13 +9116,6 @@
         "multi_shot": {
           "type": "boolean",
           "default": false
-        },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
         },
         "multi_prompt": {
           "type": "array",
@@ -9536,53 +9156,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -9729,15 +9303,6 @@
           "type": "string",
           "const": "kwaivgi/kling-video-o1/image-to-video"
         },
-        "aspect_ratio": {
-          "default": "16:9",
-          "enum": [
-            "16:9",
-            "9:16",
-            "1:1"
-          ],
-          "type": "string"
-        },
         "duration": {
           "default": 5,
           "enum": [
@@ -9769,8 +9334,7 @@
         "dataURI": false
       },
       "last_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -9861,13 +9425,6 @@
           "type": "boolean",
           "default": false
         },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
-        },
         "multi_prompt": {
           "type": "array",
           "minItems": 1,
@@ -9892,7 +9449,7 @@
         },
         "elements": {
           "type": "array",
-          "maxItems": 6,
+          "maxItems": 3,
           "items": {
             "type": "object",
             "properties": {
@@ -9984,53 +9541,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -10052,8 +9563,7 @@
         "dataURI": false
       },
       "end_image": {
-        "array": false,
-        "dataURI": false
+        "array": false
       }
     }
   },
@@ -10107,13 +9617,6 @@
           "type": "boolean",
           "default": false
         },
-        "shot_type": {
-          "type": "string",
-          "enum": [
-            "customize",
-            "intelligence"
-          ]
-        },
         "multi_prompt": {
           "type": "array",
           "minItems": 1,
@@ -10230,53 +9733,7 @@
               "multi_shot"
             ]
           },
-          "then": {
-            "required": [
-              "shot_type"
-            ]
-          },
           "else": {
-            "required": [
-              "prompt"
-            ],
-            "properties": {
-              "shot_type": {},
-              "multi_prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "customize"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
-            "required": [
-              "multi_prompt"
-            ],
-            "properties": {
-              "prompt": {}
-            }
-          }
-        },
-        {
-          "if": {
-            "properties": {
-              "shot_type": {
-                "const": "intelligence"
-              }
-            },
-            "required": [
-              "shot_type"
-            ]
-          },
-          "then": {
             "required": [
               "prompt"
             ],
@@ -12574,7 +12031,6 @@
     },
     "mediaFields": {}
   },
-
   {
     "id": "bytedance/seedance-2.0/reference-to-video",
     "media": "video",
@@ -13236,5 +12692,4 @@
       }
     }
   }
-
 ]

@@ -147,6 +147,10 @@ func (h *OpenAIGatewayHandler) tryQuotedAtlasVideo(c *gin.Context) bool {
 		return true
 	}
 	if !enrolled && token == "" && id == "" {
+		if err := service.ValidateLegacyVideoSettings(native); err != nil {
+			h.errorResponse(c, http.StatusBadRequest, "video_settings_quote_required", err.Error())
+			return true
+		}
 		return false
 	}
 	if token == "" || id == "" {

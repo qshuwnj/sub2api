@@ -27,6 +27,51 @@ const (
 )
 
 var ErrVideoQuoteUnavailable = errors.New("video quoted billing or fresh admission is unavailable")
+var ErrVideoSettingsQuoteRequired = errors.New("video settings require an exact configured quote")
+
+func videoSettingLocked(field string) bool {
+	switch field {
+	case "multi_shot", "shot_type", "multi_prompt", "elements", "omni_reference_task_type":
+		return true
+	}
+	return false
+}
+
+func videoNonPriceField(c *atlasMediaContract, field string) bool {
+	switch field {
+	case "model", "prompt", "negative_prompt", "ratio", "aspect_ratio", "duration", "resolution":
+		return true
+	}
+	_, media := c.MediaFields[field]
+	return media
+}
+
+func videoLegacySettings(c *atlasMediaContract, controls map[string]any) error {
+	for field, value := range controls {
+		if videoNonPriceField(c, field) {
+			continue
+		}
+		property := c.Input.Properties[field]
+		if property == nil || property.Default == nil || !reflectVideoEqual(value, property.Default) {
+			return ErrVideoSettingsQuoteRequired
+		}
+	}
+	return nil
+}
+
+// ValidateLegacyVideoSettings prevents changed cost controls from falling
+// through to model/resolution-only legacy billing without an exact quote.
+func ValidateLegacyVideoSettings(body []byte) error {
+	var payload map[string]any
+	if err := json.Unmarshal(body, &payload); err != nil {
+		return err
+	}
+	model, _ := payload["model"].(string)
+	if c := atlasMediaModel(model, "video"); c != nil {
+		return videoLegacySettings(c, payload)
+	}
+	return nil
+}
 
 // VideoTariffMetadata is stored only in group model_pricing JSON. Cells are
 // keyed by the exact Studio video:v1 tariff key, never by duration or resolution.
@@ -49,7 +94,7 @@ type VideoQuoteRequest struct {
 	Controls map[string]any `json:"controls"`
 }
 type VideoQuote struct {
-	Enrolled bool `json:"enrolled"`
+	Enrolled     bool `json:"enrolled"`
 	EstimateOnly bool `json:"estimate_only,omitempty"`
 	VideoQuoteRequest
 	ID                string    `json:"quote_id,omitempty"`
@@ -251,6 +296,7 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 		return req, fmt.Errorf("input ratio cost is unverified")
 	}
 	expected := map[string]bool{"duration": true}
+	optional := map[string]bool{}
 	for _, field := range []string{ratio, "resolution"} {
 		if field != "" && p[field] != nil {
 			expected[field] = true
@@ -265,18 +311,21 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 		}
 		if property.Default != nil {
 			expected[field] = true
-			a, _ := videoCanonical(controls[field])
-			b, _ := videoCanonical(property.Default)
-			if !bytes.Equal(a, b) {
-				return req, fmt.Errorf("video control %s differs from pinned native default", field)
+			if videoSettingLocked(field) && !reflectVideoEqual(controls[field], property.Default) {
+				return req, fmt.Errorf("video control %s requires a structured workflow", field)
 			}
+		} else if !videoSettingLocked(field) &&
+			(property.Type == "string" || property.Type == "boolean" || property.Type == "integer" || property.Type == "number") {
+			optional[field] = true
 		}
 	}
-	if len(controls) != len(expected) {
-		return req, fmt.Errorf("incomplete or unsupported video controls")
+	for field := range expected {
+		if _, exists := controls[field]; !exists {
+			return req, fmt.Errorf("incomplete video control %s", field)
+		}
 	}
 	for field := range controls {
-		if !expected[field] {
+		if !expected[field] && !optional[field] {
 			return req, fmt.Errorf("unsupported video control %s", field)
 		}
 	}
@@ -673,6 +722,11 @@ func (s *OpenAIGatewayService) videoCustomerRate(ctx context.Context, key *APIKe
 }
 
 func (s *OpenAIGatewayService) videoLegacyEstimate(ctx context.Context, key *APIKey, req VideoQuoteRequest) (string, error) {
+	if c := atlasMediaModel(req.Model, "video"); c != nil {
+		if err := videoLegacySettings(c, req.Controls); err != nil {
+			return "", err
+		}
+	}
 	if s == nil || s.billingService == nil || key == nil || key.Group == nil {
 		return "", ErrVideoQuoteUnavailable
 	}
@@ -735,16 +789,19 @@ func (s *OpenAIGatewayService) QuoteVideo(ctx context.Context, key *APIKey, req 
 	if !enrolled {
 		total, estimateErr := s.videoLegacyEstimate(ctx, key, req)
 		if estimateErr != nil {
+			if errors.Is(estimateErr, ErrVideoSettingsQuoteRequired) {
+				return nil, estimateErr
+			}
 			return &VideoQuote{Enrolled: false, VideoQuoteRequest: VideoQuoteRequest{Model: req.Model, Mode: req.Mode}}, nil
 		}
 		return &VideoQuote{
-			Enrolled: false,
-			EstimateOnly: true,
+			Enrolled:          false,
+			EstimateOnly:      true,
 			VideoQuoteRequest: req,
-			Currency: "USD",
-			BillingUnit: "job",
-			UnitCount: 1,
-			TotalPrice: total,
+			Currency:          "USD",
+			BillingUnit:       "job",
+			UnitCount:         1,
+			TotalPrice:        total,
 			SupplierEstimated: false,
 		}, nil
 	}

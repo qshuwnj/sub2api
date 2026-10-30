@@ -257,6 +257,28 @@ func TestQuotedVideoHandlerEnrolledMissingQuoteCannotFallback(t *testing.T) {
 	slots.assertReleased(t)
 }
 
+func TestQuotedVideoHandlerLegacySettingsCannotBypassQuote(t *testing.T) {
+	for _, changed := range []bool{false, true} {
+		h, slots, _, upstream := newGrokMediaSlotHandler(t, false, false, service.PlatformOpenAI, "https://api.atlascloud.ai")
+		c, w := atlasVideoContext(t, true, true)
+		key, _ := middleware.GetAPIKeyFromContext(c)
+		key.Group.ModelPricing = nil
+		body := quotedHandlerBody
+		if changed {
+			body = strings.Replace(body, `"generate_audio":false`, `"generate_audio":true`, 1)
+		}
+		c.Request = httptest.NewRequest(http.MethodPost, "/v1/videos/generations", strings.NewReader(body))
+		handled := h.tryQuotedAtlasVideo(c)
+		require.Equal(t, changed, handled)
+		if changed {
+			require.Equal(t, 400, w.Code, w.Body.String())
+			require.Contains(t, w.Body.String(), "video_settings_quote_required")
+		}
+		require.Zero(t, upstream.calls)
+		slots.assertReleased(t)
+	}
+}
+
 type quotedAdmissionKeys struct {
 	service.APIKeyRepository
 	key *service.APIKey

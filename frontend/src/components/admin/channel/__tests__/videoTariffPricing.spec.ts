@@ -17,7 +17,7 @@ describe('native video administrator money boundary', () => {
       count += cells.length
       expect(createHash('sha256').update(cells.map(cell => cell.key).sort().join('\n')).digest('hex')).toBe(profile.keysSHA256)
     }
-    expect(count).toBe(13757)
+    expect(count).toBe(13751)
   })
   it('includes complete fixed grids for all four Seedance R2V endpoints', () => {
     const expected = {

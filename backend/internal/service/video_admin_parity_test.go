@@ -86,5 +86,5 @@ func TestVideoTariffExhaustiveAdministratorNativeParity(t *testing.T) {
 			total += len(keys)
 		})
 	}
-	require.Equal(t, 13757, total)
+	require.Equal(t, 13751, total)
 }

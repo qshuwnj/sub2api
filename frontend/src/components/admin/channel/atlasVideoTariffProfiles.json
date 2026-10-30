@@ -10778,17 +10778,16 @@
   },
   "kwaivgi/kling-v2.5-turbo-pro/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "18256781d058d034b50a31097fd0432ac7bc3bdf7af6ba3c668be77858d00142",
+    "contractRevision": "e8304e9f7fb5577a6d18ba424fbc041aa3dd6c70688a346829fff2149b8944d5",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.5-turbo-pro/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a",
+    "contractRevision": "0a28a5df1e508628d344f5c7975cabdf7f7b3749dc35e15f6e8142d620cb41fd",
     "variants": [
       {
         "controls": {
-          "guidance_scale": 0.5,
           "aspect_ratio": "1:1"
         },
         "durations": [
@@ -10798,7 +10797,6 @@
       },
       {
         "controls": {
-          "guidance_scale": 0.5,
           "aspect_ratio": "9:16"
         },
         "durations": [
@@ -10808,7 +10806,6 @@
       },
       {
         "controls": {
-          "guidance_scale": 0.5,
           "aspect_ratio": "16:9"
         },
         "durations": [
@@ -10817,21 +10814,20 @@
         ]
       }
     ],
-    "keysSHA256": "f70edff2dec82358a4297c17ea12f710e8e090cd4452d881aa5c693e5a360bb3"
+    "keysSHA256": "1073272b2c583317c9b5c43497011be4d1a91d8a9491996a28736d3e23cd06b8"
   },
   "kwaivgi/kling-v2.6-pro/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "e06e8a51b8db5ac18e3fa850beab7ed15872ed3e40aafc07f2b0b4998e3a09cf",
+    "contractRevision": "67efacc129a90d833923befee1029c70923d302d56b61b85218583566b57b33f",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.6-pro/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "4f4ea4b379e006c25c1b636801f7ea48b141f806aa985fd0f214809252d4cd4b",
+    "contractRevision": "0149e4301e2cc50019ad3bc2d9f71f12fbfeda459ceb380d7f6ec5207c5d5965",
     "variants": [
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "aspect_ratio": "1:1"
         },
@@ -10842,7 +10838,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "aspect_ratio": "9:16"
         },
@@ -10853,7 +10848,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "aspect_ratio": "16:9"
         },
@@ -10863,21 +10857,20 @@
         ]
       }
     ],
-    "keysSHA256": "5dbb9f5c636c06aa140fb670af3a3cbe9aaa717d37e65e07b521284a93eb7d10"
+    "keysSHA256": "517ebc5a29ad952828e686d170e52094d6e88c1779cfd1f7c584de951a26dc61"
   },
   "kwaivgi/kling-v3.0-4k/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "6f922b43770fd26a0ddf785c3a01274c49c8444a90b0d6a0cf26bac9cf9ddea8",
+    "contractRevision": "9dc326a019b267b36fb9618e1c2c3f450dd6160964242bc858799a1eba71ea0e",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-4k/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "e60ecd497ed34bbca08de1f3c77763f88764fceb0ec5bb3ee5aad253065ac26b",
+    "contractRevision": "509486289574414b38f068451f8647f81f59395ff351162aac6308e2f72ce8ab",
     "variants": [
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "16:9"
@@ -10900,7 +10893,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "9:16"
@@ -10923,7 +10915,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "1:1"
@@ -10945,21 +10936,20 @@
         ]
       }
     ],
-    "keysSHA256": "c8ca2f5885e1017acc485fbeaad296bbb60faae043938435acd77a842ec67e75"
+    "keysSHA256": "0f000bcbd09f4dcb392c51270ef81202924839b56835f2bbaf21dabdd63ba2fe"
   },
   "kwaivgi/kling-v3.0-pro/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "3bd483c815d2a1e3b5685cebff03c29cefcee9c23f2300d41157b594013d72b1",
+    "contractRevision": "6844ff3de0c3444e106bcfbe42736611512216d29bff43ed13414a9b60159d47",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-pro/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "64d4ebfdc9d42bc6dd6a88b3c390f3691630c1ccb578df3572e36783a1c61726",
+    "contractRevision": "890df5de39cada6e8e8e14ea0396cd4918051899575f7c04fba698fc942a90aa",
     "variants": [
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "16:9"
@@ -10982,7 +10972,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "9:16"
@@ -11005,7 +10994,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "1:1"
@@ -11027,21 +11015,20 @@
         ]
       }
     ],
-    "keysSHA256": "41cb5a4c9644be2cf4c8705478c2934cac516770b340cb19331b37a18e47e430"
+    "keysSHA256": "cfc5d50bdc823cf2ace5645dce95e0d030dd2f270eddb8df8aed1fcaf329a094"
   },
   "kwaivgi/kling-v3.0-std/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "cb28c306e52ea46bf9dd4b0fd7bc57c4534f702d54601bf42aead704e005659c",
+    "contractRevision": "9dfdb09f61ca5a78526c41de6624e7de9c922c300f2e923e6e28026fc9f157e1",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-std/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "f6ce80adaffcd757366103c0ed5da940fc396e302254cc99c2752bc0bf4d4e72",
+    "contractRevision": "f9c17e5791a999d1f3454c77547f808b1256eaa23d72a0350592e8b49ac2c5d9",
     "variants": [
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "16:9"
@@ -11064,7 +11051,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "9:16"
@@ -11087,7 +11073,6 @@
       },
       {
         "controls": {
-          "cfg_scale": 0.5,
           "sound": true,
           "multi_shot": false,
           "aspect_ratio": "1:1"
@@ -11109,7 +11094,7 @@
         ]
       }
     ],
-    "keysSHA256": "a18c55bd3cfaffc0669cf5998afbeefd163c3390995a70dd7c24a1c6106d6759"
+    "keysSHA256": "4b901890e1e63d8d1430fc7a11b14a3059f8d1700335827a7bb4e1c4348f0157"
   },
   "kwaivgi/kling-v3.0-turbo/image-to-video": {
     "mode": "i2v",
@@ -11252,37 +11237,9 @@
   },
   "kwaivgi/kling-video-o1/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132",
-    "variants": [
-      {
-        "controls": {
-          "aspect_ratio": "16:9"
-        },
-        "durations": [
-          5,
-          10
-        ]
-      },
-      {
-        "controls": {
-          "aspect_ratio": "9:16"
-        },
-        "durations": [
-          5,
-          10
-        ]
-      },
-      {
-        "controls": {
-          "aspect_ratio": "1:1"
-        },
-        "durations": [
-          5,
-          10
-        ]
-      }
-    ],
-    "keysSHA256": "1d64c4c732dd2875f6cfbd720322e01fc86db540e82b8be3e46a4ba00aee90c4"
+    "contractRevision": "8f999555b2239e4d3e318ce959fecbf6312e1cf8b5fea392216e73a97efa171c",
+    "variants": [],
+    "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-video-o1/text-to-video": {
     "mode": "t2v",
@@ -11320,13 +11277,13 @@
   },
   "kwaivgi/kling-video-o3-4k/image-to-video": {
     "mode": "i2v",
-    "contractRevision": "34a9d2916278f4fbcde8c939d4fd7cf3e9696001a0fe9dc93c507aafd7bc3031",
+    "contractRevision": "8efe86aca0fca2fb43eeb81243b3f499e54619dc25789e57541202d6df283a73",
     "variants": [],
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-video-o3-4k/text-to-video": {
     "mode": "t2v",
-    "contractRevision": "5483b4d3c856bab43b97b19c78d0339233cee96f310c71515aae0105fbd26058",
+    "contractRevision": "c8b974ce3e67e499ace32baa6153df1021805fa3f4fb96e4137673acad89f73e",
     "variants": [
       {
         "controls": {
@@ -19931,7 +19888,257 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "16:9",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
           "resolution": "720p"
         },
         "durations": [
@@ -19981,7 +20188,257 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "16:9",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
           "resolution": "1080p"
         },
         "durations": [
@@ -20031,7 +20488,257 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "16:9",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "21:9",
           "resolution": "1440p-SR"
         },
         "durations": [
@@ -20082,307 +20789,7 @@
           "watermark": false,
           "return_last_frame": false,
           "ratio": "4:3",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
           "resolution": "4k"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -20432,156 +20839,6 @@
           "watermark": false,
           "return_last_frame": false,
           "ratio": "3:4",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
           "resolution": "4k"
         },
         "durations": [
@@ -20607,307 +20864,7 @@
           "watermark": false,
           "return_last_frame": false,
           "ratio": "9:16",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
           "resolution": "4k"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "21:9",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -20988,208 +20945,8 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "4:3",
           "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -21238,106 +20995,6 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "3:4",
           "resolution": "480p"
         },
@@ -21363,208 +21020,8 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "9:16",
           "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -21613,8 +21070,258 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "21:9",
           "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p-SR"
         },
         "durations": [
           4,
@@ -21663,8 +21370,258 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "21:9",
           "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -21745,208 +21702,8 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "16:9",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "4:3",
           "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "4:3",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -21995,106 +21752,6 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "1:1",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "3:4",
           "resolution": "480p"
         },
@@ -22120,208 +21777,8 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "3:4",
-          "resolution": "1440p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
           "ratio": "9:16",
           "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "720p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1080p-SR"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15
-        ]
-      },
-      {
-        "controls": {
-          "bitrate_mode": "standard",
-          "generate_audio": true,
-          "seed": -1,
-          "watermark": false,
-          "return_last_frame": false,
-          "ratio": "9:16",
-          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -22370,8 +21827,258 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "21:9",
           "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "720p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "720p-SR"
         },
         "durations": [
           4,
@@ -22420,8 +22127,258 @@
           "seed": -1,
           "watermark": false,
           "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
           "ratio": "21:9",
           "resolution": "1080p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "16:9",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "4:3",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "1:1",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "3:4",
+          "resolution": "1440p-SR"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      {
+        "controls": {
+          "bitrate_mode": "standard",
+          "generate_audio": true,
+          "seed": -1,
+          "watermark": false,
+          "return_last_frame": false,
+          "ratio": "9:16",
+          "resolution": "1440p-SR"
         },
         "durations": [
           4,
@@ -22517,7 +22474,407 @@
           "return_last_frame": false,
           "output_format": "mp4",
           "draft": false,
+          "ratio": "4:3",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
+          "resolution": "480p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
           "ratio": "16:9",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "4:3",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "720p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
           "resolution": "720p"
         },
         "durations": [
@@ -22597,7 +22954,407 @@
           "return_last_frame": false,
           "output_format": "mp4",
           "draft": false,
+          "ratio": "4:3",
+          "resolution": "720p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "720p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "720p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "720p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
+          "resolution": "720p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
           "ratio": "16:9",
+          "resolution": "720p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "4:3",
+          "resolution": "720p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "720p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "720p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "720p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
           "resolution": "720p-esr"
         },
         "durations": [
@@ -22677,7 +23434,407 @@
           "return_last_frame": false,
           "output_format": "mp4",
           "draft": false,
+          "ratio": "4:3",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
+          "resolution": "1080p"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
           "ratio": "16:9",
+          "resolution": "1080p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "4:3",
+          "resolution": "1080p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1080p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1080p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1080p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
           "resolution": "1080p-sr"
         },
         "durations": [
@@ -22757,7 +23914,407 @@
           "return_last_frame": false,
           "output_format": "mp4",
           "draft": false,
+          "ratio": "4:3",
+          "resolution": "1080p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1080p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1080p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1080p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
+          "resolution": "1080p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
           "ratio": "16:9",
+          "resolution": "1080p-esr & 60fps"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "4:3",
+          "resolution": "1080p-esr & 60fps"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1080p-esr & 60fps"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1080p-esr & 60fps"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1080p-esr & 60fps"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
           "resolution": "1080p-esr & 60fps"
         },
         "durations": [
@@ -22837,7 +24394,407 @@
           "return_last_frame": false,
           "output_format": "mp4",
           "draft": false,
+          "ratio": "4:3",
+          "resolution": "1440p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1440p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1440p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1440p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
+          "resolution": "1440p-sr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
           "ratio": "16:9",
+          "resolution": "1440p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "4:3",
+          "resolution": "1440p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "1:1",
+          "resolution": "1440p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "3:4",
+          "resolution": "1440p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "9:16",
+          "resolution": "1440p-esr"
+        },
+        "durations": [
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ]
+      },
+      {
+        "controls": {
+          "generate_audio": true,
+          "watermark": false,
+          "return_last_frame": false,
+          "output_format": "mp4",
+          "draft": false,
+          "ratio": "21:9",
           "resolution": "1440p-esr"
         },
         "durations": [
@@ -22918,807 +24875,7 @@
           "output_format": "mp4",
           "draft": false,
           "ratio": "4:3",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "720p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "720p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1080p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1080p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1080p-esr & 60fps"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1440p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
-          "resolution": "1440p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "4:3",
           "resolution": "4k-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "720p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "720p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1080p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1080p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1080p-esr & 60fps"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1440p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "1:1",
-          "resolution": "1440p-esr"
         },
         "durations": [
           4,
@@ -23798,406 +24955,6 @@
           "output_format": "mp4",
           "draft": false,
           "ratio": "3:4",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "720p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "720p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1080p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1080p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1080p-esr & 60fps"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1440p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
-          "resolution": "1440p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "3:4",
           "resolution": "4k-esr"
         },
         "durations": [
@@ -24238,807 +24995,7 @@
           "output_format": "mp4",
           "draft": false,
           "ratio": "9:16",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "720p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "720p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1080p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1080p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1080p-esr & 60fps"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1440p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
-          "resolution": "1440p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "9:16",
           "resolution": "4k-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "480p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "720p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "720p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "720p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1080p"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1080p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1080p-esr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1080p-esr & 60fps"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1440p-sr"
-        },
-        "durations": [
-          4,
-          5,
-          6,
-          7,
-          8,
-          9,
-          10,
-          11,
-          12,
-          13,
-          14,
-          15,
-          16,
-          17,
-          18,
-          19,
-          20,
-          21,
-          22,
-          23,
-          24,
-          25,
-          26,
-          27,
-          28,
-          29,
-          30
-        ]
-      },
-      {
-        "controls": {
-          "generate_audio": true,
-          "watermark": false,
-          "return_last_frame": false,
-          "output_format": "mp4",
-          "draft": false,
-          "ratio": "21:9",
-          "resolution": "1440p-esr"
         },
         "durations": [
           4,

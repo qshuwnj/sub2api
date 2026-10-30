@@ -27,24 +27,6 @@
         "seed": -1,
         "watermark": false,
         "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "720p-SR",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLWZhc3QvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYml0cmF0ZV9tb2RlIjoic3RhbmRhcmQiLCJkdXJhdGlvbiI6NCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJhdGlvIjoiMzo0IiwicmVzb2x1dGlvbiI6IjcyMHAtU1IiLCJyZXR1cm5fbGFzdF9mcmFtZSI6ZmFsc2UsInNlZWQiOi0xLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
-    "revision": "0258f4d27c383180da45c159cc055f788a58670e3bc88923616f21696f1dabd0"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0-fast/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
         "ratio": "21:9",
         "resolution": "1440p-SR",
         "duration": 15
@@ -69,24 +51,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIxNjo5IiwicmVzb2x1dGlvbiI6IjQ4MHAiLCJyZXR1cm5fbGFzdF9mcmFtZSI6ZmFsc2UsInNlZWQiOi0xLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
-    "revision": "fba8498de0d61010617695e6577ddd2aea2b85b1b0ca6e53394e2440398c67d5"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0-fast/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "720p-SR",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIzOjQiLCJyZXNvbHV0aW9uIjoiNzIwcC1TUiIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
     "revision": "fba8498de0d61010617695e6577ddd2aea2b85b1b0ca6e53394e2440398c67d5"
   },
   {
@@ -135,24 +99,6 @@
         "seed": -1,
         "watermark": false,
         "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "720p-SR",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLW1pbmkvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYml0cmF0ZV9tb2RlIjoic3RhbmRhcmQiLCJkdXJhdGlvbiI6NCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJhdGlvIjoiMzo0IiwicmVzb2x1dGlvbiI6IjcyMHAtU1IiLCJyZXR1cm5fbGFzdF9mcmFtZSI6ZmFsc2UsInNlZWQiOi0xLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
-    "revision": "72afdd33edcc10b920654b7e8ff48c134db7ae8492a522bc91f54f09366dae9b"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0-mini/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
         "ratio": "21:9",
         "resolution": "1440p-SR",
         "duration": 15
@@ -177,24 +123,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLW1pbmkvdGV4dC10by12aWRlbyIsInQydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIxNjo5IiwicmVzb2x1dGlvbiI6IjQ4MHAiLCJyZXR1cm5fbGFzdF9mcmFtZSI6ZmFsc2UsInNlZWQiOi0xLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
-    "revision": "508737f30cb1087fd0d69e44e39260401468a35afb11396aff4ad3ffe53c5106"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0-mini/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "720p-SR",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLW1pbmkvdGV4dC10by12aWRlbyIsInQydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIzOjQiLCJyZXNvbHV0aW9uIjoiNzIwcC1TUiIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
     "revision": "508737f30cb1087fd0d69e44e39260401468a35afb11396aff4ad3ffe53c5106"
   },
   {
@@ -243,24 +171,6 @@
         "seed": -1,
         "watermark": false,
         "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "1080p",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImJpdHJhdGVfbW9kZSI6InN0YW5kYXJkIiwiZHVyYXRpb24iOjQsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJyYXRpbyI6IjM6NCIsInJlc29sdXRpb24iOiIxMDgwcCIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
-    "revision": "d0336d0727b8a87c6541ee1d71c3bc3490cb017ebfa620cb757750609729b3c8"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
         "ratio": "21:9",
         "resolution": "4k",
         "duration": 15
@@ -285,24 +195,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYml0cmF0ZV9tb2RlIjoic3RhbmRhcmQiLCJkdXJhdGlvbiI6NCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJhdGlvIjoiMTY6OSIsInJlc29sdXRpb24iOiI0ODBwIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJzZWVkIjotMSwid2F0ZXJtYXJrIjpmYWxzZX1d",
-    "revision": "47a056302dd2cb6fd4e3d0ec80f7677c9d9d1d13881006ede0600764208e38c5"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.0/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "bitrate_mode": "standard",
-        "generate_audio": true,
-        "seed": -1,
-        "watermark": false,
-        "return_last_frame": false,
-        "ratio": "3:4",
-        "resolution": "1080p",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYml0cmF0ZV9tb2RlIjoic3RhbmRhcmQiLCJkdXJhdGlvbiI6NCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJhdGlvIjoiMzo0IiwicmVzb2x1dGlvbiI6IjEwODBwIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJzZWVkIjotMSwid2F0ZXJtYXJrIjpmYWxzZX1d",
     "revision": "47a056302dd2cb6fd4e3d0ec80f7677c9d9d1d13881006ede0600764208e38c5"
   },
   {
@@ -351,24 +243,6 @@
         "return_last_frame": false,
         "output_format": "mp4",
         "draft": false,
-        "ratio": "3:4",
-        "resolution": "1080p-sr",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi41L3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiZHJhZnQiOmZhbHNlLCJkdXJhdGlvbiI6NCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsIm91dHB1dF9mb3JtYXQiOiJtcDQiLCJyYXRpbyI6IjM6NCIsInJlc29sdXRpb24iOiIxMDgwcC1zciIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwid2F0ZXJtYXJrIjpmYWxzZX1d",
-    "revision": "37fe1b40abcd0c4204d33c61fb063787e644f14c9fb648c68b2ab52c3f2b054c"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-2.5/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "generate_audio": true,
-        "watermark": false,
-        "return_last_frame": false,
-        "output_format": "mp4",
-        "draft": false,
         "ratio": "21:9",
         "resolution": "4k-esr",
         "duration": 30
@@ -390,21 +264,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWZhc3QvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMjE6OSIsImNhbWVyYV9maXhlZCI6ZmFsc2UsImR1cmF0aW9uIjoyLCJyZXNvbHV0aW9uIjoiNDgwcCIsInNlZWQiOi0xfV0",
-    "revision": "1bfd5e86136eb434ed27306009c2c648f1cf2ca5288d734fb05c0d1d8f3a128f"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-fast/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "camera_fixed": false,
-        "seed": -1,
-        "aspect_ratio": "1:1",
-        "resolution": "720p",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWZhc3QvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiY2FtZXJhX2ZpeGVkIjpmYWxzZSwiZHVyYXRpb24iOjIsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTF9XQ",
     "revision": "1bfd5e86136eb434ed27306009c2c648f1cf2ca5288d734fb05c0d1d8f3a128f"
   },
   {
@@ -444,21 +303,6 @@
       "controls": {
         "camera_fixed": false,
         "seed": -1,
-        "aspect_ratio": "1:1",
-        "resolution": "720p",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJjYW1lcmFfZml4ZWQiOmZhbHNlLCJkdXJhdGlvbiI6MiwicmVzb2x1dGlvbiI6IjcyMHAiLCJzZWVkIjotMX1d",
-    "revision": "81c6c7db6185632c13d797fcdefa705c95e0e5ca593da3757d78bcb8679edd8a"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-fast/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "camera_fixed": false,
-        "seed": -1,
         "aspect_ratio": "9:16",
         "resolution": "1080p",
         "duration": 12
@@ -478,19 +322,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWkydi0xMDgwcCIsImkydiIseyJhc3BlY3RfcmF0aW8iOiIyMTo5IiwiZHVyYXRpb24iOjIsInNlZWQiOi0xfV0",
-    "revision": "48b0172ece14e2a76e8fb7326bc09bd883f1f09a83ca82a99be65d9658e6a461"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-i2v-1080p",
-      "mode": "i2v",
-      "controls": {
-        "seed": -1,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWkydi0xMDgwcCIsImkydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJkdXJhdGlvbiI6Miwic2VlZCI6LTF9XQ",
     "revision": "48b0172ece14e2a76e8fb7326bc09bd883f1f09a83ca82a99be65d9658e6a461"
   },
   {
@@ -525,19 +356,6 @@
       "mode": "i2v",
       "controls": {
         "seed": -1,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWkydi00ODBwIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoyLCJzZWVkIjotMX1d",
-    "revision": "5ab1802b57017a49ebcbe2e6343827e661f71c1c1b08bffccba0dcfbc9920681"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-i2v-480p",
-      "mode": "i2v",
-      "controls": {
-        "seed": -1,
         "aspect_ratio": "9:16",
         "duration": 12
       }
@@ -556,19 +374,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWkydi03MjBwIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjIxOjkiLCJkdXJhdGlvbiI6Miwic2VlZCI6LTF9XQ",
-    "revision": "6d59fd25f8784807f639e09497d78acb91db7d3c6ebc6a01d9b9e33c1ea14e06"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-i2v-720p",
-      "mode": "i2v",
-      "controls": {
-        "seed": -1,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLWkydi03MjBwIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoyLCJzZWVkIjotMX1d",
     "revision": "6d59fd25f8784807f639e09497d78acb91db7d3c6ebc6a01d9b9e33c1ea14e06"
   },
   {
@@ -605,20 +410,6 @@
       "controls": {
         "seed": -1,
         "camera_fixed": false,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLXQydi0xMDgwcCIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJjYW1lcmFfZml4ZWQiOmZhbHNlLCJkdXJhdGlvbiI6Miwic2VlZCI6LTF9XQ",
-    "revision": "26eacc27c82d07f3fcd3821043023fb69fc8ce33df899923f00d5a49c433a72e"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-t2v-1080p",
-      "mode": "t2v",
-      "controls": {
-        "seed": -1,
-        "camera_fixed": false,
         "aspect_ratio": "9:16",
         "duration": 12
       }
@@ -637,19 +428,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLXQydi00ODBwIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjIxOjkiLCJkdXJhdGlvbiI6Miwic2VlZCI6LTF9XQ",
-    "revision": "4583e5aa214a8f4109ad19a116c64aed610aad541aec9b2c4fcbc53daac37fe6"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-t2v-480p",
-      "mode": "t2v",
-      "controls": {
-        "seed": -1,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLXQydi00ODBwIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoyLCJzZWVkIjotMX1d",
     "revision": "4583e5aa214a8f4109ad19a116c64aed610aad541aec9b2c4fcbc53daac37fe6"
   },
   {
@@ -684,19 +462,6 @@
       "mode": "t2v",
       "controls": {
         "seed": -1,
-        "aspect_ratio": "1:1",
-        "duration": 2
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEtcHJvLXQydi03MjBwIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoyLCJzZWVkIjotMX1d",
-    "revision": "2d5704f1da2193d40e302ad98e8b1493771c2ad21729da66a953dfe118afbc3f"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1-pro-t2v-720p",
-      "mode": "t2v",
-      "controls": {
-        "seed": -1,
         "aspect_ratio": "9:16",
         "duration": 12
       }
@@ -718,22 +483,6 @@
       }
     },
     "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEuNS1wcm8vaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMjE6OSIsImNhbWVyYV9maXhlZCI6ZmFsc2UsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmVzb2x1dGlvbiI6IjcyMHAiLCJzZWVkIjotMX1d",
-    "revision": "adb0a5d48661fb5ea16491ba51e74ffd163a4f30ff9a5c4a59c9f07f6a832fe6"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1.5-pro/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "camera_fixed": false,
-        "generate_audio": true,
-        "seed": -1,
-        "aspect_ratio": "21:9",
-        "resolution": "480p",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEuNS1wcm8vaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMjE6OSIsImNhbWVyYV9maXhlZCI6ZmFsc2UsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmVzb2x1dGlvbiI6IjQ4MHAiLCJzZWVkIjotMX1d",
     "revision": "adb0a5d48661fb5ea16491ba51e74ffd163a4f30ff9a5c4a59c9f07f6a832fe6"
   },
   {
@@ -776,22 +525,6 @@
         "camera_fixed": false,
         "generate_audio": true,
         "seed": -1,
-        "aspect_ratio": "21:9",
-        "resolution": "480p",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtdjEuNS1wcm8vdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIyMTo5IiwiY2FtZXJhX2ZpeGVkIjpmYWxzZSwiZHVyYXRpb24iOjQsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJyZXNvbHV0aW9uIjoiNDgwcCIsInNlZWQiOi0xfV0",
-    "revision": "08a2324ac5a5afc9dd5a094cd6aed66a03f7c674f022c1f4940c04f80d4c8aab"
-  },
-  {
-    "selection": {
-      "model": "bytedance/seedance-v1.5-pro/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "camera_fixed": false,
-        "generate_audio": true,
-        "seed": -1,
         "aspect_ratio": "9:16",
         "resolution": "480p",
         "duration": 12
@@ -822,21 +555,6 @@
       "controls": {
         "thinking_level": "default",
         "seed": -1,
-        "aspect_ratio": "16:9",
-        "resolution": "1080p",
-        "duration": 3
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktMS4xLWZsYXNoL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE2OjkiLCJkdXJhdGlvbiI6MywicmVzb2x1dGlvbiI6IjEwODBwIiwic2VlZCI6LTEsInRoaW5raW5nX2xldmVsIjoiZGVmYXVsdCJ9XQ",
-    "revision": "929a4a939af57e23077e824b7e6d1515ab83f534a40de7f68406479b7ddfc87d"
-  },
-  {
-    "selection": {
-      "model": "google/gemini-omni-1.1-flash/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "thinking_level": "default",
-        "seed": -1,
         "aspect_ratio": "9:16",
         "resolution": "4k",
         "duration": 10
@@ -858,21 +576,6 @@
       }
     },
     "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktMS4xLWZsYXNoL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjozLCJyZXNvbHV0aW9uIjoiMzYwcCIsInNlZWQiOi0xLCJ0aGlua2luZ19sZXZlbCI6ImRlZmF1bHQifV0",
-    "revision": "54b0ab9b08c86935680ad4a23ae2f2d8625ff438211e723e456f84107ba28d1b"
-  },
-  {
-    "selection": {
-      "model": "google/gemini-omni-1.1-flash/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "thinking_level": "default",
-        "seed": -1,
-        "aspect_ratio": "16:9",
-        "resolution": "1080p",
-        "duration": 3
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktMS4xLWZsYXNoL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjozLCJyZXNvbHV0aW9uIjoiMTA4MHAiLCJzZWVkIjotMSwidGhpbmtpbmdfbGV2ZWwiOiJkZWZhdWx0In1d",
     "revision": "54b0ab9b08c86935680ad4a23ae2f2d8625ff438211e723e456f84107ba28d1b"
   },
   {
@@ -914,21 +617,6 @@
         "seed": -1,
         "aspect_ratio": "9:16",
         "resolution": "720p",
-        "duration": 3
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktZmxhc2gvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjozLCJyZXNvbHV0aW9uIjoiNzIwcCIsInNlZWQiOi0xLCJ0aGlua2luZ19sZXZlbCI6ImRlZmF1bHQifV0",
-    "revision": "00fe5fff7630e3708218af83d685d7f81947ae43026301a2f7e31a79bbd4548a"
-  },
-  {
-    "selection": {
-      "model": "google/gemini-omni-flash/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "thinking_level": "default",
-        "seed": -1,
-        "aspect_ratio": "9:16",
-        "resolution": "720p",
         "duration": 10
       }
     },
@@ -948,21 +636,6 @@
       }
     },
     "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktZmxhc2gvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjMsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTEsInRoaW5raW5nX2xldmVsIjoiZGVmYXVsdCJ9XQ",
-    "revision": "9fe93afae2131ba83bf19512e25fa44b842d87d5b40fa6a97e85a865fe2f4a27"
-  },
-  {
-    "selection": {
-      "model": "google/gemini-omni-flash/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "thinking_level": "default",
-        "seed": -1,
-        "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 3
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvZ2VtaW5pLW9tbmktZmxhc2gvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiZHVyYXRpb24iOjMsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTEsInRoaW5raW5nX2xldmVsIjoiZGVmYXVsdCJ9XQ",
     "revision": "9fe93afae2131ba83bf19512e25fa44b842d87d5b40fa6a97e85a865fe2f4a27"
   },
   {
@@ -1001,20 +674,6 @@
       "controls": {
         "generate_audio": false,
         "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWZhc3QvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjo2LCJnZW5lcmF0ZV9hdWRpbyI6ZmFsc2UsInJlc29sdXRpb24iOiI3MjBwIn1d",
-    "revision": "15c60b7a4c084d31d840112397116d406aa5dff2db1c91cfaeee703989ed74d2"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1-fast/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "generate_audio": false,
-        "aspect_ratio": "9:16",
         "resolution": "4k",
         "duration": 8
       }
@@ -1034,20 +693,6 @@
       }
     },
     "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjgsImdlbmVyYXRlX2F1ZGlvIjpmYWxzZSwicmVzb2x1dGlvbiI6IjcyMHAifV0",
-    "revision": "ce31dd352a120088a6baeb3ae3819cd8e991b4fd3d96fefc654831c6fd68bd53"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1-fast/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "generate_audio": false,
-        "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiZHVyYXRpb24iOjYsImdlbmVyYXRlX2F1ZGlvIjpmYWxzZSwicmVzb2x1dGlvbiI6IjcyMHAifV0",
     "revision": "ce31dd352a120088a6baeb3ae3819cd8e991b4fd3d96fefc654831c6fd68bd53"
   },
   {
@@ -1085,20 +730,6 @@
       "controls": {
         "seed": -1,
         "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWxpdGUvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjo2LCJyZXNvbHV0aW9uIjoiNzIwcCIsInNlZWQiOi0xfV0",
-    "revision": "ab5b907c4b57e8e89e096a7839c7374b39363259ae3436a301860bba64f96391"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1-lite/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "seed": -1,
-        "aspect_ratio": "9:16",
         "resolution": "1080p",
         "duration": 8
       }
@@ -1118,20 +749,6 @@
       }
     },
     "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWxpdGUvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjQsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTF9XQ",
-    "revision": "5de7d053659c7b6dd12cdcb89f736f0321a17f22f61e5592e3473f4bcfec6437"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1-lite/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "seed": -1,
-        "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xLWxpdGUvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiZHVyYXRpb24iOjYsInJlc29sdXRpb24iOiI3MjBwIiwic2VlZCI6LTF9XQ",
     "revision": "5de7d053659c7b6dd12cdcb89f736f0321a17f22f61e5592e3473f4bcfec6437"
   },
   {
@@ -1169,20 +786,6 @@
       "controls": {
         "generate_audio": false,
         "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6Ijk6MTYiLCJkdXJhdGlvbiI6NiwiZ2VuZXJhdGVfYXVkaW8iOmZhbHNlLCJyZXNvbHV0aW9uIjoiNzIwcCJ9XQ",
-    "revision": "c7abd2030dacb3813f9a4375cd6f9ee97be043b40b6fd01f592e2307429639de"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "generate_audio": false,
-        "aspect_ratio": "9:16",
         "resolution": "4k",
         "duration": 8
       }
@@ -1202,20 +805,6 @@
       }
     },
     "key": "video:v1:WyJnb29nbGUvdmVvMy4xL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjo4LCJnZW5lcmF0ZV9hdWRpbyI6ZmFsc2UsInJlc29sdXRpb24iOiI3MjBwIn1d",
-    "revision": "96364e550ce406bb6b31c0756d656cd14af8d96e8b1eedb5c95b697250c06c07"
-  },
-  {
-    "selection": {
-      "model": "google/veo3.1/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "generate_audio": false,
-        "aspect_ratio": "9:16",
-        "resolution": "720p",
-        "duration": 6
-      }
-    },
-    "key": "video:v1:WyJnb29nbGUvdmVvMy4xL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjo2LCJnZW5lcmF0ZV9hdWRpbyI6ZmFsc2UsInJlc29sdXRpb24iOiI3MjBwIn1d",
     "revision": "96364e550ce406bb6b31c0756d656cd14af8d96e8b1eedb5c95b697250c06c07"
   },
   {
@@ -1249,18 +838,6 @@
       "model": "kwaivgi/kling-v1.6-multi-i2v-pro",
       "mode": "i2v",
       "controls": {
-        "aspect_ratio": "16:9",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYxLjYtbXVsdGktaTJ2LXBybyIsImkydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjEwfV0",
-    "revision": "5462eedb13adb5806e14cd7b03926e80cb42e0ed82ad05a86a84223a70d908d0"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v1.6-multi-i2v-pro",
-      "mode": "i2v",
-      "controls": {
         "aspect_ratio": "9:16",
         "duration": 10
       }
@@ -1278,18 +855,6 @@
       }
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYxLjYtbXVsdGktaTJ2LXN0YW5kYXJkIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjo1fV0",
-    "revision": "19dab022b6a960ebd414fee66071b59d85cd4a099de426286ea712cf5490d825"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v1.6-multi-i2v-standard",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "16:9",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYxLjYtbXVsdGktaTJ2LXN0YW5kYXJkIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE2OjkiLCJkdXJhdGlvbiI6MTB9XQ",
     "revision": "19dab022b6a960ebd414fee66071b59d85cd4a099de426286ea712cf5490d825"
   },
   {
@@ -1323,19 +888,6 @@
       "mode": "t2v",
       "controls": {
         "guidance_scale": 0.5,
-        "aspect_ratio": "9:16",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYxLjYtdDJ2LXN0YW5kYXJkIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6Ijk6MTYiLCJkdXJhdGlvbiI6MTAsImd1aWRhbmNlX3NjYWxlIjowLjV9XQ",
-    "revision": "5582ba3573928c4ec2bf83e28977458afbcf449621deb416e13d898dac74e13a"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v1.6-t2v-standard",
-      "mode": "t2v",
-      "controls": {
-        "guidance_scale": 0.5,
         "aspect_ratio": "1:1",
         "duration": 10
       }
@@ -1353,18 +905,6 @@
       }
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjAtdDJ2LW1hc3RlciIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOiI1In1d",
-    "revision": "afc8faa9a16aca9cda627cfc15f3497fbab7f6148f71eb11c10b745f8bcacfcf"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v2.0-t2v-master",
-      "mode": "t2v",
-      "controls": {
-        "aspect_ratio": "9:16",
-        "duration": "10"
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjAtdDJ2LW1hc3RlciIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiZHVyYXRpb24iOiIxMCJ9XQ",
     "revision": "afc8faa9a16aca9cda627cfc15f3497fbab7f6148f71eb11c10b745f8bcacfcf"
   },
   {
@@ -1398,19 +938,6 @@
       "mode": "t2v",
       "controls": {
         "guidance_scale": 0.5,
-        "aspect_ratio": "9:16",
-        "duration": "10"
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjEtdDJ2LW1hc3RlciIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiZHVyYXRpb24iOiIxMCIsImd1aWRhbmNlX3NjYWxlIjowLjV9XQ",
-    "revision": "6a211fb5e806c6d78319b8addb5f6ec3431d64ff36db4eea821836f6c8e0b2d8"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v2.1-t2v-master",
-      "mode": "t2v",
-      "controls": {
-        "guidance_scale": 0.5,
         "aspect_ratio": "1:1",
         "duration": "10"
       }
@@ -1423,216 +950,134 @@
       "model": "kwaivgi/kling-v2.5-turbo-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "guidance_scale": 0.5,
         "aspect_ratio": "1:1",
         "duration": 5
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjUtdHVyYm8tcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjUsImd1aWRhbmNlX3NjYWxlIjowLjV9XQ",
-    "revision": "cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjUtdHVyYm8tcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjV9XQ",
+    "revision": "0a28a5df1e508628d344f5c7975cabdf7f7b3749dc35e15f6e8142d620cb41fd"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v2.5-turbo-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "guidance_scale": 0.5,
-        "aspect_ratio": "9:16",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjUtdHVyYm8tcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjoxMCwiZ3VpZGFuY2Vfc2NhbGUiOjAuNX1d",
-    "revision": "cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v2.5-turbo-pro/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "guidance_scale": 0.5,
         "aspect_ratio": "16:9",
         "duration": 10
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjUtdHVyYm8tcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjoxMCwiZ3VpZGFuY2Vfc2NhbGUiOjAuNX1d",
-    "revision": "cb4e9122308e2e1d0913c9de7f18a9a753bf14477c541c67505e383df3e8e40a"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjUtdHVyYm8tcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjoxMH1d",
+    "revision": "0a28a5df1e508628d344f5c7975cabdf7f7b3749dc35e15f6e8142d620cb41fd"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v2.6-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "aspect_ratio": "1:1",
         "duration": 5
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjYtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiY2ZnX3NjYWxlIjowLjUsImR1cmF0aW9uIjo1LCJzb3VuZCI6dHJ1ZX1d",
-    "revision": "4f4ea4b379e006c25c1b636801f7ea48b141f806aa985fd0f214809252d4cd4b"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjYtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjUsInNvdW5kIjp0cnVlfV0",
+    "revision": "0149e4301e2cc50019ad3bc2d9f71f12fbfeda459ceb380d7f6ec5207c5d5965"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v2.6-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
-        "sound": true,
-        "aspect_ratio": "9:16",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjYtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6MTAsInNvdW5kIjp0cnVlfV0",
-    "revision": "4f4ea4b379e006c25c1b636801f7ea48b141f806aa985fd0f214809252d4cd4b"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v2.6-pro/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "aspect_ratio": "16:9",
         "duration": 10
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjYtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6MTAsInNvdW5kIjp0cnVlfV0",
-    "revision": "4f4ea4b379e006c25c1b636801f7ea48b141f806aa985fd0f214809252d4cd4b"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYyLjYtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjoxMCwic291bmQiOnRydWV9XQ",
+    "revision": "0149e4301e2cc50019ad3bc2d9f71f12fbfeda459ceb380d7f6ec5207c5d5965"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-4k/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "16:9",
         "duration": 3
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtNGsvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiY2ZnX3NjYWxlIjowLjUsImR1cmF0aW9uIjozLCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "e60ecd497ed34bbca08de1f3c77763f88764fceb0ec5bb3ee5aad253065ac26b"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtNGsvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjMsIm11bHRpX3Nob3QiOmZhbHNlLCJzb3VuZCI6dHJ1ZX1d",
+    "revision": "509486289574414b38f068451f8647f81f59395ff351162aac6308e2f72ce8ab"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-4k/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
-        "sound": true,
-        "multi_shot": false,
-        "aspect_ratio": "9:16",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtNGsvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI5OjE2IiwiY2ZnX3NjYWxlIjowLjUsImR1cmF0aW9uIjo5LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "e60ecd497ed34bbca08de1f3c77763f88764fceb0ec5bb3ee5aad253065ac26b"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v3.0-4k/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "1:1",
         "duration": 15
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtNGsvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJjZmdfc2NhbGUiOjAuNSwiZHVyYXRpb24iOjE1LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "e60ecd497ed34bbca08de1f3c77763f88764fceb0ec5bb3ee5aad253065ac26b"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtNGsvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJkdXJhdGlvbiI6MTUsIm11bHRpX3Nob3QiOmZhbHNlLCJzb3VuZCI6dHJ1ZX1d",
+    "revision": "509486289574414b38f068451f8647f81f59395ff351162aac6308e2f72ce8ab"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "16:9",
         "duration": 3
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6MywibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "64d4ebfdc9d42bc6dd6a88b3c390f3691630c1ccb578df3572e36783a1c61726"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjozLCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
+    "revision": "890df5de39cada6e8e8e14ea0396cd4918051899575f7c04fba698fc942a90aa"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-pro/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
-        "sound": true,
-        "multi_shot": false,
-        "aspect_ratio": "9:16",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6OSwibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "64d4ebfdc9d42bc6dd6a88b3c390f3691630c1ccb578df3572e36783a1c61726"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v3.0-pro/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "1:1",
         "duration": 15
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiY2ZnX3NjYWxlIjowLjUsImR1cmF0aW9uIjoxNSwibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "64d4ebfdc9d42bc6dd6a88b3c390f3691630c1ccb578df3572e36783a1c61726"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtcHJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjE1LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
+    "revision": "890df5de39cada6e8e8e14ea0396cd4918051899575f7c04fba698fc942a90aa"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-std/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "16:9",
         "duration": 3
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtc3RkL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6MywibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "f6ce80adaffcd757366103c0ed5da940fc396e302254cc99c2752bc0bf4d4e72"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtc3RkL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjozLCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
+    "revision": "f9c17e5791a999d1f3454c77547f808b1256eaa23d72a0350592e8b49ac2c5d9"
   },
   {
     "selection": {
       "model": "kwaivgi/kling-v3.0-std/text-to-video",
       "mode": "t2v",
       "controls": {
-        "cfg_scale": 0.5,
-        "sound": true,
-        "multi_shot": false,
-        "aspect_ratio": "9:16",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtc3RkL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImNmZ19zY2FsZSI6MC41LCJkdXJhdGlvbiI6OSwibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "f6ce80adaffcd757366103c0ed5da940fc396e302254cc99c2752bc0bf4d4e72"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v3.0-std/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "cfg_scale": 0.5,
         "sound": true,
         "multi_shot": false,
         "aspect_ratio": "1:1",
         "duration": 15
       }
     },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtc3RkL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiY2ZnX3NjYWxlIjowLjUsImR1cmF0aW9uIjoxNSwibXVsdGlfc2hvdCI6ZmFsc2UsInNvdW5kIjp0cnVlfV0",
-    "revision": "f6ce80adaffcd757366103c0ed5da940fc396e302254cc99c2752bc0bf4d4e72"
+    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtc3RkL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjE1LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
+    "revision": "f9c17e5791a999d1f3454c77547f808b1256eaa23d72a0350592e8b49ac2c5d9"
   },
   {
     "selection": {
@@ -1652,19 +1097,6 @@
       "model": "kwaivgi/kling-v3.0-turbo/text-to-video",
       "mode": "t2v",
       "controls": {
-        "aspect_ratio": "16:9",
-        "resolution": "1080p",
-        "duration": 3
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtdHVyYm8vdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjMsInJlc29sdXRpb24iOiIxMDgwcCJ9XQ",
-    "revision": "49745649ce0cc964e0f1158343b514813ca6679bb30894d4a1043d7a67d6bf5d"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-v3.0-turbo/text-to-video",
-      "mode": "t2v",
-      "controls": {
         "aspect_ratio": "1:1",
         "resolution": "1080p",
         "duration": 15
@@ -1672,42 +1104,6 @@
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXYzLjAtdHVyYm8vdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiIxOjEiLCJkdXJhdGlvbiI6MTUsInJlc29sdXRpb24iOiIxMDgwcCJ9XQ",
     "revision": "49745649ce0cc964e0f1158343b514813ca6679bb30894d4a1043d7a67d6bf5d"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-video-o1/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "16:9",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE2OjkiLCJkdXJhdGlvbiI6NX1d",
-    "revision": "149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-video-o1/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "9:16",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6Ijk6MTYiLCJkdXJhdGlvbiI6MTB9XQ",
-    "revision": "149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-video-o1/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "1:1",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoxMH1d",
-    "revision": "149578b2ff630033bf066ea82faff0ff41e5f55e9685b0fb07efdc6cbacfd132"
   },
   {
     "selection": {
@@ -1719,18 +1115,6 @@
       }
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjo1fV0",
-    "revision": "7246bfd4973ca3521b3cf79957a3c5bb6814c845385fbf16163241d0514a7494"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-video-o1/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "aspect_ratio": "9:16",
-        "duration": 10
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8xL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjoxMH1d",
     "revision": "7246bfd4973ca3521b3cf79957a3c5bb6814c845385fbf16163241d0514a7494"
   },
   {
@@ -1757,21 +1141,7 @@
       }
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8zLTRrL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjozLCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "5483b4d3c856bab43b97b19c78d0339233cee96f310c71515aae0105fbd26058"
-  },
-  {
-    "selection": {
-      "model": "kwaivgi/kling-video-o3-4k/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "sound": true,
-        "multi_shot": false,
-        "aspect_ratio": "9:16",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8zLTRrL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImR1cmF0aW9uIjo5LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "5483b4d3c856bab43b97b19c78d0339233cee96f310c71515aae0105fbd26058"
+    "revision": "c8b974ce3e67e499ace32baa6153df1021805fa3f4fb96e4137673acad89f73e"
   },
   {
     "selection": {
@@ -1785,7 +1155,7 @@
       }
     },
     "key": "video:v1:WyJrd2FpdmdpL2tsaW5nLXZpZGVvLW8zLTRrL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjE1LCJtdWx0aV9zaG90IjpmYWxzZSwic291bmQiOnRydWV9XQ",
-    "revision": "5483b4d3c856bab43b97b19c78d0339233cee96f310c71515aae0105fbd26058"
+    "revision": "c8b974ce3e67e499ace32baa6153df1021805fa3f4fb96e4137673acad89f73e"
   },
   {
     "selection": {
@@ -1799,20 +1169,6 @@
       }
     },
     "key": "video:v1:WyJtaW5pbWF4L2gzLWRldmVsb3Blci90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo0LCJwcm9tcHRfZXhwYW5zaW9uIjpmYWxzZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjQ4MFAifV0",
-    "revision": "f829698c431c18fcd028770565c524afbf85fc7d1fb2f15f1e0cb086805108b0"
-  },
-  {
-    "selection": {
-      "model": "minimax/h3-developer/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "prompt_expansion": false,
-        "ratio": "21:9",
-        "resolution": "1440p-sr",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJtaW5pbWF4L2gzLWRldmVsb3Blci90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo0LCJwcm9tcHRfZXhwYW5zaW9uIjpmYWxzZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjE0NDBwLXNyIn1d",
     "revision": "f829698c431c18fcd028770565c524afbf85fc7d1fb2f15f1e0cb086805108b0"
   },
   {
@@ -1849,20 +1205,6 @@
       "mode": "t2v",
       "controls": {
         "prompt_expansion": false,
-        "ratio": "1:1",
-        "resolution": "480P",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJtaW5pbWF4L2gzLWZhc3QvdGV4dC10by12aWRlbyIsInQydiIseyJkdXJhdGlvbiI6NSwicHJvbXB0X2V4cGFuc2lvbiI6ZmFsc2UsInJhdGlvIjoiMToxIiwicmVzb2x1dGlvbiI6IjQ4MFAifV0",
-    "revision": "5d2087b8b0b85556aff4df4465e4ab3bedeb75117b88405510e9bd2f4826d77d"
-  },
-  {
-    "selection": {
-      "model": "minimax/h3-fast/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "prompt_expansion": false,
         "ratio": "9:16",
         "resolution": "480P",
         "duration": 15
@@ -1882,19 +1224,6 @@
       }
     },
     "key": "video:v1:WyJtaW5pbWF4L2gzLW1heC10dXJiby90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo1LCJyYXRpbyI6IjIxOjkiLCJyZXNvbHV0aW9uIjoiNDgwUCJ9XQ",
-    "revision": "5211579221d12ae9544b1a69e71d8f0d62c3739055e2d9fadf5a8873793f46d2"
-  },
-  {
-    "selection": {
-      "model": "minimax/h3-max-turbo/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "ratio": "21:9",
-        "resolution": "768P",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJtaW5pbWF4L2gzLW1heC10dXJiby90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo1LCJyYXRpbyI6IjIxOjkiLCJyZXNvbHV0aW9uIjoiNzY4UCJ9XQ",
     "revision": "5211579221d12ae9544b1a69e71d8f0d62c3739055e2d9fadf5a8873793f46d2"
   },
   {
@@ -1922,20 +1251,6 @@
       }
     },
     "key": "video:v1:WyJtaW5pbWF4L2gzLW1heC90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo1LCJwcm9tcHRfZXhwYW5zaW9uIjpmYWxzZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjQ4MFAifV0",
-    "revision": "9758bbf5e294013aa000d5a778b3896f112abd8f413d26043ab2609a18756bd1"
-  },
-  {
-    "selection": {
-      "model": "minimax/h3-max/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "prompt_expansion": false,
-        "ratio": "21:9",
-        "resolution": "1440p-sr",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJtaW5pbWF4L2gzLW1heC90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImR1cmF0aW9uIjo1LCJwcm9tcHRfZXhwYW5zaW9uIjpmYWxzZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjE0NDBwLXNyIn1d",
     "revision": "9758bbf5e294013aa000d5a778b3896f112abd8f413d26043ab2609a18756bd1"
   },
   {
@@ -1972,20 +1287,6 @@
       "mode": "t2v",
       "controls": {
         "prompt_expansion": false,
-        "ratio": "1:1",
-        "resolution": "768P",
-        "duration": 4
-      }
-    },
-    "key": "video:v1:WyJtaW5pbWF4L2gzL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiZHVyYXRpb24iOjQsInByb21wdF9leHBhbnNpb24iOmZhbHNlLCJyYXRpbyI6IjE6MSIsInJlc29sdXRpb24iOiI3NjhQIn1d",
-    "revision": "ee45bc83e412077b4e3e0ddb3e7807767a750ca404d846e40462db04874fd786"
-  },
-  {
-    "selection": {
-      "model": "minimax/h3/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "prompt_expansion": false,
         "ratio": "9:16",
         "resolution": "2K",
         "duration": 15
@@ -2009,23 +1310,6 @@
       }
     },
     "key": "video:v1:WyJ2aWR1L3ExL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImJnbSI6dHJ1ZSwiZHVyYXRpb24iOjUsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJtb3ZlbWVudF9hbXBsaXR1ZGUiOiJhdXRvIiwicmVzb2x1dGlvbiI6IjEwODBwIiwic3R5bGUiOiJnZW5lcmFsIn1d",
-    "revision": "93c139150573f8a16725433becaf661f9b360f812b3c1f31a155072c2c1ca955"
-  },
-  {
-    "selection": {
-      "model": "vidu/q1/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "style": "general",
-        "generate_audio": true,
-        "movement_amplitude": "auto",
-        "bgm": true,
-        "aspect_ratio": "9:16",
-        "resolution": "1080p",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJ2aWR1L3ExL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiOToxNiIsImJnbSI6dHJ1ZSwiZHVyYXRpb24iOjUsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJtb3ZlbWVudF9hbXBsaXR1ZGUiOiJhdXRvIiwicmVzb2x1dGlvbiI6IjEwODBwIiwic3R5bGUiOiJnZW5lcmFsIn1d",
     "revision": "93c139150573f8a16725433becaf661f9b360f812b3c1f31a155072c2c1ca955"
   },
   {
@@ -2071,23 +1355,6 @@
         "generate_audio": true,
         "movement_amplitude": "auto",
         "bgm": true,
-        "aspect_ratio": "1:1",
-        "resolution": "720p",
-        "duration": 5
-      }
-    },
-    "key": "video:v1:WyJ2aWR1L3EyL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiYmdtIjp0cnVlLCJkdXJhdGlvbiI6NSwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsIm1vdmVtZW50X2FtcGxpdHVkZSI6ImF1dG8iLCJyZXNvbHV0aW9uIjoiNzIwcCIsInN0eWxlIjoiZ2VuZXJhbCJ9XQ",
-    "revision": "7257b0d96cbb059ad6eabf75729d0bbfab45339ddd2ca1fe29753ca89680200c"
-  },
-  {
-    "selection": {
-      "model": "vidu/q2/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "style": "general",
-        "generate_audio": true,
-        "movement_amplitude": "auto",
-        "bgm": true,
         "aspect_ratio": "3:4",
         "resolution": "1080p",
         "duration": 8
@@ -2111,23 +1378,6 @@
       }
     },
     "key": "video:v1:WyJ2aWR1L3EzLXByby90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE2OjkiLCJiZ20iOnRydWUsImR1cmF0aW9uIjoxLCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwibW92ZW1lbnRfYW1wbGl0dWRlIjoiYXV0byIsInJlc29sdXRpb24iOiI1NDBwIiwic3R5bGUiOiJnZW5lcmFsIn1d",
-    "revision": "835f0342993757df12ab036ac56b5f2c7a29e6ad3d8e16bca9b7bef5ae8b9f5d"
-  },
-  {
-    "selection": {
-      "model": "vidu/q3-pro/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "bgm": true,
-        "generate_audio": true,
-        "movement_amplitude": "auto",
-        "style": "general",
-        "aspect_ratio": "4:3",
-        "resolution": "1080p",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJ2aWR1L3EzLXByby90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjQ6MyIsImJnbSI6dHJ1ZSwiZHVyYXRpb24iOjksImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJtb3ZlbWVudF9hbXBsaXR1ZGUiOiJhdXRvIiwicmVzb2x1dGlvbiI6IjEwODBwIiwic3R5bGUiOiJnZW5lcmFsIn1d",
     "revision": "835f0342993757df12ab036ac56b5f2c7a29e6ad3d8e16bca9b7bef5ae8b9f5d"
   },
   {
@@ -2173,23 +1423,6 @@
         "generate_audio": true,
         "movement_amplitude": "auto",
         "style": "general",
-        "aspect_ratio": "4:3",
-        "resolution": "1080p",
-        "duration": 9
-      }
-    },
-    "key": "video:v1:WyJ2aWR1L3EzLXR1cmJvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiNDozIiwiYmdtIjp0cnVlLCJkdXJhdGlvbiI6OSwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsIm1vdmVtZW50X2FtcGxpdHVkZSI6ImF1dG8iLCJyZXNvbHV0aW9uIjoiMTA4MHAiLCJzdHlsZSI6ImdlbmVyYWwifV0",
-    "revision": "3de07529a99f19ed88eab2c18fd1bbbb2581a45cf61239a497021007140919e9"
-  },
-  {
-    "selection": {
-      "model": "vidu/q3-turbo/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "bgm": true,
-        "generate_audio": true,
-        "movement_amplitude": "auto",
-        "style": "general",
         "aspect_ratio": "1:1",
         "resolution": "1440p-sr",
         "duration": 16
@@ -2209,19 +1442,6 @@
       }
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtZGV2ZWxvcGVyL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoxLCJyZXNvbHV0aW9uIjoiNDgwcCJ9XQ",
-    "revision": "b5ed5e74ab04b23d973f8f35018ec68061a83030dd81c51a08dd86d6358946e0"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-developer/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtZGV2ZWxvcGVyL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjQ6MyIsImR1cmF0aW9uIjo4LCJyZXNvbHV0aW9uIjoiNzIwcCJ9XQ",
     "revision": "b5ed5e74ab04b23d973f8f35018ec68061a83030dd81c51a08dd86d6358946e0"
   },
   {
@@ -2255,19 +1475,6 @@
       "model": "xai/grok-imagine-video-v1.5-developer/text-to-video",
       "mode": "t2v",
       "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtZGV2ZWxvcGVyL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiNDozIiwiZHVyYXRpb24iOjgsInJlc29sdXRpb24iOiI3MjBwIn1d",
-    "revision": "98e00606c2204b0ffe0bf6bf73297a952e9b9ae90ecffe9e6bb1481f3e1a035c"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-developer/text-to-video",
-      "mode": "t2v",
-      "controls": {
         "aspect_ratio": "2:3",
         "resolution": "1080p",
         "duration": 15
@@ -2287,19 +1494,6 @@
       }
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS1kZXZlbG9wZXIvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMTY6OSIsImR1cmF0aW9uIjoxLCJyZXNvbHV0aW9uIjoiNDgwcCJ9XQ",
-    "revision": "dd4928ef82ccbe474ac438ee4c599125d634374530dc4f3c88845b721ee67d76"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-lite-developer/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS1kZXZlbG9wZXIvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiNDozIiwiZHVyYXRpb24iOjgsInJlc29sdXRpb24iOiI3MjBwIn1d",
     "revision": "dd4928ef82ccbe474ac438ee4c599125d634374530dc4f3c88845b721ee67d76"
   },
   {
@@ -2333,19 +1527,6 @@
       "model": "xai/grok-imagine-video-v1.5-lite-developer/text-to-video",
       "mode": "t2v",
       "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS1kZXZlbG9wZXIvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI0OjMiLCJkdXJhdGlvbiI6OCwicmVzb2x1dGlvbiI6IjcyMHAifV0",
-    "revision": "740336f4136184286c516e79d473a7092b1f90603948eb74cbe1be86e899e315"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-lite-developer/text-to-video",
-      "mode": "t2v",
-      "controls": {
         "aspect_ratio": "2:3",
         "resolution": "1080p",
         "duration": 15
@@ -2366,20 +1547,6 @@
       }
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS9pbWFnZS10by12aWRlbyIsImkydiIseyJhc3BlY3RfcmF0aW8iOiIxNjo5IiwiZHVyYXRpb24iOjEsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJyZXNvbHV0aW9uIjoiNDgwcCJ9XQ",
-    "revision": "d8288966f218274080810751719fda4d6ca63c2fa57f5e2e7a0392b08a330111"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-lite/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "generate_audio": true,
-        "aspect_ratio": "3:4",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS9pbWFnZS10by12aWRlbyIsImkydiIseyJhc3BlY3RfcmF0aW8iOiIzOjQiLCJkdXJhdGlvbiI6OCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJlc29sdXRpb24iOiI3MjBwIn1d",
     "revision": "d8288966f218274080810751719fda4d6ca63c2fa57f5e2e7a0392b08a330111"
   },
   {
@@ -2416,20 +1583,6 @@
       "mode": "t2v",
       "controls": {
         "generate_audio": true,
-        "aspect_ratio": "3:4",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUtbGl0ZS90ZXh0LXRvLXZpZGVvIiwidDJ2Iix7ImFzcGVjdF9yYXRpbyI6IjM6NCIsImR1cmF0aW9uIjo4LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmVzb2x1dGlvbiI6IjcyMHAifV0",
-    "revision": "c2f0fb8f58b573bd2e66138f3fd6514902f8b81ed1cf138519fb5abecfb984cd"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5-lite/text-to-video",
-      "mode": "t2v",
-      "controls": {
-        "generate_audio": true,
         "aspect_ratio": "5:2",
         "resolution": "1080p",
         "duration": 15
@@ -2449,19 +1602,6 @@
       }
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjEsInJlc29sdXRpb24iOiI0ODBwIn1d",
-    "revision": "d7092e55edfd8abdf7ec795d7cd95845b1f6539f79983627f7e910442ee32095"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUvaW1hZ2UtdG8tdmlkZW8iLCJpMnYiLHsiYXNwZWN0X3JhdGlvIjoiNDozIiwiZHVyYXRpb24iOjgsInJlc29sdXRpb24iOiI3MjBwIn1d",
     "revision": "d7092e55edfd8abdf7ec795d7cd95845b1f6539f79983627f7e910442ee32095"
   },
   {
@@ -2495,19 +1635,6 @@
       "model": "xai/grok-imagine-video-v1.5/text-to-video",
       "mode": "t2v",
       "controls": {
-        "aspect_ratio": "4:3",
-        "resolution": "720p",
-        "duration": 8
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvLXYxLjUvdGV4dC10by12aWRlbyIsInQydiIseyJhc3BlY3RfcmF0aW8iOiI0OjMiLCJkdXJhdGlvbiI6OCwicmVzb2x1dGlvbiI6IjcyMHAifV0",
-    "revision": "bee71712fd307e2eee1a5e60f26f34b2ab62154313b57b6bf5c607af733cb58c"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video-v1.5/text-to-video",
-      "mode": "t2v",
-      "controls": {
         "aspect_ratio": "2:3",
         "resolution": "1080p",
         "duration": 15
@@ -2527,19 +1654,6 @@
       }
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoxLCJyZXNvbHV0aW9uIjoiNDgwcCJ9XQ",
-    "revision": "a9bdbf83e9daf98c26c5bfe78d79451d36727ad974a25e91c8b61aeab9c8a4d9"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video/image-to-video",
-      "mode": "i2v",
-      "controls": {
-        "aspect_ratio": "1:1",
-        "resolution": "720p",
-        "duration": 1
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvL2ltYWdlLXRvLXZpZGVvIiwiaTJ2Iix7ImFzcGVjdF9yYXRpbyI6IjE6MSIsImR1cmF0aW9uIjoxLCJyZXNvbHV0aW9uIjoiNzIwcCJ9XQ",
     "revision": "a9bdbf83e9daf98c26c5bfe78d79451d36727ad974a25e91c8b61aeab9c8a4d9"
   },
   {
@@ -2573,19 +1687,6 @@
       "model": "xai/grok-imagine-video/text-to-video",
       "mode": "t2v",
       "controls": {
-        "aspect_ratio": "1:1",
-        "resolution": "720p",
-        "duration": 1
-      }
-    },
-    "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMToxIiwiZHVyYXRpb24iOjEsInJlc29sdXRpb24iOiI3MjBwIn1d",
-    "revision": "93cf43f74eae520940adbdfb0e5c8d899d1d412cea72235cb27cfd1c6c61b54b"
-  },
-  {
-    "selection": {
-      "model": "xai/grok-imagine-video/text-to-video",
-      "mode": "t2v",
-      "controls": {
         "aspect_ratio": "2:3",
         "resolution": "720p",
         "duration": 15
@@ -2593,5 +1694,149 @@
     },
     "key": "video:v1:WyJ4YWkvZ3Jvay1pbWFnaW5lLXZpZGVvL3RleHQtdG8tdmlkZW8iLCJ0MnYiLHsiYXNwZWN0X3JhdGlvIjoiMjozIiwiZHVyYXRpb24iOjE1LCJyZXNvbHV0aW9uIjoiNzIwcCJ9XQ",
     "revision": "93cf43f74eae520940adbdfb0e5c8d899d1d412cea72235cb27cfd1c6c61b54b"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "16:9",
+        "resolution": "480p",
+        "duration": 4
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wL3JlZmVyZW5jZS10by12aWRlbyIsInIydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIxNjo5IiwicmVzb2x1dGlvbiI6IjQ4MHAiLCJyZXR1cm5fbGFzdF9mcmFtZSI6ZmFsc2UsInNlZWQiOi0xLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
+    "revision": "dd4d199e9175d171614a71dfd603fe106eabc39b040f098af923832eb52ff008"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "21:9",
+        "resolution": "4k",
+        "duration": 15
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wL3JlZmVyZW5jZS10by12aWRlbyIsInIydiIseyJiaXRyYXRlX21vZGUiOiJzdGFuZGFyZCIsImR1cmF0aW9uIjoxNSwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsInJhdGlvIjoiMjE6OSIsInJlc29sdXRpb24iOiI0ayIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
+    "revision": "dd4d199e9175d171614a71dfd603fe106eabc39b040f098af923832eb52ff008"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false,
+        "ratio": "16:9",
+        "resolution": "480p",
+        "duration": 4
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi41L3JlZmVyZW5jZS10by12aWRlbyIsInIydiIseyJkcmFmdCI6ZmFsc2UsImR1cmF0aW9uIjo0LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwib3V0cHV0X2Zvcm1hdCI6Im1wNCIsInJhdGlvIjoiMTY6OSIsInJlc29sdXRpb24iOiI0ODBwIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
+    "revision": "e2252525f721553959239b449779799516c41f935f2849daae5282bca3ced230"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false,
+        "ratio": "21:9",
+        "resolution": "4k-esr",
+        "duration": 30
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi41L3JlZmVyZW5jZS10by12aWRlbyIsInIydiIseyJkcmFmdCI6ZmFsc2UsImR1cmF0aW9uIjozMCwiZ2VuZXJhdGVfYXVkaW8iOnRydWUsIm91dHB1dF9mb3JtYXQiOiJtcDQiLCJyYXRpbyI6IjIxOjkiLCJyZXNvbHV0aW9uIjoiNGstZXNyIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJ3YXRlcm1hcmsiOmZhbHNlfV0",
+    "revision": "e2252525f721553959239b449779799516c41f935f2849daae5282bca3ced230"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "16:9",
+        "resolution": "480p",
+        "duration": 4
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLW1pbmkvcmVmZXJlbmNlLXRvLXZpZGVvIiwicjJ2Iix7ImJpdHJhdGVfbW9kZSI6InN0YW5kYXJkIiwiZHVyYXRpb24iOjQsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJyYXRpbyI6IjE2OjkiLCJyZXNvbHV0aW9uIjoiNDgwcCIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
+    "revision": "c029126f05deff62bcc2ab5f08ca5afc78e75544742f3eef7ec5836dba0134b2"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "21:9",
+        "resolution": "1440p-SR",
+        "duration": 15
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLW1pbmkvcmVmZXJlbmNlLXRvLXZpZGVvIiwicjJ2Iix7ImJpdHJhdGVfbW9kZSI6InN0YW5kYXJkIiwiZHVyYXRpb24iOjE1LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjE0NDBwLVNSIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJzZWVkIjotMSwid2F0ZXJtYXJrIjpmYWxzZX1d",
+    "revision": "c029126f05deff62bcc2ab5f08ca5afc78e75544742f3eef7ec5836dba0134b2"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "16:9",
+        "resolution": "480p",
+        "duration": 4
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLWZhc3QvcmVmZXJlbmNlLXRvLXZpZGVvIiwicjJ2Iix7ImJpdHJhdGVfbW9kZSI6InN0YW5kYXJkIiwiZHVyYXRpb24iOjQsImdlbmVyYXRlX2F1ZGlvIjp0cnVlLCJyYXRpbyI6IjE2OjkiLCJyZXNvbHV0aW9uIjoiNDgwcCIsInJldHVybl9sYXN0X2ZyYW1lIjpmYWxzZSwic2VlZCI6LTEsIndhdGVybWFyayI6ZmFsc2V9XQ",
+    "revision": "01d53fc60069f7156c7d48a72c567ac84ca70b766d7fda14c60cf9981258cf72"
+  },
+  {
+    "selection": {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false,
+        "ratio": "21:9",
+        "resolution": "1440p-SR",
+        "duration": 15
+      }
+    },
+    "key": "video:v1:WyJieXRlZGFuY2Uvc2VlZGFuY2UtMi4wLWZhc3QvcmVmZXJlbmNlLXRvLXZpZGVvIiwicjJ2Iix7ImJpdHJhdGVfbW9kZSI6InN0YW5kYXJkIiwiZHVyYXRpb24iOjE1LCJnZW5lcmF0ZV9hdWRpbyI6dHJ1ZSwicmF0aW8iOiIyMTo5IiwicmVzb2x1dGlvbiI6IjE0NDBwLVNSIiwicmV0dXJuX2xhc3RfZnJhbWUiOmZhbHNlLCJzZWVkIjotMSwid2F0ZXJtYXJrIjpmYWxzZX1d",
+    "revision": "01d53fc60069f7156c7d48a72c567ac84ca70b766d7fda14c60cf9981258cf72"
   }
 ]

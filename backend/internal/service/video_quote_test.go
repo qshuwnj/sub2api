@@ -278,9 +278,8 @@ func TestVideoQuoteLegacyNativeResolutionMatchesGeneration(t *testing.T) {
 		Model: "kwaivgi/kling-v2.5-turbo-pro/text-to-video",
 		Mode:  "t2v",
 		Controls: map[string]any{
-			"duration":       float64(5),
-			"aspect_ratio":   "1:1",
-			"guidance_scale": 0.5,
+			"duration":     float64(5),
+			"aspect_ratio": "1:1",
 		},
 	}
 	for _, tc := range []struct {
@@ -393,8 +392,8 @@ func TestVideoTariffLiteralKeyAndRetail(t *testing.T) {
 
 func TestVideoTariffNativeControlsAndConditionals(t *testing.T) {
 	for _, body := range []string{
-		`{"duration":"8"}`, `{"duration":-1}`, `{"aspect_ratio":"adaptive"}`, `{"generate_audio":true}`,
-		`{"resolution":"1080p","duration":4}`, `{"prompt":"content"}`, `{"seed":12}`, `{"image":"https://assets.example/test.png"}`,
+		`{"duration":"8"}`, `{"duration":-1}`, `{"aspect_ratio":"adaptive"}`, `{"generate_audio":"yes"}`,
+		`{"resolution":"1080p","duration":4}`, `{"prompt":"content"}`, `{"seed":"12"}`, `{"image":"https://assets.example/test.png"}`,
 	} {
 		req := videoTestRequest()
 		var patch map[string]any
@@ -752,11 +751,13 @@ func TestVideoTariffUnsupportedSchemaTypeFailsClosed(t *testing.T) {
 	require.Error(t, err)
 }
 
-func TestVideoTariffFixedResolutionDefaultPreservesLegacyLookup(t *testing.T) {
+func TestVideoTariffRemovedResolutionUsesNativeLegacyLookup(t *testing.T) {
 	model := "kwaivgi/kling-v3.0-4k/image-to-video"
-	got, ok := LookupVideoBillingResolutionForModel(model, "1080P")
+	got, ok := LookupVideoBillingResolutionForModel(model, "native")
 	require.True(t, ok)
-	require.Equal(t, "1080p", got)
+	require.Equal(t, "native", got)
+	_, ok = LookupVideoBillingResolutionForModel(model, "1080P")
+	require.False(t, ok, "removed upstream controls cannot retain a stale explicit tier")
 	_, ok = LookupVideoBillingResolutionForModel(model, "4k")
 	require.False(t, ok, "model-name 4k never invents a native 4k request value")
 }
