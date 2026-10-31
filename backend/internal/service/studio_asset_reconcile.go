@@ -6,6 +6,8 @@ import (
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/tidwall/gjson"
 )
 
 // StudioVideoIntake is private library intent, never an immutable quote input.
@@ -22,6 +24,10 @@ type StudioVideoIntake struct {
 type StudioAssetHistoryRepository interface {
 	ListStudioAssetHistory(context.Context, StudioAssetOwner, int) ([]string, error)
 	FindStudioAssetGeneration(context.Context, StudioAssetOwner, string) (*StudioAsset, error)
+}
+
+type StudioAssetImageOutputRepository interface {
+	FindStudioAssetOutput(context.Context, StudioAssetOwner, string, int) (*StudioAsset, error)
 }
 
 type StudioVideoRecoveryRepository interface {
@@ -154,10 +160,19 @@ func (s *StudioAssetService) reconcileOwnedHistory(ctx context.Context, owner St
 		}
 		seen[id] = true
 		isImage := strings.HasPrefix(id, "imgtask_")
-		resource := id
-		if !isImage {
-			resource = studioHistoryResource(id)
+		if isImage {
+			queued, saved := s.recoverImageTask(ctx, owner, id)
+			switch {
+			case queued:
+				result.Queued++
+			case saved:
+				result.AlreadySaved++
+			default:
+				result.Unrecoverable++
+			}
+			continue
 		}
+		resource := studioHistoryResource(id)
 		if hasHistory {
 			a, err := history.FindStudioAssetGeneration(ctx, owner, resource)
 			if err == nil && a != nil {
@@ -173,14 +188,6 @@ func (s *StudioAssetService) reconcileOwnedHistory(ctx context.Context, owner St
 			if err != nil && !errors.Is(err, ErrStudioAssetNotFound) {
 				return nil, err
 			}
-		}
-		if isImage {
-			if s.recoverImageTask(ctx, owner, id) {
-				result.Queued++
-			} else {
-				result.Unrecoverable++
-			}
-			continue
 		}
 		if s.recoverVideo != nil {
 			if err := s.recoverVideo(ctx, owner, resource); err != nil {
@@ -206,32 +213,55 @@ func (s *StudioAssetService) reconcileOwnedHistory(ctx context.Context, owner St
 	return result, nil
 }
 
-func (s *StudioAssetService) recoverImageTask(ctx context.Context, owner StudioAssetOwner, id string) bool {
+func (s *StudioAssetService) recoverImageTask(ctx context.Context, owner StudioAssetOwner, id string) (queued, saved bool) {
 	if s.imageTasks == nil {
-		return false
+		return false, false
 	}
 	task, err := s.imageTasks.Get(ctx, ImageTaskOwner{UserID: owner.UserID, APIKeyID: owner.APIKeyID}, id)
 	if err != nil || task == nil || task.ID != id || task.Status != ImageTaskStatusCompleted ||
 		task.HTTPStatus < 200 || task.HTTPStatus >= 300 || task.ExpiresAt <= time.Now().Unix() {
-		return false
+		return false, false
 	}
-	outputs := studioImageJSONOutputs(task.Result)
+	outputs := gjson.GetBytes(task.Result, "data").Array()
 	if len(outputs) == 0 {
-		return false
+		return false, false
 	}
 	// ImageTaskRecord never retained original request metadata. Do not infer it
 	// from response model aliases, revised prompts, or browser-supplied data.
-	queued := false
+	allIndexed, liveIndexed := true, false
+	indexed, canFindOutput := s.repo.(StudioAssetImageOutputRepository)
 	generatedAt := time.Unix(task.CreatedAt, 0).UTC()
 	if task.CompletedAt != nil {
 		generatedAt = time.Unix(*task.CompletedAt, 0).UTC()
 	}
-	for index, output := range outputs {
+	for index, item := range outputs {
+		if item.Get("url").String() == "" && item.Get("b64_json").String() == "" {
+			continue
+		}
+		if canFindOutput {
+			a, err := indexed.FindStudioAssetOutput(ctx, owner, id, index)
+			if err == nil {
+				if a == nil || a.Owner != owner || a.GenerationID != id || a.OutputIndex != index || a.Kind != "image" {
+					return queued, false
+				}
+				// Existing outputs are authoritative, including terminal state,
+				// active leases, ready objects, immutable metadata and tombstones.
+				liveIndexed = liveIndexed || a.DeletedAt == nil
+				continue
+			}
+			if !errors.Is(err, ErrStudioAssetNotFound) {
+				return queued, false
+			}
+		}
+		output := studioImageSource(item.Get("url").String(), item.Get("b64_json").String(),
+			firstNonEmpty(item.Get("output_format").String(), gjson.GetBytes(task.Result, "output_format").String()))
 		if persisted, _ := s.collectImageAt(ctx, owner, id, index, "", "", nil, output, generatedAt); persisted {
 			queued = true
+		} else {
+			allIndexed = false
 		}
 	}
-	return queued
+	return queued, !queued && allIndexed && liveIndexed
 }
 
 // CompleteStudioNativeVideo is called only after the existing authenticated,

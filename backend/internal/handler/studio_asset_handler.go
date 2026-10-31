@@ -82,6 +82,10 @@ func (h *OpenAIGatewayHandler) StudioAssets(c *gin.Context) {
 		return
 	}
 	q := service.StudioAssetQuery{Kind: c.Query("type"), Cursor: c.Query("cursor")}
+	// "all" is the public unfiltered spelling; internal repositories use "".
+	if q.Kind == "all" {
+		q.Kind = ""
+	}
 	if value, exists := c.GetQuery("limit"); exists {
 		n, err := strconv.Atoi(value)
 		if err != nil || n < 1 {

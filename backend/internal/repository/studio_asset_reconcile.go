@@ -101,6 +101,14 @@ func (r *usageBillingRepository) FindStudioAssetGeneration(ctx context.Context, 
 		owner.UserID, owner.APIKeyID, generation))
 }
 
+// Include tombstones: recovery must distinguish a deleted output from a missing
+// one, independently of any sibling's index or archive state.
+func (r *usageBillingRepository) FindStudioAssetOutput(ctx context.Context, owner service.StudioAssetOwner, generation string, index int) (*service.StudioAsset, error) {
+	return scanStudioAsset(r.db.QueryRowContext(ctx, `SELECT `+studioAssetColumns+` FROM studio_assets
+		WHERE user_id=$1 AND api_key_id=$2 AND generation_id=$3 AND output_index=$4`,
+		owner.UserID, owner.APIKeyID, generation, index))
+}
+
 func (r *usageBillingRepository) ListStudioAssetHistory(ctx context.Context, owner service.StudioAssetOwner, limit int) ([]string, error) {
 	if limit < 1 || limit > 100 {
 		limit = 100
