@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/google/uuid"
@@ -43,11 +44,11 @@ func studioHistoryDB(t *testing.T) (*usageBillingRepository, context.Context) {
 		INSERT INTO users VALUES(16),(17); INSERT INTO api_keys VALUES(20),(21);
 		CREATE TABLE video_attempts(id text, user_id bigint,api_key_id bigint,state text, financial_state text,
 		receipt_usage_log_id bigint,upstream_task_id text,created_at timestamptz DEFAULT NOW(),updated_at timestamptz DEFAULT NOW());
-		CREATE TABLE usage_logs(id bigserial,user_id bigint,api_key_id bigint,account_id bigint,request_id text,video_count int,created_at timestamptz DEFAULT NOW());
+		CREATE TABLE usage_logs(id bigserial,user_id bigint,api_key_id bigint,account_id bigint,request_id text,video_count int,output_tokens int DEFAULT 0,created_at timestamptz DEFAULT NOW());
 		CREATE TABLE usage_billing_dedup(request_id text,api_key_id bigint);
 		CREATE TABLE usage_billing_dedup_archive(request_id text,api_key_id bigint);`)
 	require.NoError(t, err)
-	for _, file := range []string{"252_video_results.sql", "253_studio_assets.sql", "254_studio_video_intakes.sql"} {
+	for _, file := range []string{"252_video_results.sql", "253_studio_assets.sql", "254_studio_video_intakes.sql", "255_studio_asset_recovery_checks.sql"} {
 		b, err := os.ReadFile(filepath.Join("..", "..", "migrations", file))
 		require.NoError(t, err)
 		_, err = db.Exec(string(b))
@@ -154,7 +155,64 @@ func TestStudioAssetPostgresVideoProtectedNativeRequiresCompletedBoundIntake(t *
 	require.NoError(t, err)
 	got, err = r.ReconcileStudioAssets(ctx, owner, []string{"task:native"})
 	require.NoError(t, err)
+	require.Equal(t, &service.StudioAssetReconcileResult{Unrecoverable: 1}, got, "supplier completion is not a committed customer receipt")
+	_, err = r.db.Exec(`INSERT INTO usage_logs(user_id,api_key_id,account_id,request_id,video_count)
+		VALUES(16,20,90,'grok-video:native',1);
+		INSERT INTO usage_billing_dedup VALUES('grok-video:native',20);`)
+	require.NoError(t, err)
+	got, err = r.ReconcileStudioAssets(ctx, owner, []string{"task:native"})
+	require.NoError(t, err)
 	require.Equal(t, &service.StudioAssetReconcileResult{Queued: 1}, got)
+}
+
+func TestStudioAssetPostgresNativeReceiptCannotBeReplacedByReadyArchive(t *testing.T) {
+	for _, task := range []string{"native", "seedance:native"} {
+		t.Run(task, func(t *testing.T) {
+			r, ctx := studioHistoryDB(t)
+			owner := service.StudioAssetOwner{UserID: 16, APIKeyID: 20}
+			_, err := r.db.Exec(`INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,storage_key,mime,size_bytes)
+				VALUES(16,20,$1,$2,90,'video-results/16/20/native.mp4','video/mp4',42)`, "task:"+task, task)
+			require.NoError(t, err)
+			result, err := r.ReconcileStudioAssets(ctx, owner, []string{"task:" + task})
+			require.NoError(t, err)
+			require.Equal(t, &service.StudioAssetReconcileResult{Unrecoverable: 1}, result)
+			old := &service.StudioAsset{Owner: owner, Kind: "video", GenerationID: "task:" + task,
+				VideoResource: "task:" + task, GeneratedAt: time.Now()}
+			require.NoError(t, r.UpsertStudioAsset(ctx, old))
+			_, err = r.db.Exec(`UPDATE studio_assets SET state='ready',storage_key='video-results/16/20/native.mp4',mime='video/mp4',size_bytes=42`)
+			require.NoError(t, err)
+			result, err = service.NewStudioAssetService(r, nil).Reconcile(ctx, owner, []string{"task:" + task})
+			require.NoError(t, err)
+			require.Equal(t, &service.StudioAssetReconcileResult{Unrecoverable: 1}, result, "previously indexed ready rows cannot report saved without a receipt")
+			// Keep the positive case focused on new indexing after proof exists.
+			_, err = r.db.Exec(`DELETE FROM studio_assets`)
+			require.NoError(t, err)
+			videoCount, outputTokens := 1, 0
+			if strings.HasPrefix(task, "seedance:") {
+				videoCount, outputTokens = 0, 42
+			}
+			_, err = r.db.Exec(`WITH inserted AS (
+				INSERT INTO usage_logs(user_id,api_key_id,account_id,request_id,video_count,output_tokens)
+				VALUES(16,21,90,$1,$2,$3) RETURNING request_id,api_key_id)
+				INSERT INTO usage_billing_dedup_archive SELECT request_id,api_key_id FROM inserted`,
+				service.StableGrokVideoBillingRequestID(task), videoCount, outputTokens)
+			require.NoError(t, err)
+			result, err = r.ReconcileStudioAssets(ctx, owner, []string{"task:" + task})
+			require.NoError(t, err)
+			require.Equal(t, &service.StudioAssetReconcileResult{Unrecoverable: 1}, result, "same user, different key cannot provide the receipt")
+			_, err = r.db.Exec(`WITH inserted AS (
+				INSERT INTO usage_logs(user_id,api_key_id,account_id,request_id,video_count,output_tokens)
+				VALUES(16,20,90,$1,$2,$3) RETURNING request_id,api_key_id)
+				INSERT INTO usage_billing_dedup_archive SELECT request_id,api_key_id FROM inserted`,
+				service.StableGrokVideoBillingRequestID(task), videoCount, outputTokens)
+			require.NoError(t, err)
+			result, err = r.ReconcileStudioAssets(ctx, owner, []string{"task:" + task})
+			require.NoError(t, err)
+			require.Equal(t, &service.StudioAssetReconcileResult{Queued: 1}, result)
+			_, err = r.FindStudioNativeVideoReceipt(ctx, service.VideoAttemptOwner{UserID: owner.UserID, APIKeyID: owner.APIKeyID}, "grok-video:"+task)
+			require.ErrorIs(t, err, service.ErrVideoResultNotFound, "a billing-key alias is not the original native task identity")
+		})
+	}
 }
 
 func TestStudioAssetPostgresReconcileArchivedLegacyVideoWithoutInventedMetadata(t *testing.T) {
@@ -224,4 +282,86 @@ func TestStudioAssetPostgresVideoExpiredAndUncapturedHistoryIsUnrecoverable(t *t
 	page, err := r.ListStudioAssets(ctx, service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, service.StudioAssetQuery{})
 	require.NoError(t, err)
 	require.Empty(t, page.Items)
+}
+
+func TestStudioAssetPostgresHistoryAdvancesPastUnrecoverableHundred(t *testing.T) {
+	r, ctx := studioHistoryDB(t)
+	_, err := r.db.Exec(`INSERT INTO video_attempts(id,user_id,api_key_id,state,financial_state,receipt_usage_log_id,upstream_task_id)
+		SELECT 'a-expired-'||n,16,20,'completed','captured',n,'atlascloud:a-expired-'||n FROM generate_series(1,100) n;
+		INSERT INTO video_attempts(id,user_id,api_key_id,state,financial_state,receipt_usage_log_id,upstream_task_id)
+		VALUES('z-valid',16,20,'completed','captured',101,'atlascloud:z-valid');
+		INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,source_url)
+		SELECT 16,20,'attempt:a-expired-'||n,'atlascloud:a-expired-'||n,90,
+		'https://example.com/expired.mp4?X-Amz-Date=20000101T000000Z&X-Amz-Expires=60' FROM generate_series(1,100) n;
+		INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,storage_key,mime,size_bytes)
+		VALUES(16,20,'attempt:z-valid','atlascloud:z-valid',90,'video-results/16/20/z-valid.mp4','video/mp4',42);`)
+	require.NoError(t, err)
+	owner := service.StudioAssetOwner{UserID: 16, APIKeyID: 20}
+	first, err := r.ReconcileStudioAssets(ctx, owner, nil)
+	require.NoError(t, err)
+	require.Equal(t, &service.StudioAssetReconcileResult{Unrecoverable: 100}, first)
+	second, err := r.ReconcileStudioAssets(ctx, owner, nil)
+	require.NoError(t, err)
+	require.Equal(t, &service.StudioAssetReconcileResult{Queued: 1}, second, "unrecoverable lexical head must back off so the next bounded pass advances")
+}
+
+func TestStudioAssetPostgresBackgroundLookupAdvancesPastUnresolvedHundred(t *testing.T) {
+	r, ctx := studioHistoryDB(t)
+	_, err := r.db.Exec(`INSERT INTO video_attempts(id,user_id,api_key_id,state,financial_state,receipt_usage_log_id,upstream_task_id)
+		SELECT 'attempt-'||n,16,20,'completed','captured',n,'atlascloud:attempt-'||n FROM generate_series(1,101) n;
+		INSERT INTO studio_video_intakes(user_id,api_key_id,resource,generation_id,model,prompt,account_id)
+		SELECT 16,20,'attempt:attempt-'||n,'attempt:attempt-'||n,'original','original prompt',90 FROM generate_series(1,101) n;`)
+	require.NoError(t, err)
+	first, err := r.ListStudioVideoIntakes(ctx, 100)
+	require.NoError(t, err)
+	require.Len(t, first, 100)
+	second, err := r.ListStudioVideoIntakes(ctx, 100)
+	require.NoError(t, err)
+	require.Len(t, second, 1, "unresolved older intakes must not monopolize every lookup pass")
+	for _, old := range first {
+		require.NotEqual(t, old.Resource, second[0].Resource)
+	}
+}
+
+func TestStudioAssetPostgresDiscoveryDoesNotSelectUnbilledIncompleteNative(t *testing.T) {
+	r, ctx := studioHistoryDB(t)
+	_, err := r.db.Exec(`INSERT INTO studio_video_intakes(user_id,api_key_id,resource,generation_id,model,prompt,account_id)
+		SELECT 16,20,'task:a-pending-'||n,'task:a-pending-'||n,'original','original prompt',90 FROM generate_series(1,100) n;
+		INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,source_url)
+		SELECT 16,20,'task:a-pending-'||n,'a-pending-'||n,90,'https://vidgen.x.ai/not-paid.mp4' FROM generate_series(1,100) n;`)
+	require.NoError(t, err)
+	ids, err := r.ListStudioAssetHistory(ctx, service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, 100)
+	require.NoError(t, err)
+	require.Empty(t, ids, "unbilled or incomplete intakes are not completed-history candidates")
+	intakes, err := r.ListStudioVideoIntakes(ctx, 100)
+	require.NoError(t, err)
+	require.Empty(t, intakes)
+	_, err = r.ReconcileStudioAssets(ctx, service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, []string{"task:foreign"})
+	require.NoError(t, err)
+	var checks int
+	require.NoError(t, r.db.QueryRow(`SELECT COUNT(*) FROM studio_asset_recovery_checks`).Scan(&checks))
+	require.Zero(t, checks, "caller-supplied unproven identities must not create recovery scheduling rows")
+}
+
+func TestStudioAssetPostgresBackgroundIndexAdvancesPastUnrecoverableHundred(t *testing.T) {
+	r, ctx := studioHistoryDB(t)
+	_, err := r.db.Exec(`INSERT INTO video_attempts(id,user_id,api_key_id,state,financial_state,receipt_usage_log_id,upstream_task_id)
+		SELECT 'a-expired-'||n,16,20,'completed','captured',n,'atlascloud:a-expired-'||n FROM generate_series(1,100) n;
+		INSERT INTO video_attempts(id,user_id,api_key_id,state,financial_state,receipt_usage_log_id,upstream_task_id)
+		VALUES('z-valid',16,20,'completed','captured',101,'atlascloud:z-valid');
+		INSERT INTO studio_video_intakes(user_id,api_key_id,resource,generation_id,model,prompt,account_id)
+		SELECT 16,20,'attempt:'||id,'attempt:'||id,'original','original prompt',90 FROM video_attempts;
+		INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,source_url)
+		SELECT 16,20,'attempt:a-expired-'||n,'atlascloud:a-expired-'||n,90,
+		'https://example.com/expired.mp4?X-Amz-Date=20000101T000000Z&X-Amz-Expires=60' FROM generate_series(1,100) n;
+		INSERT INTO video_results(user_id,api_key_id,resource,upstream_task_id,account_id,storage_key,mime,size_bytes)
+		VALUES(16,20,'attempt:z-valid','atlascloud:z-valid',90,'video-results/16/20/z-valid.mp4','video/mp4',42);`)
+	require.NoError(t, err)
+	require.NoError(t, r.ProcessStudioVideoIntakes(ctx, 100))
+	var count int
+	require.NoError(t, r.db.QueryRow(`SELECT COUNT(*) FROM studio_assets`).Scan(&count))
+	require.Zero(t, count)
+	require.NoError(t, r.ProcessStudioVideoIntakes(ctx, 100))
+	require.NoError(t, r.db.QueryRow(`SELECT COUNT(*) FROM studio_assets WHERE generation_id='attempt:z-valid'`).Scan(&count))
+	require.Equal(t, 1, count, "background indexing must also advance past failed old sources")
 }

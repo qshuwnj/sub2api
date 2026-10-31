@@ -9,7 +9,8 @@ import (
 )
 
 // StudioVideoIntake is private library intent, never an immutable quote input.
-// Completed is only written after an owned native task lookup succeeds.
+// Completed is only written after an owned native task lookup and a committed
+// customer receipt are both proven; this flag alone is never billing proof.
 type StudioVideoIntake struct {
 	Owner                   StudioAssetOwner
 	Resource, Model, Prompt string
@@ -99,8 +100,13 @@ func (s *StudioAssetService) CollectVideo(ctx context.Context, owner StudioAsset
 }
 
 func (s *StudioAssetService) processVideoIntakes(ctx context.Context) error {
+	if r, ok := s.repo.(StudioVideoIntakeRepository); ok {
+		if err := r.ProcessStudioVideoIntakes(ctx, 100); err != nil {
+			return ErrStudioAssetUnavailable
+		}
+	}
 	if r, ok := s.repo.(StudioVideoRecoveryRepository); ok && s.recoverVideo != nil {
-		intakes, err := r.ListStudioVideoIntakes(ctx, 100)
+		intakes, err := r.ListStudioVideoIntakes(ctx, 2)
 		if err != nil {
 			return ErrStudioAssetUnavailable
 		}
@@ -109,12 +115,9 @@ func (s *StudioAssetService) processVideoIntakes(ctx context.Context) error {
 				return ErrStudioAssetUnavailable
 			}
 			// Retry is GET-only. A single expired source must not block others.
-			_ = s.recoverVideo(ctx, in.Owner, in.Resource)
-		}
-	}
-	if r, ok := s.repo.(StudioVideoIntakeRepository); ok {
-		if err := r.ProcessStudioVideoIntakes(ctx, 100); err != nil {
-			return ErrStudioAssetUnavailable
+			lookupCtx, cancel := context.WithTimeout(ctx, 2*time.Second)
+			_ = s.recoverVideo(lookupCtx, in.Owner, in.Resource)
+			cancel()
 		}
 	}
 	return nil
@@ -161,7 +164,8 @@ func (s *StudioAssetService) reconcileOwnedHistory(ctx context.Context, owner St
 				if a.Owner != owner || a.DeletedAt != nil {
 					result.Unrecoverable++
 					continue
-				} else if a.Kind != "video" || a.State != "unavailable" {
+				} else if a.Kind != "video" || a.State != "unavailable" &&
+					(!strings.HasPrefix(resource, "task:") || strings.HasPrefix(resource, "task:atlascloud:")) {
 					result.AlreadySaved++
 					continue
 				}
@@ -253,6 +257,11 @@ func (s *OpenAIGatewayService) CompleteStudioNativeVideo(ctx context.Context, ow
 	if in.AccountID <= 0 || in.AccountID != accountID {
 		return ErrVideoAttemptConflict
 	}
+	video := &VideoResult{UserID: owner.UserID, APIKeyID: owner.APIKeyID,
+		Resource: resource, TaskID: strings.TrimPrefix(resource, "task:"), AccountID: accountID, SourceURL: source}
+	if err := requireStudioNativeVideoReceipt(ctx, s.usageBillingRepo, video); err != nil {
+		return err
+	}
 	protected := source == "" && s.videoResults != nil && s.videoResults.nativeContent != nil &&
 		studioNativeContentTask(&VideoResult{Resource: resource, TaskID: strings.TrimPrefix(resource, "task:")})
 	if accountID <= 0 || s.videoResults == nil || !protected && (!validVideoResultURL(source) || videoSignedURLExpired(source, time.Now())) {
@@ -262,6 +271,5 @@ func (s *OpenAIGatewayService) CompleteStudioNativeVideo(ctx context.Context, ow
 	if err := r.SaveStudioVideoIntake(ctx, in); err != nil {
 		return ErrStudioAssetUnavailable
 	}
-	return s.QueueVideoResult(ctx, &VideoResult{UserID: owner.UserID, APIKeyID: owner.APIKeyID,
-		Resource: resource, TaskID: strings.TrimPrefix(resource, "task:"), AccountID: accountID, SourceURL: source})
+	return s.QueueVideoResult(ctx, video)
 }

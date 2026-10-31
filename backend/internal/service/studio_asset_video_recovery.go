@@ -13,6 +13,39 @@ import (
 
 var errStudioNativeContent = errors.New("owned native video uses authenticated content")
 
+type StudioNativeVideoReceiptRepository interface {
+	FindStudioNativeVideoReceipt(context.Context, VideoAttemptOwner, string) (*VideoResult, error)
+}
+
+func studioNativeVideoResource(v *VideoResult) bool {
+	return v != nil && v.Resource == "task:"+v.TaskID && ValidVideoAttemptID(v.TaskID) &&
+		!strings.HasPrefix(v.TaskID, "atlascloud:")
+}
+
+// A successful supplier GET is not customer billing proof. This read-only gate
+// also protects rows queued by earlier versions before the receipt was committed.
+func requireStudioNativeVideoReceipt(ctx context.Context, repo any, v *VideoResult) error {
+	if v == nil || !strings.HasPrefix(v.Resource, "task:") || strings.HasPrefix(v.Resource, "task:atlascloud:") {
+		return nil
+	}
+	if !studioNativeVideoResource(v) {
+		return ErrVideoResultNotFound
+	}
+	r, ok := repo.(StudioNativeVideoReceiptRepository)
+	if !ok {
+		return ErrVideoResultUnavailable
+	}
+	proof, err := r.FindStudioNativeVideoReceipt(ctx, VideoAttemptOwner{UserID: v.UserID, APIKeyID: v.APIKeyID}, v.TaskID)
+	if err != nil {
+		return err
+	}
+	if proof == nil || proof.UserID != v.UserID || proof.APIKeyID != v.APIKeyID ||
+		proof.Resource != v.Resource || proof.TaskID != v.TaskID || proof.AccountID <= 0 || proof.AccountID != v.AccountID {
+		return ErrVideoResultNotFound
+	}
+	return nil
+}
+
 func studioNativeContentTask(v *VideoResult) bool {
 	return v != nil && v.Resource == "task:"+v.TaskID && ValidVideoAttemptID(v.TaskID) &&
 		!strings.HasPrefix(v.TaskID, "atlascloud:") && !strings.HasPrefix(v.TaskID, "seedance:")
@@ -56,6 +89,11 @@ func (s *OpenAIGatewayService) recoverStudioVideoResource(ctx context.Context, o
 	}
 	if v != nil && (v.UserID != owner.UserID || v.APIKeyID != owner.APIKeyID || v.Resource != resource) {
 		return ErrVideoResultNotFound
+	}
+	if v != nil {
+		if err := requireStudioNativeVideoReceipt(ctx, s.videoResults.repo, v); err != nil {
+			return err
+		}
 	}
 	if StudioVideoSourceUsable(v) {
 		return nil // Prefer the one existing object/outbox; never duplicate upload.
@@ -105,6 +143,9 @@ func (s *OpenAIGatewayService) recoverStudioVideoResource(ctx context.Context, o
 		v = &VideoResult{Resource: resource, TaskID: task, UserID: owner.UserID, APIKeyID: owner.APIKeyID, AccountID: in.AccountID}
 	} else if v.AccountID != in.AccountID {
 		return ErrVideoAttemptConflict
+	}
+	if err := requireStudioNativeVideoReceipt(ctx, s.videoResults.repo, v); err != nil {
+		return err
 	}
 	source, err := s.refreshStoredVideoSource(ctx, v)
 	if err != nil && !errors.Is(err, errStudioNativeContent) {

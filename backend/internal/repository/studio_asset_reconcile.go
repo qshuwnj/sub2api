@@ -11,6 +11,53 @@ import (
 	"github.com/google/uuid"
 )
 
+// Only durable owned completed/captured attempts or committed task receipts are
+// discovery candidates. Pending intakes and video URLs alone prove neither.
+const studioOwnedHistoryCandidates = `
+	SELECT user_id,api_key_id,'attempt:'||id AS resource FROM video_attempts
+	WHERE state='completed' AND financial_state='captured' AND receipt_usage_log_id IS NOT NULL
+	UNION SELECT u.user_id,u.api_key_id,'task:'||SUBSTRING(u.request_id FROM 12) AS resource
+	FROM usage_logs u WHERE u.request_id ~ '^grok-video:[A-Za-z0-9_.:-]{1,128}$'
+	AND ((u.request_id LIKE 'grok-video:seedance:%' AND u.output_tokens>0)
+		OR (u.request_id NOT LIKE 'grok-video:seedance:%' AND u.video_count>0))
+	AND (EXISTS(SELECT 1 FROM usage_billing_dedup d WHERE d.request_id=u.request_id AND d.api_key_id=u.api_key_id)
+		OR EXISTS(SELECT 1 FROM usage_billing_dedup_archive d WHERE d.request_id=u.request_id AND d.api_key_id=u.api_key_id))`
+
+// Native completion billing uses the same stable task key as the existing
+// handlers. Seedance is token-billed, while Grok uses a positive video count.
+func (r *usageBillingRepository) FindStudioNativeVideoReceipt(ctx context.Context, owner service.VideoAttemptOwner, task string) (*service.VideoResult, error) {
+	if owner.UserID <= 0 || owner.APIKeyID <= 0 || !service.ValidVideoAttemptID(task) ||
+		strings.HasPrefix(task, "atlascloud:") || strings.HasPrefix(task, "grok-video:") {
+		return nil, service.ErrVideoResultNotFound
+	}
+	rows, err := r.db.QueryContext(ctx, `SELECT DISTINCT u.account_id FROM usage_logs u
+		WHERE u.user_id=$1 AND u.api_key_id=$2 AND u.request_id=$3
+		AND (($4 AND u.output_tokens>0) OR (NOT $4 AND u.video_count>0))
+		AND (EXISTS(SELECT 1 FROM usage_billing_dedup d WHERE d.request_id=u.request_id AND d.api_key_id=u.api_key_id)
+			OR EXISTS(SELECT 1 FROM usage_billing_dedup_archive d WHERE d.request_id=u.request_id AND d.api_key_id=u.api_key_id))
+		LIMIT 2`, owner.UserID, owner.APIKeyID, service.StableGrokVideoBillingRequestID(task), strings.HasPrefix(task, "seedance:"))
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	var accounts []int64
+	for rows.Next() {
+		var account int64
+		if err := rows.Scan(&account); err != nil {
+			return nil, err
+		}
+		accounts = append(accounts, account)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	if len(accounts) != 1 || accounts[0] <= 0 {
+		return nil, service.ErrVideoResultNotFound
+	}
+	return &service.VideoResult{Resource: "task:" + task, TaskID: task,
+		UserID: owner.UserID, APIKeyID: owner.APIKeyID, AccountID: accounts[0]}, nil
+}
+
 func (r *usageBillingRepository) SaveStudioVideoIntake(ctx context.Context, in *service.StudioVideoIntake) error {
 	if in == nil || !validStudioAssetOwner(in.Owner) || !service.ValidStudioVideoResource(in.Resource) {
 		return service.ErrStudioAssetInvalidRequest
@@ -58,16 +105,20 @@ func (r *usageBillingRepository) ListStudioAssetHistory(ctx context.Context, own
 	if limit < 1 || limit > 100 {
 		limit = 100
 	}
-	rows, err := r.db.QueryContext(ctx, `SELECT resource FROM (
-		SELECT resource FROM studio_video_intakes WHERE user_id=$1 AND api_key_id=$2
-		UNION SELECT 'attempt:'||id FROM video_attempts WHERE user_id=$1 AND api_key_id=$2
-			AND state='completed' AND financial_state='captured' AND receipt_usage_log_id IS NOT NULL
-		UNION SELECT resource FROM video_results WHERE user_id=$1 AND api_key_id=$2
-		UNION SELECT 'task:'||SUBSTRING(request_id FROM 12) FROM usage_logs
-			WHERE user_id=$1 AND api_key_id=$2 AND video_count>0 AND request_id LIKE 'grok-video:atlascloud:%'
-		) candidates WHERE NOT EXISTS (SELECT 1 FROM studio_assets a
-			WHERE a.user_id=$1 AND a.api_key_id=$2 AND a.generation_id=candidates.resource)
-		ORDER BY resource LIMIT $3`, owner.UserID, owner.APIKeyID, limit)
+	rows, err := r.db.QueryContext(ctx, `WITH candidates AS (`+studioOwnedHistoryCandidates+`),
+		due AS (SELECT c.user_id,c.api_key_id,c.resource FROM candidates c
+			LEFT JOIN studio_asset_recovery_checks h ON h.user_id=c.user_id AND h.api_key_id=c.api_key_id
+				AND h.resource=c.resource AND h.purpose='history'
+			WHERE c.user_id=$1 AND c.api_key_id=$2 AND (h.next_retry_at IS NULL OR h.next_retry_at<=NOW())
+			AND NOT EXISTS(SELECT 1 FROM studio_assets a
+				WHERE a.user_id=c.user_id AND a.api_key_id=c.api_key_id AND a.generation_id=c.resource)
+			ORDER BY h.last_checked_at NULLS FIRST,c.resource LIMIT $3),
+		checked AS (INSERT INTO studio_asset_recovery_checks(user_id,api_key_id,resource,purpose,last_checked_at,next_retry_at)
+			SELECT user_id,api_key_id,resource,'history',NOW(),NOW()+INTERVAL '5 minutes' FROM due
+			ON CONFLICT(user_id,api_key_id,resource,purpose) DO UPDATE
+			SET last_checked_at=NOW(),next_retry_at=NOW()+INTERVAL '5 minutes'
+			WHERE studio_asset_recovery_checks.next_retry_at<=NOW() RETURNING resource)
+		SELECT resource FROM checked`, owner.UserID, owner.APIKeyID, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -165,6 +216,25 @@ func (r *usageBillingRepository) ReconcileStudioAssets(ctx context.Context, owne
 }
 
 func (r *usageBillingRepository) reconcileStudioVideo(ctx context.Context, owner service.StudioAssetOwner, resource string) (string, error) {
+	if task, native := strings.CutPrefix(resource, "task:"); native && !strings.HasPrefix(task, "atlascloud:") {
+		proof, err := r.FindStudioNativeVideoReceipt(ctx, service.VideoAttemptOwner{UserID: owner.UserID, APIKeyID: owner.APIKeyID}, task)
+		if errors.Is(err, service.ErrVideoResultNotFound) {
+			return "", nil
+		}
+		if err != nil {
+			return "", err
+		}
+		v, err := r.GetVideoResult(ctx, service.VideoAttemptOwner{UserID: owner.UserID, APIKeyID: owner.APIKeyID}, resource)
+		if errors.Is(err, service.ErrVideoResultNotFound) {
+			return "", nil
+		}
+		if err != nil {
+			return "", err
+		}
+		if v.AccountID != proof.AccountID {
+			return "", nil
+		}
+	}
 	var deleted bool
 	var state string
 	err := r.db.QueryRowContext(ctx, `SELECT deleted_at IS NOT NULL,state FROM studio_assets
@@ -276,37 +346,12 @@ func (r *usageBillingRepository) reconcileStudioVideo(ctx context.Context, owner
 }
 
 func (r *usageBillingRepository) ProcessStudioVideoIntakes(ctx context.Context, limit int) error {
-	if limit < 1 || limit > 100 {
-		limit = 100
-	}
-	rows, err := r.db.QueryContext(ctx, `SELECT i.user_id,i.api_key_id,i.resource
-		FROM studio_video_intakes i WHERE NOT EXISTS(SELECT 1 FROM studio_assets a
-			WHERE a.user_id=i.user_id AND a.api_key_id=i.api_key_id AND a.generation_id=i.resource)
-		AND EXISTS(SELECT 1 FROM video_results v WHERE v.user_id=i.user_id AND v.api_key_id=i.api_key_id AND v.resource=i.resource)
-		ORDER BY i.created_at,i.resource LIMIT $1`, limit)
-	if err != nil {
-		return err
-	}
-	type candidate struct {
-		owner    service.StudioAssetOwner
-		resource string
-	}
-	var candidates []candidate
-	for rows.Next() {
-		var c candidate
-		if err := rows.Scan(&c.owner.UserID, &c.owner.APIKeyID, &c.resource); err != nil {
-			rows.Close()
-			return err
-		}
-		candidates = append(candidates, c)
-	}
-	err = rows.Err()
-	rows.Close()
+	candidates, err := r.listStudioIntakeCandidates(ctx, limit, "index")
 	if err != nil {
 		return err
 	}
 	for _, c := range candidates {
-		if _, err := r.reconcileStudioVideo(ctx, c.owner, c.resource); err != nil {
+		if _, err := r.reconcileStudioVideo(ctx, c.Owner, c.Resource); err != nil {
 			return err
 		}
 	}
@@ -314,14 +359,32 @@ func (r *usageBillingRepository) ProcessStudioVideoIntakes(ctx context.Context, 
 }
 
 func (r *usageBillingRepository) ListStudioVideoIntakes(ctx context.Context, limit int) ([]*service.StudioVideoIntake, error) {
+	return r.listStudioIntakeCandidates(ctx, limit, "lookup")
+}
+
+func (r *usageBillingRepository) listStudioIntakeCandidates(ctx context.Context, limit int, purpose string) ([]*service.StudioVideoIntake, error) {
 	if limit < 1 || limit > 100 {
 		limit = 100
 	}
-	rows, err := r.db.QueryContext(ctx, `SELECT i.user_id,i.api_key_id,i.resource,i.model,i.prompt,i.metadata,i.completed,i.account_id
-		FROM studio_video_intakes i WHERE NOT EXISTS(SELECT 1 FROM studio_assets a
-			WHERE a.user_id=i.user_id AND a.api_key_id=i.api_key_id AND a.generation_id=i.resource)
-		AND NOT EXISTS(SELECT 1 FROM video_results v WHERE v.user_id=i.user_id AND v.api_key_id=i.api_key_id AND v.resource=i.resource)
-		ORDER BY i.created_at,i.resource LIMIT $1`, limit)
+	rows, err := r.db.QueryContext(ctx, `WITH candidates AS (`+studioOwnedHistoryCandidates+`),
+		due AS (SELECT i.user_id,i.api_key_id,i.resource FROM studio_video_intakes i
+			JOIN candidates c ON c.user_id=i.user_id AND c.api_key_id=i.api_key_id AND c.resource=i.resource
+			LEFT JOIN studio_asset_recovery_checks h ON h.user_id=i.user_id AND h.api_key_id=i.api_key_id
+				AND h.resource=i.resource AND h.purpose=$2
+			WHERE (h.next_retry_at IS NULL OR h.next_retry_at<=NOW())
+			AND NOT EXISTS(SELECT 1 FROM studio_assets a WHERE a.user_id=i.user_id
+				AND a.api_key_id=i.api_key_id AND a.generation_id=i.resource)
+			AND EXISTS(SELECT 1 FROM video_results v WHERE v.user_id=i.user_id
+				AND v.api_key_id=i.api_key_id AND v.resource=i.resource)=($2='index')
+			ORDER BY h.last_checked_at NULLS FIRST,i.created_at,i.resource LIMIT $1),
+		checked AS (INSERT INTO studio_asset_recovery_checks(user_id,api_key_id,resource,purpose,last_checked_at,next_retry_at)
+			SELECT user_id,api_key_id,resource,$2,NOW(),NOW()+INTERVAL '5 minutes' FROM due
+			ON CONFLICT(user_id,api_key_id,resource,purpose) DO UPDATE
+			SET last_checked_at=NOW(),next_retry_at=NOW()+INTERVAL '5 minutes'
+			WHERE studio_asset_recovery_checks.next_retry_at<=NOW() RETURNING user_id,api_key_id,resource)
+		SELECT i.user_id,i.api_key_id,i.resource,i.model,i.prompt,i.metadata,i.completed,i.account_id
+		FROM studio_video_intakes i JOIN checked c
+			ON c.user_id=i.user_id AND c.api_key_id=i.api_key_id AND c.resource=i.resource`, limit, purpose)
 	if err != nil {
 		return nil, err
 	}

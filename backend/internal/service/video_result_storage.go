@@ -97,6 +97,9 @@ func (s *VideoResultService) Queue(ctx context.Context, v *VideoResult) error {
 		strings.HasPrefix(v.Resource, "task:") && v.Resource != "task:"+v.TaskID {
 		return ErrVideoResultUnavailable
 	}
+	if err := requireStudioNativeVideoReceipt(ctx, s.repo, v); err != nil {
+		return err
+	}
 	return s.repo.QueueVideoResult(ctx, v)
 }
 
@@ -123,6 +126,9 @@ func (s *VideoResultService) Playback(ctx context.Context, owner VideoAttemptOwn
 	if err != nil {
 		return nil, err
 	}
+	if err := requireStudioNativeVideoReceipt(ctx, s.repo, v); err != nil {
+		return nil, err
+	}
 	if v.StorageKey == "" {
 		return nil, ErrVideoResultUnavailable
 	}
@@ -143,6 +149,9 @@ func (s *VideoResultService) Open(ctx context.Context, owner VideoAttemptOwner, 
 	}
 	v, err := s.repo.GetVideoResult(ctx, owner, resource)
 	if err != nil {
+		return nil, err
+	}
+	if err := requireStudioNativeVideoReceipt(ctx, s.repo, v); err != nil {
 		return nil, err
 	}
 	if v.StorageKey == "" {
@@ -209,6 +218,9 @@ func (s *VideoResultService) ArchivePending(ctx context.Context, refresh VideoRe
 }
 
 func (s *VideoResultService) archive(ctx context.Context, u *ImageResultUploader, store VideoObjectStore, v *VideoResult, refresh VideoResultRefresher) error {
+	if err := requireStudioNativeVideoReceipt(ctx, s.repo, v); err != nil {
+		return err
+	}
 	body, length, err := s.openArchiveSource(ctx, u, v, refresh)
 	if err != nil {
 		return err

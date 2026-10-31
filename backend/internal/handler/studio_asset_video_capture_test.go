@@ -25,6 +25,15 @@ type studioVideoHandlerRepository struct {
 	failSave  bool
 	failQueue bool
 	deadline  time.Duration
+	receipt   bool
+}
+
+func (r *studioVideoHandlerRepository) FindStudioNativeVideoReceipt(_ context.Context, owner service.VideoAttemptOwner, task string) (*service.VideoResult, error) {
+	if !r.receipt || r.intake == nil || r.intake.Owner != (service.StudioAssetOwner{UserID: owner.UserID, APIKeyID: owner.APIKeyID}) ||
+		r.intake.Resource != "task:"+task {
+		return nil, service.ErrVideoResultNotFound
+	}
+	return &service.VideoResult{UserID: owner.UserID, APIKeyID: owner.APIKeyID, Resource: "task:" + task, TaskID: task, AccountID: r.intake.AccountID}, nil
 }
 
 func (r *studioVideoHandlerRepository) SaveStudioVideoIntake(ctx context.Context, in *service.StudioVideoIntake) error {
@@ -69,7 +78,7 @@ func TestStudioAssetVideoNativeCompletionPreservesProofAcrossQueueFailure(t *tes
 	for _, mismatch := range []bool{false, true} {
 		repo := &studioVideoHandlerRepository{intake: &service.StudioVideoIntake{
 			Owner: service.StudioAssetOwner{UserID: 10, APIKeyID: 20}, Resource: "task:task",
-			AccountID: 1, Model: "original-model", Prompt: "original prompt"}, failQueue: true}
+			AccountID: 1, Model: "original-model", Prompt: "original prompt"}, failQueue: true, receipt: true}
 		h, _, _, _ := newGrokMediaSlotHandlerWithBilling(t, false, false, repo)
 		h.gatewayService.SetStudioAssetStorage(nil)
 		h.gatewayService.SetVideoResultStorage(nil)
@@ -87,7 +96,7 @@ func TestStudioAssetVideoNativeCompletionPreservesProofAcrossQueueFailure(t *tes
 func TestStudioAssetVideoNativeProtectedResultQueuesNoCredentials(t *testing.T) {
 	repo := &studioVideoHandlerRepository{intake: &service.StudioVideoIntake{
 		Owner: service.StudioAssetOwner{UserID: 10, APIKeyID: 20}, Resource: "task:task",
-		AccountID: 1, Model: "original-model", Prompt: "original prompt"}}
+		AccountID: 1, Model: "original-model", Prompt: "original prompt"}, receipt: true}
 	h, _, _, upstream := newGrokMediaSlotHandlerWithBilling(t, false, false, repo)
 	h.gatewayService.SetStudioAssetStorage(nil)
 	h.gatewayService.SetVideoResultStorage(nil)
@@ -165,12 +174,18 @@ func TestStudioAssetVideoNativeSubmissionUsesActualTaskIdentity(t *testing.T) {
 	c, w = grokMediaSlotContext(context.Background(), false)
 	h.GrokVideoStatus(c)
 	require.Equal(t, 200, w.Code, w.Body.String())
+	require.False(t, repo.intake.Completed, "supplier success without committed customer usage must not become library proof")
+	require.Nil(t, repo.video)
+	repo.receipt = true
+	c, w = grokMediaSlotContext(context.Background(), false)
+	h.GrokVideoStatus(c)
+	require.Equal(t, 200, w.Code, w.Body.String())
 	require.NotNil(t, repo.video)
 	require.Equal(t, "task:task", repo.video.Resource)
 	require.Equal(t, int64(10), repo.video.UserID)
 	require.Equal(t, int64(20), repo.video.APIKeyID)
 	require.Equal(t, "https://vidgen.x.ai/video.mp4", repo.video.SourceURL)
-	require.Equal(t, 2, upstream.calls)
+	require.Equal(t, 3, upstream.calls)
 	require.Zero(t, repo.reserves)
 	require.Zero(t, repo.captures)
 	slots.assertReleased(t)

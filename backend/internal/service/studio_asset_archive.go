@@ -206,15 +206,24 @@ func (s *StudioAssetService) Open(ctx context.Context, owner StudioAssetOwner, i
 	return content, nil
 }
 
-func (s *StudioAssetService) ProcessPending(ctx context.Context) error {
+func (s *StudioAssetService) ProcessPending(ctx context.Context) (result error) {
 	if s == nil || s.repo == nil {
 		return ErrStudioAssetUnavailable
 	}
 	ctx, cancel := context.WithTimeout(ctx, 120*time.Second)
 	defer cancel()
-	if err := s.processVideoIntakes(ctx); err != nil {
-		return err
-	}
+	// Existing images/video references get archive progress before any supplier
+	// GET. Intake work has its own bounded budget and cannot consume this lease.
+	defer func() {
+		if ctx.Err() != nil {
+			return
+		}
+		recoveryCtx, recoveryCancel := context.WithTimeout(ctx, 5*time.Second)
+		defer recoveryCancel()
+		if err := s.processVideoIntakes(recoveryCtx); err != nil && result == nil {
+			result = err
+		}
+	}()
 	items, err := s.repo.ClaimStudioAssets(ctx, 1)
 	if err != nil {
 		return ErrStudioAssetUnavailable
@@ -283,6 +292,9 @@ func (s *StudioAssetService) videoReference(ctx context.Context, a *StudioAsset)
 	}
 	if v == nil || v.UserID != a.Owner.UserID || v.APIKeyID != a.Owner.APIKeyID || v.Resource != a.VideoResource {
 		return nil, "video_not_found", true
+	}
+	if err := requireStudioNativeVideoReceipt(ctx, s.repo, v); err != nil {
+		return nil, "video_receipt_unavailable", false
 	}
 	if v.StorageKey == "" {
 		return nil, "video_pending", false
