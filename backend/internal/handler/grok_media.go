@@ -69,6 +69,9 @@ func (h *OpenAIGatewayHandler) AtlasCloudVideoStatus(c *gin.Context) {
 	if h.QuotedVideoStatus(c) {
 		return
 	}
+	if h.recoveredLegacyVideoStatus(c) {
+		return
+	}
 	h.handleGrokMedia(c, service.AtlasCloudEndpointVideoStatus, id)
 }
 
@@ -621,6 +624,16 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 						}
 						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video settlement confirmation is unavailable; retry status later")
 						return
+					}
+				}
+			}
+			if result.VideoCount > 0 {
+				if video, ok := result.AtlasCloudVideoResponse["video"].(gin.H); ok {
+					if link, ok := video["url"].(string); ok {
+						_ = h.gatewayService.QueueVideoResult(requestCtx, &service.VideoResult{
+							Resource: "task:" + taskID, TaskID: taskID, UserID: subject.UserID,
+							APIKeyID: apiKey.ID, AccountID: account.ID, SourceURL: link,
+						})
 					}
 				}
 			}

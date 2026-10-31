@@ -390,6 +390,9 @@ func isVideoAttemptRead(method, path string) bool {
 	}
 	path = strings.TrimPrefix(path, "/v1")
 	parts := strings.Split(strings.TrimPrefix(path, "/"), "/")
+	if len(parts) > 2 && parts[len(parts)-1] == "content" {
+		parts = parts[:len(parts)-1]
+	}
 	if len(parts) == 3 && parts[0] == "videos" && parts[1] == "attempts" {
 		return service.ValidVideoAttemptID(parts[2])
 	}

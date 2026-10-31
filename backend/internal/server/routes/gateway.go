@@ -150,6 +150,10 @@ func RegisterGatewayRoutes(
 		})
 	}
 	videoContentHandler := func(c *gin.Context) {
+		if strings.HasPrefix(c.Param("request_id"), "atlascloud:") {
+			h.OpenAIGateway.AtlasCloudVideoContent(c)
+			return
+		}
 		// Video content requests do not carry a model, so composite groups cannot
 		// be resolved by compositeTargetPlatformMiddleware. Route them through
 		// the Grok handler just like video status lookups.
@@ -292,6 +296,7 @@ func RegisterGatewayRoutes(
 		gateway.POST("/images/quote", h.OpenAIGateway.ImageQuote)
 		gateway.POST("/videos/quote", h.OpenAIGateway.VideoQuote)
 		gateway.GET("/videos/attempts/:attempt_id", h.OpenAIGateway.VideoAttempt)
+		gateway.GET("/videos/attempts/:attempt_id/content", h.OpenAIGateway.VideoAttemptContent)
 		gateway.POST("/images/edits", imagesHandler)
 		gateway.POST("/images/generations/async", h.AsyncImage.Submit)
 		gateway.POST("/images/edits/async", h.AsyncImage.Submit)
@@ -463,6 +468,7 @@ func RegisterGatewayRoutes(
 	rootRoute(http.MethodPost, "/images/quote", bodyLimit, h.OpenAIGateway.ImageQuote)
 	rootRoute(http.MethodPost, "/videos/quote", bodyLimit, h.OpenAIGateway.VideoQuote)
 	rootRoute(http.MethodGet, "/videos/attempts/:attempt_id", bodyLimit, h.OpenAIGateway.VideoAttempt)
+	rootRoute(http.MethodGet, "/videos/attempts/:attempt_id/content", bodyLimit, h.OpenAIGateway.VideoAttemptContent)
 	rootRoute(http.MethodPost, "/images/edits", bodyLimit, imagesHandler)
 	rootRoute(http.MethodPost, "/images/generations/async", bodyLimit, h.AsyncImage.Submit)
 	rootRoute(http.MethodPost, "/images/edits/async", bodyLimit, h.AsyncImage.Submit)

@@ -210,6 +210,38 @@ func quotedDispatchFixture(t *testing.T) (*OpenAIGatewayService, *APIKey, *quote
 	return s, k, r, snapshot, native, a
 }
 
+func TestCompletedVideoRefreshesExpiredOutputWithoutGeneratingOrCharging(t *testing.T) {
+	s, _, r, q, _, account := quotedDispatchFixture(t)
+	s.accountRepo = &quotedBoundAccounts{s.accountRepo.(*videoQuoteAccounts)}
+	owner := VideoAttemptOwner{UserID: q.UserID(), APIKeyID: q.APIKeyID()}
+	r.attempts["old-attempt"] = &VideoAttempt{
+		ID: "old-attempt", UserID: owner.UserID, APIKeyID: owner.APIKeyID,
+		AccountID: account.ID, State: VideoAttemptCompleted, FinancialState: VideoFinancialCaptured,
+		UpstreamTaskID: "atlascloud:old-video",
+		ResultURLs:     []string{"https://cdn.example/video.mp4?X-Tos-Date=20000101T000000Z&X-Tos-Expires=86400"},
+		Receipt:        &VideoChargeReceipt{RequestID: "original-receipt", Amount: "1.00000000", Currency: "USD", UsageLogID: 19},
+	}
+	gets := 0
+	s.httpUpstream = &quotedVideoHTTP{call: func(req *http.Request, id int64) (*http.Response, error) {
+		require.Equal(t, http.MethodGet, req.Method, "history refresh must never generate again")
+		require.Equal(t, account.ID, id)
+		require.Equal(t, "/api/v1/model/prediction/old-video", req.URL.Path)
+		gets++
+		return videoHTTPResponse(200, `{"data":{"id":"old-video","status":"completed","outputs":["https://cdn.example/refreshed.mp4"]}}`), nil
+	}}
+	got, err := s.PollQuotedVideo(context.Background(), owner, "old-attempt")
+	require.NoError(t, err)
+	require.Equal(t, 1, gets, "expired completed results need a fresh supplier lookup")
+	require.Equal(t, []string{"https://cdn.example/refreshed.mp4"}, got.ResultURLs)
+	require.Equal(t, "original-receipt", got.Receipt.RequestID)
+	require.Zero(t, r.reserves)
+	require.Zero(t, r.captures)
+	require.Zero(t, r.releases)
+	_, err = s.PollQuotedVideo(context.Background(), VideoAttemptOwner{UserID: owner.UserID + 1, APIKeyID: owner.APIKeyID}, "old-attempt")
+	require.ErrorIs(t, err, ErrVideoAttemptNotFound)
+	require.Equal(t, 1, gets, "another owner must not refresh or discover this video")
+}
+
 func TestQuotedVideoDispatchOnePostLockedBeforeEffectAndDisconnect(t *testing.T) {
 	s, _, r, q, native, a := quotedDispatchFixture(t)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -495,6 +527,53 @@ func TestQuotedVideoWorkerStopCancelsInflightKnownPoll(t *testing.T) {
 	}
 	require.Empty(t, r.leases, "shutdown releases its exact lease using detached cleanup")
 	require.Equal(t, VideoFinancialReserved, r.attempts["attempt"].FinancialState)
+	require.Zero(t, r.captures+r.releases)
+}
+
+type videoArchiveSignalRepository struct {
+	*videoResultMemory
+	claimed chan struct{}
+}
+
+func (r *videoArchiveSignalRepository) ClaimVideoResults(ctx context.Context, limit int) ([]*VideoResult, error) {
+	select {
+	case r.claimed <- struct{}{}:
+	default:
+	}
+	return nil, nil
+}
+
+func TestVideoArchiveWorkerRunsWhileFinancialPollIsBlocked(t *testing.T) {
+	s, _, r, q, native, account := quotedDispatchFixture(t)
+	s.httpUpstream = &quotedVideoHTTP{call: func(*http.Request, int64) (*http.Response, error) {
+		return videoHTTPResponse(200, `{"data":{"id":"job","status":"processing"}}`), nil
+	}}
+	_, err := s.DispatchQuotedVideo(context.Background(), q, "attempt", native, account)
+	require.NoError(t, err)
+	s.accountRepo = &quotedBoundAccounts{s.accountRepo.(*videoQuoteAccounts)}
+	entered := make(chan struct{})
+	s.httpUpstream = &quotedVideoHTTP{call: func(req *http.Request, _ int64) (*http.Response, error) {
+		close(entered)
+		<-req.Context().Done()
+		return nil, req.Context().Err()
+	}}
+	retention, memory, _, _ := videoResultFixture()
+	signals := &videoArchiveSignalRepository{videoResultMemory: memory, claimed: make(chan struct{}, 1)}
+	retention.repo = signals
+	s.videoResults = retention
+	worker := NewVideoReconcileService(s, time.Millisecond)
+	worker.Start()
+	defer worker.Stop()
+	select {
+	case <-entered:
+	case <-time.After(5 * time.Second):
+		t.Fatal("financial poll never started")
+	}
+	select {
+	case <-signals.claimed:
+	case <-time.After(time.Second):
+		t.Fatal("slow supplier polling starved the independent archive worker")
+	}
 	require.Zero(t, r.captures+r.releases)
 }
 

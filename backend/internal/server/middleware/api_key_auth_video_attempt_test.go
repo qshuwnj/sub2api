@@ -20,7 +20,7 @@ import (
 
 func TestVideoAttemptRecoveryAuthenticationBoundary(t *testing.T) {
 	const native = `{"model":"google/veo3.1/text-to-video","prompt":"private"}`
-	for _, scenario := range []string{"owned spent", "owned expired", "new", "foreign", "model mismatch", "legacy model", "lookup failure", "disabled", "inactive user", "inactive group", "denied IP", "other route", "body limit", "get attempt", "get native", "get quote"} {
+	for _, scenario := range []string{"owned spent", "owned expired", "new", "foreign", "model mismatch", "legacy model", "lookup failure", "disabled", "inactive user", "inactive group", "denied IP", "other route", "body limit", "get attempt", "get native", "get attempt content", "get native content", "get quote"} {
 		t.Run(scenario, func(t *testing.T) {
 			gin.SetMode(gin.TestMode)
 			group := &service.Group{ID: 42, Status: service.StatusActive, Hydrated: true, Platform: service.PlatformOpenAI}
@@ -77,6 +77,10 @@ func TestVideoAttemptRecoveryAuthenticationBoundary(t *testing.T) {
 				path, method, body = "/v1/videos/attempts/attempt", http.MethodGet, ""
 			case "get native":
 				path, method, body = "/v1/videos/atlascloud:job", http.MethodGet, ""
+			case "get attempt content":
+				path, method, body = "/v1/videos/attempts/attempt/content", http.MethodGet, ""
+			case "get native content":
+				path, method, body = "/v1/videos/atlascloud:job/content", http.MethodGet, ""
 			case "get quote":
 				path, method, body = "/v1/videos/quote", http.MethodGet, ""
 			}
@@ -97,7 +101,7 @@ func TestVideoAttemptRecoveryAuthenticationBoundary(t *testing.T) {
 			w := httptest.NewRecorder()
 			router.ServeHTTP(w, req)
 			switch scenario {
-			case "owned spent", "owned expired", "get attempt", "get native":
+			case "owned spent", "owned expired", "get attempt", "get native", "get attempt content", "get native content":
 				require.Equal(t, 204, w.Code, w.Body.String())
 				require.True(t, reached)
 			case "lookup failure":

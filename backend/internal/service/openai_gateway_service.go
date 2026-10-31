@@ -478,6 +478,7 @@ type OpenAIGatewayService struct {
 	liveAttestation       liveattestation.Provider
 	liveAttestationCipher SecretEncryptor
 	videoAttemptOnce      sync.Once
+	videoResults          *VideoResultService
 	videoAttempts         *VideoAttemptService
 	videoAuthInvalidator  APIKeyAuthCacheInvalidator
 	videoRuntimeOnce      sync.Once

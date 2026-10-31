@@ -26,6 +26,8 @@ type videoAttemptResponse struct {
 	Video          *videoResult                `json:"video,omitempty"`
 	Receipt        *service.VideoChargeReceipt `json:"receipt,omitempty"`
 	RecoveryNeeded bool                        `json:"recovery_required"`
+	ContentPath    string                      `json:"content_path,omitempty"`
+	Archived       bool                        `json:"archived"`
 	Error          *videoAttemptResponseError  `json:"error,omitempty"`
 }
 type videoLockedPrice struct {
@@ -67,6 +69,18 @@ func (h *OpenAIGatewayHandler) respondVideoAttempt(c *gin.Context, a *service.Vi
 		if len(a.ResultURLs) > 0 {
 			dto.Video = &videoResult{URL: a.ResultURLs[0]}
 		}
+		if playback, loadErr := h.gatewayService.VideoPlayback(c.Request.Context(),
+			service.VideoAttemptOwner{UserID: a.UserID, APIKeyID: a.APIKeyID}, "attempt:"+a.ID); loadErr == nil {
+			dto.Video, dto.Outputs = &videoResult{URL: playback.URL}, []string{playback.URL}
+			dto.ContentPath, dto.Archived = playback.ContentPath, true
+			if c.Param("request_id") != "" {
+				dto.ContentPath = "/v1/videos/" + a.UpstreamTaskID + "/content"
+			}
+		}
+	}
+	if errors.Is(err, service.ErrVideoResultExpired) || errors.Is(err, service.ErrVideoResultUnavailable) {
+		h.videoPlaybackError(c, err)
+		return
 	}
 	if err != nil {
 		dto.Error = &videoAttemptResponseError{Type: "video_recovery_pending", Message: "Recover this existing attempt; do not submit another generation"}
@@ -247,7 +261,7 @@ func (h *OpenAIGatewayHandler) VideoAttempt(c *gin.Context) {
 		h.videoAttemptError(c, service.ErrVideoAttemptNotFound)
 		return
 	}
-	a, err := h.gatewayService.PollQuotedVideo(c.Request.Context(), service.VideoAttemptOwner{UserID: key.UserID, APIKeyID: key.ID}, id)
+	a, err := h.gatewayService.PollQuotedVideo(c.Request.Context(), service.VideoAttemptOwner{UserID: key.UserID, APIKeyID: key.ID}, id, c.Query("refresh") == "1")
 	h.respondVideoAttempt(c, a, err)
 }
 
@@ -294,7 +308,7 @@ func (h *OpenAIGatewayHandler) QuotedVideoStatus(c *gin.Context) bool {
 		h.videoAttemptError(c, err)
 		return true
 	}
-	a, err = h.gatewayService.PollQuotedVideo(c.Request.Context(), owner, a.ID)
+	a, err = h.gatewayService.PollQuotedVideo(c.Request.Context(), owner, a.ID, c.Query("refresh") == "1")
 	h.respondVideoAttempt(c, a, err)
 	return true
 }

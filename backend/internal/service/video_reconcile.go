@@ -193,6 +193,12 @@ func (s *OpenAIGatewayService) settleQuotedVideo(ctx context.Context, a *VideoAt
 	if err != nil {
 		return a, err
 	}
+	if settled.Attempt.FinancialState == VideoFinancialCaptured && len(settled.Attempt.ResultURLs) == 1 {
+		saved := settled.Attempt
+		_ = s.QueueVideoResult(ctx, &VideoResult{Resource: "attempt:" + saved.ID,
+			TaskID: saved.UpstreamTaskID, UserID: saved.UserID, APIKeyID: saved.APIKeyID,
+			AccountID: saved.AccountID, SourceURL: saved.ResultURLs[0]})
+	}
 	return settled.Attempt, nil
 }
 
@@ -223,9 +229,15 @@ func (s *OpenAIGatewayService) FindQuotedVideoTask(ctx context.Context, owner Vi
 
 // PollQuotedVideo never schedules or generates work. It loads credentials from
 // the persisted account even when new pricing/enrollment/quota has changed.
-func (s *OpenAIGatewayService) PollQuotedVideo(ctx context.Context, owner VideoAttemptOwner, id string) (*VideoAttempt, error) {
+func (s *OpenAIGatewayService) PollQuotedVideo(ctx context.Context, owner VideoAttemptOwner, id string, refresh ...bool) (*VideoAttempt, error) {
 	a, err := s.GetQuotedVideo(ctx, owner, id)
-	if err != nil || a.FinancialState != VideoFinancialReserved || a.UpstreamTaskID == "" {
+	if err != nil {
+		return a, err
+	}
+	if a.FinancialState == VideoFinancialCaptured {
+		return s.refreshCompletedVideo(ctx, a, len(refresh) > 0 && refresh[0])
+	}
+	if a.FinancialState != VideoFinancialReserved || a.UpstreamTaskID == "" {
 		return a, err
 	}
 	r, err := s.VideoAttempts().Repository()
@@ -318,6 +330,30 @@ func (w *VideoReconcileService) ReconcileOnce(ctx context.Context) error {
 	return first
 }
 
+func (w *VideoReconcileService) runLoop(ctx context.Context, run func(context.Context) error) {
+	delay := w.interval
+	for ctx.Err() == nil {
+		tickCtx, tickCancel := context.WithTimeout(ctx, 2*time.Minute)
+		err := run(tickCtx)
+		tickCancel()
+		if err != nil && delay < 2*time.Minute {
+			delay *= 2
+			if delay > 2*time.Minute {
+				delay = 2 * time.Minute
+			}
+		} else if err == nil {
+			delay = w.interval
+		}
+		timer := time.NewTimer(delay)
+		select {
+		case <-ctx.Done():
+			timer.Stop()
+			return
+		case <-timer.C:
+		}
+	}
+}
+
 func (w *VideoReconcileService) Start() {
 	w.mu.Lock()
 	defer w.mu.Unlock()
@@ -327,29 +363,26 @@ func (w *VideoReconcileService) Start() {
 	ctx, cancel := context.WithCancel(context.Background())
 	w.cancel, w.done = cancel, make(chan struct{})
 	done := w.done
+	var workers sync.WaitGroup
+	workers.Add(1)
 	go func() {
-		defer close(done)
-		delay := w.interval
-		for {
-			tickCtx, tickCancel := context.WithTimeout(ctx, 2*time.Minute)
-			err := w.ReconcileOnce(tickCtx)
-			tickCancel()
-			if err != nil && delay < 2*time.Minute {
-				delay *= 2
-				if delay > 2*time.Minute {
-					delay = 2 * time.Minute
-				}
-			} else if err == nil {
-				delay = w.interval
-			}
-			timer := time.NewTimer(delay)
-			select {
-			case <-ctx.Done():
-				timer.Stop()
-				return
-			case <-timer.C:
-			}
-		}
+		defer workers.Done()
+		w.runLoop(ctx, w.ReconcileOnce)
+	}()
+	// Archival has its own deadline and retry cadence; slow supplier status
+	// polls must never consume the budget needed to preserve completed files.
+	if w.gateway.videoResults != nil {
+		workers.Add(1)
+		go func() {
+			defer workers.Done()
+			w.runLoop(ctx, func(ctx context.Context) error {
+				return w.gateway.videoResults.ArchivePending(ctx, w.gateway.refreshStoredVideoSource)
+			})
+		}()
+	}
+	go func() {
+		workers.Wait()
+		close(done)
 	}()
 }
 
