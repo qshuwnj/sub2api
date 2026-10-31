@@ -153,17 +153,30 @@ func validStudioAssetRange(value string) bool {
 
 func (s *StudioAssetService) Open(ctx context.Context, owner StudioAssetOwner, id, byteRange string) (*VideoResultContent, error) {
 	if !validStudioAssetRange(byteRange) {
-		return nil, ErrStudioAssetInvalidRequest
+		return nil, ErrStudioAssetInvalidRange
 	}
 	if s == nil || s.repo == nil {
 		return nil, ErrStudioAssetUnavailable
 	}
-	a, err := s.repo.GetStudioAsset(ctx, owner, id)
+	a, err := s.Get(ctx, owner, id)
+	if errors.Is(err, ErrStudioAssetInvalidRequest) {
+		return nil, err
+	}
 	if errors.Is(err, ErrStudioAssetNotFound) {
 		return nil, ErrStudioAssetNotFound
 	}
 	if err != nil || a == nil || a.Owner != owner || a.DeletedAt != nil || a.State != "ready" || a.StorageKey == "" {
 		return nil, ErrStudioAssetUnavailable
+	}
+	if byteRange != "" && a.SizeBytes > 0 {
+		raw := strings.TrimPrefix(byteRange, "bytes=")
+		start, _, _ := strings.Cut(raw, "-")
+		if start != "" {
+			n, _ := strconv.ParseInt(start, 10, 64)
+			if n >= a.SizeBytes {
+				return nil, ErrStudioAssetInvalidRange
+			}
+		}
 	}
 	_, store, err := s.objects()
 	if err != nil {

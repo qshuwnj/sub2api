@@ -160,6 +160,8 @@ func ProvideOpenAIGatewayHandler(
 	apiKeyService.SetVideoAttemptRecoveryLookup(gatewayService.GetQuotedVideo)
 	gatewayService.SetVideoResultStorage(imageStorage.Resolver())
 	gatewayService.StartVideoReconciler(apiKeyService)
+	gatewayService.SetStudioAssetStorage(imageStorage.Resolver())
+	gatewayService.StartStudioAssetWorker()
 	return h
 }
 

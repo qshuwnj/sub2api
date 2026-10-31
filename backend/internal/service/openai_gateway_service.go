@@ -484,6 +484,10 @@ type OpenAIGatewayService struct {
 	videoRuntimeOnce      sync.Once
 	videoReconciler       *VideoReconcileService
 	videoCalculator       *videoPriceCalculator
+	studioAssets          *StudioAssetService
+	studioAssetRuntimeMu  sync.Mutex
+	studioAssetCancel     context.CancelFunc
+	studioAssetDone       chan struct{}
 
 	openaiWSPoolOnce               sync.Once
 	openaiWSStateStoreOnce         sync.Once

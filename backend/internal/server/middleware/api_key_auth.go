@@ -169,11 +169,18 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 		ctx := context.WithValue(c.Request.Context(), ctxkey.UserID, apiKey.User.ID)
 		c.Request = c.Request.WithContext(ctx)
 		billingInfoRequest := c.Request.URL.Path == "/v1/sub2api/billing"
+		studioAssetRequest := isStudioAssetMetadataRequest(c.Request.Method, c.Request.URL.Path)
+		// Library operations are non-billable, but never authorize an expired key.
+		// Check before SimpleMode and the legacy read-only billing exceptions.
+		if studioAssetRequest && (apiKey.Status == service.StatusAPIKeyExpired || apiKey.IsExpired()) {
+			AbortWithError(c, http.StatusForbidden, "API_KEY_EXPIRED", "API key has expired")
+			return
+		}
 		// Async image task polling only reads data that already belongs to the
 		// authenticated key and must remain available after the completed
 		// generation consumes the key's remaining balance.
 		skipBilling := c.Request.URL.Path == "/v1/usage" || billingInfoRequest || isAsyncImageTaskRead(c.Request.Method, c.Request.URL.Path) ||
-			isVideoAttemptRead(c.Request.Method, c.Request.URL.Path)
+			isVideoAttemptRead(c.Request.Method, c.Request.URL.Path) || studioAssetRequest
 		if !skipBilling && isNativeVideoCreatePath(c.Request.Method, c.Request.URL.Path) && service.ValidVideoAttemptID(c.GetHeader("Idempotency-Key")) {
 			body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
 			if err != nil {
@@ -313,6 +320,25 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 
 		c.Next()
 	}
+}
+
+// Exact library routes only: no supplier routing or generation can inherit this
+// exemption. Malformed asset IDs are still authenticated then rejected by 400.
+func isStudioAssetMetadataRequest(method, path string) bool {
+	const root = "/v1/studio/assets"
+	if path == root {
+		return method == http.MethodGet
+	}
+	if path == root+"/reconcile" && method == http.MethodPost {
+		return true
+	}
+	tail, ok := strings.CutPrefix(path, root+"/")
+	if !ok || tail == "" {
+		return false
+	}
+	parts := strings.Split(tail, "/")
+	return len(parts) == 1 && (method == http.MethodGet || method == http.MethodDelete) ||
+		len(parts) == 2 && parts[0] != "" && parts[1] == "content" && method == http.MethodGet
 }
 
 func apiKeyHeadersTooLarge(c *gin.Context) bool {

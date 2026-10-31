@@ -217,6 +217,18 @@ func RegisterGatewayRoutes(
 	referenceAssets.Use(gin.HandlerFunc(apiKeyAuth))
 	referenceAssets.POST("/video-reference-assets", h.Gateway.VideoReferenceAssets)
 	referenceAssets.DELETE("/video-reference-assets", h.Gateway.VideoReferenceAssets)
+	studioAssets := r.Group("/v1/studio/assets")
+	studioAssets.Use(func(c *gin.Context) {
+		c.Header("Cache-Control", "private, no-store")
+		c.Header("X-Content-Type-Options", "nosniff")
+		c.Next()
+	})
+	studioAssets.Use(bodyLimit, clientRequestID, opsErrorLogger, endpointNorm, gin.HandlerFunc(apiKeyAuth))
+	studioAssets.GET("", h.OpenAIGateway.StudioAssets)
+	studioAssets.GET("/:asset_id", h.OpenAIGateway.StudioAsset)
+	studioAssets.GET("/:asset_id/content", h.OpenAIGateway.StudioAssetContent)
+	studioAssets.POST("/reconcile", h.OpenAIGateway.StudioAssetsReconcile)
+	studioAssets.DELETE("/:asset_id", h.OpenAIGateway.StudioAssetDelete)
 
 	gateway := r.Group("/v1")
 	gateway.Use(bodyLimit)
