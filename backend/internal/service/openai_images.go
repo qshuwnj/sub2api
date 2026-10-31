@@ -1062,6 +1062,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 	bufferStudioSSE := direct == nil && StudioLibraryRequested(c)
 	var rawStudioEvent bytes.Buffer
 	studioSSEDetected := false
+	studioJSONDetected := false
 	writeRawStudioEvent := func(data []byte) {
 		if clientDisconnected || len(data) == 0 {
 			return
@@ -1199,9 +1200,16 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 				writeRawStudioEvent(line)
 				return
 			}
-			isSSEField := isDataLine || strings.HasPrefix(trimmedLine, ":") ||
+			if !studioJSONDetected {
+				if prefix := bytes.TrimSpace(line); len(prefix) > 0 {
+					studioJSONDetected = prefix[0] == '{' || prefix[0] == '['
+				}
+			}
+			// JSON chunks may start inside a string. Once identified, never
+			// reinterpret an SSE-looking continuation as an event field.
+			isSSEField := !studioJSONDetected && (isDataLine || strings.HasPrefix(trimmedLine, ":") ||
 				strings.HasPrefix(trimmedLine, "event:") || strings.HasPrefix(trimmedLine, "id:") ||
-				strings.HasPrefix(trimmedLine, "retry:")
+				strings.HasPrefix(trimmedLine, "retry:"))
 			if !isSSEField {
 				// Until an SSE field appears, blank lines belong to the JSON
 				// fallback too. Never flush or duplicate that document as an event.

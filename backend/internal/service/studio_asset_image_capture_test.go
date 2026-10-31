@@ -235,6 +235,53 @@ func TestStudioAssetImageRawStreamJSONFallbackDeliversExactlyOnce(t *testing.T) 
 	}
 }
 
+func TestStudioAssetImageRawStreamJSONFallbackChunkBoundariesNeverBecomeSSE(t *testing.T) {
+	const chunkSize = 4096
+	const paddingPrefix = `{"padding":"`
+	for _, boundary := range []string{":", "data:", "event:", "id:", "retry:"} {
+		body := paddingPrefix + strings.Repeat("x", chunkSize-len(paddingPrefix)) +
+			boundary + `still-json","data":[{"url":"https://images.example/final.png"}]}`
+		if boundary == ":" {
+			body = paddingPrefix + strings.Repeat("x", 4061) +
+				`","data":[{"url":"https://images.example/final.png"}]}`
+		}
+		require.True(t, json.Valid([]byte(body)))
+		require.True(t, strings.HasPrefix(body[chunkSize:], boundary))
+		for _, timed := range []bool{false, true} {
+			t.Run(boundary+map[bool]string{false: "/sync", true: "/timed"}[timed], func(t *testing.T) {
+				rec := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rec)
+				c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+				c.Request.Header.Set("X-Studio-Library", "save")
+				calls := 0
+				SetStudioImageCollector(c, func(outputs []StudioImageOutput) *StudioLibraryStatus {
+					calls++
+					require.False(t, c.Writer.Written(), "persist before complete fallback JSON delivery")
+					require.Len(t, outputs, 1)
+					require.Equal(t, "https://images.example/final.png", outputs[0].URL)
+					return &StudioLibraryStatus{Status: "queued", GenerationID: "image_chunk_boundary"}
+				})
+				cfg := &config.Config{}
+				cfg.Gateway.UpstreamResponseReadMaxBytes = chunkSize * 2
+				if timed {
+					cfg.Gateway.ImageStreamDataIntervalTimeout = 1
+					cfg.Gateway.ImageStreamKeepaliveInterval = 1
+				}
+				resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+				_, count, _, _, err := (&OpenAIGatewayService{cfg: cfg}).handleOpenAIImagesStreamingResponse(resp, c, time.Now(), nil)
+				require.NoError(t, err)
+				var delivered map[string]json.RawMessage
+				require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &delivered), "deliver one complete JSON document")
+				require.JSONEq(t, `[{"url":"https://images.example/final.png"}]`, string(delivered["data"]))
+				require.Contains(t, string(delivered["library"]), `"status":"queued"`)
+				require.Equal(t, 1, count)
+				require.Equal(t, 1, calls)
+				require.Empty(t, rec.Result().Header.Get("X-Studio-Library-Warning"))
+			})
+		}
+	}
+}
+
 func TestStudioAssetImageRawStreamOversizedJSONFallbackPreservesMedia(t *testing.T) {
 	for _, suffix := range []string{"", "\n\n"} {
 		t.Run(map[bool]string{false: "no_delimiter", true: "blank_delimiter"}[suffix != ""], func(t *testing.T) {
