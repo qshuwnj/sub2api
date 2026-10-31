@@ -58,8 +58,8 @@ func TestStudioAssetLateUploadCleanupRequiresOwnedTombstone(t *testing.T) {
 	r, mock := newStudioRepo(t)
 	a := studioFixture()
 	a.ID, a.StorageKey = studioTestID, "studio-results/16/20/digest/0"
-	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = \$4, lease_token = '', lease_expires_at = NULL, next_retry_at = NOW\(\), updated_at = NOW\(\).*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NOT NULL AND \(storage_key = '' OR storage_key = \$4\)`).
-		WithArgs(int64(16), int64(20), studioTestID, a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 0))
+	mock.ExpectExec(`(?s)UPDATE studio_assets SET state = CASE WHEN storage_key = '' THEN 'pending' ELSE state END, lease_token = \$4, lease_expires_at = GREATEST\(lease_expires_at, NOW\(\) \+ INTERVAL '4 minutes'\), next_retry_at = NOW\(\), updated_at = NOW\(\).*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NOT NULL AND kind = 'image' AND \(storage_key = '' OR storage_key = \$5\)`).
+		WithArgs(int64(16), int64(20), studioTestID, sqlmock.AnyArg(), a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 0))
 	require.NoError(t, r.RecordStudioAssetCleanup(context.Background(), a))
 }
 
@@ -67,10 +67,10 @@ func TestStudioAssetLateUploadInvalidatesEarlierCleanupCompletion(t *testing.T) 
 	r, mock := newStudioRepo(t)
 	a := studioFixture()
 	a.ID, a.StorageKey, a.LeaseToken = studioTestID, "studio-results/16/20/digest/0", "earlier-cleanup"
-	mock.ExpectExec(`(?s)SET storage_key = \$4, lease_token = '', lease_expires_at = NULL.*deleted_at IS NOT NULL`).
-		WithArgs(int64(16), int64(20), studioTestID, a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 1))
+	mock.ExpectExec(`(?s)SET state = CASE WHEN storage_key = '' THEN 'pending' ELSE state END, lease_token = \$4, lease_expires_at = GREATEST.*deleted_at IS NOT NULL`).
+		WithArgs(int64(16), int64(20), studioTestID, sqlmock.AnyArg(), a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 1))
 	require.NoError(t, r.RecordStudioAssetCleanup(context.Background(), a))
-	mock.ExpectExec(`(?s)WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND lease_token = \$4 AND lease_expires_at > NOW\(\) AND deleted_at IS NOT NULL AND storage_key = \$5`).
+	mock.ExpectExec(`(?s)WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND lease_token = \$4 AND lease_expires_at > NOW\(\) AND deleted_at IS NOT NULL AND \(storage_key = \$5 OR \(kind = 'image' AND storage_key = '' AND state <> 'unavailable'\)\)`).
 		WithArgs(int64(16), int64(20), studioTestID, "earlier-cleanup", a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 0))
 	require.ErrorIs(t, r.CompleteStudioAssetCleanup(context.Background(), a), service.ErrStudioAssetUnavailable)
 }
@@ -236,10 +236,25 @@ func TestStudioAssetUpsertPreservesReadyObjectAndTombstone(t *testing.T) {
 func TestStudioAssetDeleteIsOwnedIdempotentTombstone(t *testing.T) {
 	r, mock := newStudioRepo(t)
 	for _, affected := range []int64{1, 0} {
-		mock.ExpectExec(`(?s)UPDATE studio_assets SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, lease_token = '', lease_expires_at = NULL.*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
+		mock.ExpectExec(`(?s)UPDATE studio_assets SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
 			WithArgs(int64(16), int64(20), studioTestID).WillReturnResult(sqlmock.NewResult(0, affected))
 		require.NoError(t, r.DeleteStudioAsset(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, studioTestID))
 	}
+}
+
+func TestStudioAssetDeleteDefersCleanupUntilInflightArchiveLeaseExpires(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	mock.ExpectExec(`(?s)SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
+		WithArgs(int64(16), int64(20), studioTestID).WillReturnResult(sqlmock.NewResult(0, 1))
+	require.NoError(t, r.DeleteStudioAsset(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, studioTestID))
+}
+
+func TestStudioAssetDeletedImagesWithoutRecordedKeyRemainDurableCleanupWork(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	mock.ExpectQuery(`(?s)deleted_at IS NOT NULL AND \(storage_key <> '' OR \(kind = 'image' AND state <> 'unavailable'\)\) AND next_retry_at <= NOW\(\).*AND \(lease_expires_at IS NULL OR lease_expires_at <= NOW\(\)\).*FOR UPDATE SKIP LOCKED`).
+		WithArgs(sqlmock.AnyArg(), 1).WillReturnRows(studioRows())
+	_, err := r.ClaimDeletedStudioAssets(context.Background(), 1)
+	require.NoError(t, err)
 }
 
 func TestStudioAssetClaimsLeaseOnlyEligibleRows(t *testing.T) {
@@ -289,14 +304,14 @@ func TestStudioAssetRetryCanMarkTerminalSourceUnavailable(t *testing.T) {
 
 func TestStudioAssetDeletedCleanupRetainsTombstone(t *testing.T) {
 	r, mock := newStudioRepo(t)
-	mock.ExpectQuery(`(?s)UPDATE studio_assets SET lease_token = \$1.*deleted_at IS NOT NULL AND storage_key <> '' AND.*LIMIT \$2 FOR UPDATE SKIP LOCKED.*RETURNING`).
+	mock.ExpectQuery(`(?s)UPDATE studio_assets SET lease_token = \$1.*deleted_at IS NOT NULL AND \(storage_key <> '' OR \(kind = 'image' AND state <> 'unavailable'\)\) AND.*LIMIT \$2 FOR UPDATE SKIP LOCKED.*RETURNING`).
 		WithArgs(sqlmock.AnyArg(), 2).WillReturnRows(studioRows())
 	items, err := r.ClaimDeletedStudioAssets(context.Background(), 2)
 	require.NoError(t, err)
 	require.Empty(t, items)
 	a := studioFixture()
 	a.ID, a.LeaseToken, a.StorageKey = studioTestID, "cleanup-lease", "private/image.png"
-	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = '', state = 'unavailable',.*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND lease_token = \$4 AND lease_expires_at > NOW\(\) AND deleted_at IS NOT NULL AND storage_key = \$5`).
+	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = '', state = 'unavailable',.*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND lease_token = \$4 AND lease_expires_at > NOW\(\) AND deleted_at IS NOT NULL AND \(storage_key = \$5 OR \(kind = 'image' AND storage_key = '' AND state <> 'unavailable'\)\)`).
 		WithArgs(int64(16), int64(20), studioTestID, "cleanup-lease", "private/image.png").WillReturnResult(sqlmock.NewResult(0, 1))
 	require.NoError(t, r.CompleteStudioAssetCleanup(context.Background(), a))
 }
@@ -305,7 +320,7 @@ func TestStudioAssetDeletedCleanupRejectsStaleLease(t *testing.T) {
 	r, mock := newStudioRepo(t)
 	a := studioFixture()
 	a.ID, a.LeaseToken, a.StorageKey = studioTestID, "stale-lease", "private/image.png"
-	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = '',.*deleted_at IS NOT NULL AND storage_key = \$5`).
+	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = '',.*deleted_at IS NOT NULL AND \(storage_key = \$5 OR \(kind = 'image' AND storage_key = '' AND state <> 'unavailable'\)\)`).
 		WithArgs(int64(16), int64(20), studioTestID, "stale-lease", "private/image.png").WillReturnResult(sqlmock.NewResult(0, 0))
 	require.ErrorIs(t, r.CompleteStudioAssetCleanup(context.Background(), a), service.ErrStudioAssetUnavailable)
 }

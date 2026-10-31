@@ -341,6 +341,11 @@ func (s *StudioAssetService) ProcessCleanup(ctx context.Context) error {
 	if a == nil || a.DeletedAt == nil {
 		return ErrStudioAssetUnavailable
 	}
+	if a.Kind == "image" && a.StorageKey == "" {
+		// A crash or database outage may prevent the late upload from recording
+		// its key. Durable tombstone identity still owns deterministic cleanup.
+		a.StorageKey = studioAssetImageKey(a)
+	}
 	if a.Kind == "image" && a.StorageKey == studioAssetImageKey(a) {
 		u, _, err := s.objects()
 		if err != nil || u.Delete(ctx, a.StorageKey) != nil {

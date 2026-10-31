@@ -18,13 +18,14 @@ import (
 
 type studioArchiveMemory struct {
 	StudioAssetRepository
-	asset           *StudioAsset
-	video           *VideoResult
-	claimLimit      int
-	deadline        time.Duration
-	beforeComplete  func()
-	retryCode       string
-	cleanupRecorded bool
+	asset             *StudioAsset
+	video             *VideoResult
+	claimLimit        int
+	deadline          time.Duration
+	beforeComplete    func()
+	retryCode         string
+	cleanupRecorded   bool
+	failCleanupRecord bool
 }
 
 func cloneStudioArchive(a *StudioAsset) *StudioAsset {
@@ -87,16 +88,21 @@ func (r *studioArchiveMemory) RetryStudioAsset(_ context.Context, a *StudioAsset
 	return nil
 }
 func (r *studioArchiveMemory) RecordStudioAssetCleanup(_ context.Context, a *StudioAsset) error {
+	if r.failCleanupRecord {
+		return errors.New("database unavailable")
+	}
 	if r.asset.DeletedAt != nil && r.asset.Owner == a.Owner && r.asset.ID == a.ID {
-		r.asset.StorageKey = a.StorageKey
-		r.asset.LeaseToken = ""
+		if r.asset.StorageKey == "" {
+			r.asset.State = "pending"
+		}
+		r.asset.LeaseToken = "late-cleanup-horizon"
 		r.cleanupRecorded = true
 	}
 	return nil
 }
 func (r *studioArchiveMemory) ClaimDeletedStudioAssets(_ context.Context, limit int) ([]*StudioAsset, error) {
 	r.claimLimit = limit
-	if r.asset == nil || r.asset.DeletedAt == nil || r.asset.StorageKey == "" {
+	if r.asset == nil || r.asset.DeletedAt == nil || r.asset.StorageKey == "" && (r.asset.Kind != "image" || r.asset.State == "unavailable") {
 		return nil, nil
 	}
 	r.asset.LeaseToken = "cleanup-lease"
@@ -107,6 +113,7 @@ func (r *studioArchiveMemory) CompleteStudioAssetCleanup(_ context.Context, a *S
 		return ErrStudioAssetUnavailable
 	}
 	r.asset.StorageKey = ""
+	r.asset.State = "unavailable"
 	return nil
 }
 func (r *studioArchiveMemory) GetVideoResult(_ context.Context, o VideoAttemptOwner, resource string) (*VideoResult, error) {
@@ -345,7 +352,7 @@ func TestStudioAssetCASFailureSchedulesOnlyTombstonedCleanup(t *testing.T) {
 			if deleted {
 				o.failDelete = true
 				require.ErrorIs(t, s.ProcessCleanup(context.Background()), ErrStudioAssetUnavailable)
-				require.NotEmpty(t, r.asset.StorageKey)
+				require.Equal(t, "pending", r.asset.State)
 				o.failDelete = false
 				require.NoError(t, s.ProcessCleanup(context.Background()))
 				require.Empty(t, r.asset.StorageKey)
@@ -366,9 +373,33 @@ func TestStudioAssetAmbiguousUploadFailureAfterDeleteRetainsDurableCleanup(t *te
 	o.afterSave = func() { now := time.Now(); r.asset.DeletedAt = &now }
 	require.ErrorIs(t, s.ProcessPending(context.Background()), ErrStudioAssetUnavailable)
 	require.True(t, r.cleanupRecorded)
-	require.NotEmpty(t, r.asset.StorageKey)
+	require.Equal(t, "pending", r.asset.State)
 	require.NoError(t, s.ProcessCleanup(context.Background()))
 	require.Empty(t, o.data)
+}
+
+// The tombstone itself must recover an orphan even when the post-upload cleanup-record write fails during a DB outage.
+func TestStudioAssetDeletedImageCleanupReconstructsKeyAfterDatabaseRecovery(t *testing.T) {
+	s, r, o := studioArchiveFixture(1024, nil)
+	collectStudioPNG(t, s)
+	r.failCleanupRecord = true
+	r.beforeComplete = func() {
+		now := time.Now()
+		r.asset.DeletedAt = &now
+		r.asset.SourceBytes = nil
+		r.asset.LeaseToken = ""
+	}
+	require.ErrorIs(t, s.ProcessPending(context.Background()), ErrStudioAssetUnavailable)
+	require.False(t, r.cleanupRecorded)
+	require.Empty(t, r.asset.StorageKey)
+	require.Len(t, o.data, 1)
+	r.failCleanupRecord = false
+	require.NoError(t, s.ProcessCleanup(context.Background()))
+	require.Empty(t, o.data)
+	require.Equal(t, 1, o.deleted)
+	require.Equal(t, "unavailable", r.asset.State)
+	require.NoError(t, s.ProcessCleanup(context.Background()))
+	require.Equal(t, 1, o.deleted, "completed tombstones must not be reclaimed forever")
 }
 
 // Re-archiving or deleting a video reference must never upload/delete the shared video_results object.

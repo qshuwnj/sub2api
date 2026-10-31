@@ -216,8 +216,10 @@ func (r *usageBillingRepository) DeleteStudioAsset(ctx context.Context, owner se
 	if err := r.studioAssetDB(); err != nil {
 		return err
 	}
-	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET deleted_at = NOW(), source_url = '', source_bytes = NULL, lease_token = '', lease_expires_at = NULL,
-		updated_at = NOW() WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NULL`, owner.UserID, owner.APIKeyID, id)
+	// Tombstoning invalidates archive completion without erasing its matched
+	// lease: cleanup must wait until an in-flight upload's bounded horizon.
+	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET deleted_at = NOW(), source_url = '', source_bytes = NULL, updated_at = NOW()
+		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NULL`, owner.UserID, owner.APIKeyID, id)
 	return err
 }
 
@@ -233,7 +235,7 @@ func (r *usageBillingRepository) claimStudioAssets(ctx context.Context, limit in
 	eligible := `state IN ('pending', 'retrying') AND deleted_at IS NULL AND next_retry_at <= NOW()`
 	order := `next_retry_at, id`
 	if deleted {
-		eligible = `deleted_at IS NOT NULL AND storage_key <> '' AND next_retry_at <= NOW()`
+		eligible = `deleted_at IS NOT NULL AND (storage_key <> '' OR (kind = 'image' AND state <> 'unavailable')) AND next_retry_at <= NOW()`
 		order = `deleted_at, id`
 	}
 	rows, err := r.db.QueryContext(ctx, `UPDATE studio_assets SET lease_token = $1,
@@ -325,7 +327,7 @@ func (r *usageBillingRepository) CompleteStudioAssetCleanup(ctx context.Context,
 	}
 	return studioAssetLeaseResult(r.db.ExecContext(ctx, `UPDATE studio_assets SET storage_key = '', state = 'unavailable',
 		lease_token = '', lease_expires_at = NULL, updated_at = NOW()
-		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND lease_token = $4 AND lease_expires_at > NOW() AND deleted_at IS NOT NULL AND storage_key = $5`,
+		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND lease_token = $4 AND lease_expires_at > NOW() AND deleted_at IS NOT NULL AND (storage_key = $5 OR (kind = 'image' AND storage_key = '' AND state <> 'unavailable'))`,
 		a.Owner.UserID, a.Owner.APIKeyID, a.ID, a.LeaseToken, a.StorageKey))
 }
 
@@ -340,11 +342,15 @@ func (r *usageBillingRepository) RecordStudioAssetCleanup(ctx context.Context, a
 	if err := r.studioAssetDB(); err != nil {
 		return err
 	}
-	// Invalidate any cleaner that deleted the key before this late upload
-	// recreated it; its old completion must not erase the fresh cleanup intent.
-	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET storage_key = $4, lease_token = '', lease_expires_at = NULL, next_retry_at = NOW(), updated_at = NOW()
-		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NOT NULL AND (storage_key = '' OR storage_key = $4)`,
-		a.Owner.UserID, a.Owner.APIKeyID, a.ID, a.StorageKey)
+	// Identity on the tombstone is sufficient to reconstruct the image key.
+	// Requeue even an earlier completed cleaner, but never populate a pending
+	// storage_key (which would violate the ready/source schema constraints).
+	// A fresh matched lease invalidates the old cleaner while preserving the
+	// prior archive horizon and the lease-token/expiry CHECK invariant.
+	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET state = CASE WHEN storage_key = '' THEN 'pending' ELSE state END,
+		lease_token = $4, lease_expires_at = GREATEST(lease_expires_at, NOW() + INTERVAL '4 minutes'), next_retry_at = NOW(), updated_at = NOW()
+		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NOT NULL AND kind = 'image' AND (storage_key = '' OR storage_key = $5)`,
+		a.Owner.UserID, a.Owner.APIKeyID, a.ID, uuid.NewString(), a.StorageKey)
 	return err
 }
 
