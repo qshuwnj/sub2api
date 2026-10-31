@@ -343,6 +343,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 					UpstreamEndpoint: "/api/v1" + atlasCloudImagesPath,
 					ResponseHeaders:  synthetic.Header.Clone(), Duration: time.Since(started),
 					AtlasCloudImageResponse: responseBody,
+					StudioImageOutputs:      studioImageJSONOutputs(responseBody),
 				}, nil
 			}
 			responseRequest := parsed
@@ -358,7 +359,8 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			}
 			return &OpenAIForwardResult{
 				RequestID: predictionID, UpstreamModel: upstreamModel, Model: parsed.Model, Usage: usage,
-				ImageCount: count, ImageSize: tier, ImageInputSize: strings.ReplaceAll(size, "*", "x"),
+				StudioImageOutputs: studioImageOutputs(c),
+				ImageCount:         count, ImageSize: tier, ImageInputSize: strings.ReplaceAll(size, "*", "x"),
 				ImageOutputSizes: sizes, UpstreamEndpoint: "/api/v1" + atlasCloudImagesPath,
 				ResponseHeaders: synthetic.Header.Clone(), Duration: time.Since(started),
 			}, nil

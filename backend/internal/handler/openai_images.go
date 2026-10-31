@@ -75,6 +75,7 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 		return
 	}
 	requestModel := parsed.Model
+	h.prepareStudioImages(c, parsed, body)
 	apiKey, err = h.gatewayService.RefreshImageQualityKey(c.Request.Context(), apiKey, requestModel)
 	if err != nil {
 		h.errorResponse(c, http.StatusServiceUnavailable, "pricing_unavailable", err.Error())
@@ -567,10 +568,25 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 					return
 				}
 				response["billing"] = imagePricing.Receipt()
+				if library := service.CompleteStudioImages(c, result.StudioImageOutputs); library != nil {
+					response["library"] = library
+				}
 				c.JSON(http.StatusOK, response)
 				return
 			}
-			c.Data(http.StatusOK, "application/json", result.AtlasCloudImageResponse)
+			if service.StudioLibraryRequested(c) {
+				var response map[string]any
+				if json.Unmarshal(result.AtlasCloudImageResponse, &response) == nil {
+					if library := service.CompleteStudioImages(c, result.StudioImageOutputs); library != nil {
+						response["library"] = library
+					}
+					c.JSON(http.StatusOK, response)
+				} else {
+					c.Data(http.StatusOK, "application/json", result.AtlasCloudImageResponse)
+				}
+			} else {
+				c.Data(http.StatusOK, "application/json", result.AtlasCloudImageResponse)
+			}
 		} else {
 			h.submitMandatoryUsageRecordTask(c.Request.Context(), func(ctx context.Context) { _ = record(ctx) })
 		}

@@ -1389,6 +1389,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesOAuthNonStreamingResponse(
 		return OpenAIUsage{}, 0, nil, err
 	}
 	responseheaders.WriteFilteredHeaders(c.Writer.Header(), resp.Header, s.responseHeaderFilter)
+	responseBody = withStudioLibraryStatus(responseBody, CompleteStudioImages(c, studioResponsesImageOutputs(results)))
 	c.Data(resp.StatusCode, "application/json; charset=utf-8", responseBody)
 	return usage, len(results), openAIResponsesImageResultSizes(results), nil
 }
@@ -1551,12 +1552,14 @@ func (s *OpenAIGatewayService) handleOpenAIImagesOAuthStreamingResponse(
 				return
 			}
 			eventName := streamPrefix + ".completed"
+			library := CompleteStudioImages(c, studioResponsesImageOutputs(finalResults))
 			for _, img := range finalResults {
 				key := openAIResponsesImageResultKey("", img)
 				if _, exists := emitted[key]; exists {
 					continue
 				}
 				payload := buildOpenAIImagesStreamCompletedPayload(eventName, img, format, createdAt, usageRaw)
+				payload = withStudioLibraryStatus(payload, library)
 				emitted[key] = struct{}{}
 				s.tryWriteOpenAIImagesStreamEvent(c, flusher, &clientDisconnected, &lastDownstreamWriteAt, eventName, payload)
 			}
@@ -1607,12 +1610,14 @@ func (s *OpenAIGatewayService) handleOpenAIImagesOAuthStreamingResponse(
 				mergeOpenAIResponsesImageMeta(&finalResults[i], streamMeta)
 			}
 			reconcileOpenAIResponsesImageResultSizes(finalResults, nil)
+			library := CompleteStudioImages(c, studioResponsesImageOutputs(finalResults))
 			for _, img := range finalResults {
 				key := openAIResponsesImageResultKey("", img)
 				if _, exists := emitted[key]; exists {
 					continue
 				}
 				payload := buildOpenAIImagesStreamCompletedPayload(eventName, img, format, createdAt, nil)
+				payload = withStudioLibraryStatus(payload, library)
 				emitted[key] = struct{}{}
 				s.tryWriteOpenAIImagesStreamEvent(c, flusher, &clientDisconnected, &lastDownstreamWriteAt, eventName, payload)
 			}
@@ -1864,6 +1869,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesOAuth(
 		proxyURL = account.Proxy.URL()
 	}
 	upstreamStart := time.Now()
+	upstreamReq.Header.Del("X-Studio-Library")
 	resp, err := s.doOpenAIUpstream(upstreamReq, proxyURL, account)
 	SetOpsLatencyMs(c, OpsUpstreamLatencyMsKey, time.Since(upstreamStart).Milliseconds())
 	if err != nil {
@@ -1949,6 +1955,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesOAuth(
 			if imageCount > 0 {
 				return &OpenAIForwardResult{
 					RequestID:                     resp.Header.Get("x-request-id"),
+					StudioImageOutputs:            studioImageOutputs(c),
 					UpstreamHeaders:               resp.Header,
 					Usage:                         usage,
 					Model:                         requestModel,
@@ -2000,6 +2007,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesOAuth(
 	imageCount = resolveBillableImageCount(imageCount, parsed.N, imageCountBillingEnabled(getAPIKeyFromContext(c)))
 	return &OpenAIForwardResult{
 		RequestID:                     resp.Header.Get("x-request-id"),
+		StudioImageOutputs:            studioImageOutputs(c),
 		UpstreamHeaders:               resp.Header,
 		Usage:                         usage,
 		Model:                         requestModel,

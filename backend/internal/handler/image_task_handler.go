@@ -222,6 +222,8 @@ func (h *AsyncImageHandler) executeWithGateway(platform string, c *gin.Context) 
 
 func (h *AsyncImageHandler) run(taskID, platform string, taskCtx *gin.Context, recorder *httptest.ResponseRecorder, cancel context.CancelFunc) {
 	defer cancel()
+	// Nested synchronous delivery uses this server task identity exactly once.
+	taskCtx.Set(studioImageGenerationKey, taskID)
 	defer func() {
 		if recovered := recover(); recovered != nil {
 			logger.L().Error("image_task.execution_panicked", zap.String("task_id", taskID), zap.Any("panic", recovered))

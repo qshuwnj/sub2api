@@ -256,6 +256,7 @@ func (s *OpenAIGatewayService) handleCodexDirectImagesNonStreamingResponse(resp 
 			contentType = upstreamType
 		}
 	}
+	body = withStudioLibraryStatus(body, CompleteStudioImages(c, studioResponsesImageOutputs(results)))
 	c.Data(resp.StatusCode, contentType, body)
 	return usage, len(results), openAIResponsesImageResultSizes(results), nil
 }

@@ -744,6 +744,7 @@ func (s *OpenAIGatewayService) ForwardGrokMedia(
 	}
 	// 账号级请求头覆写最后应用，配置值优先于内置默认头。
 	account.ApplyHeaderOverrides(upstreamReq.Header)
+	upstreamReq.Header.Del("X-Studio-Library")
 
 	proxyURL := ""
 	if account.ProxyID != nil && account.Proxy != nil {
@@ -785,6 +786,9 @@ func (s *OpenAIGatewayService) ForwardGrokMedia(
 			grokMediaContentProxyURL(c, requestID),
 		)
 	}
+	if endpoint == GrokMediaEndpointImagesGenerations || endpoint == GrokMediaEndpointImagesEdits {
+		respBody = withStudioLibraryStatus(respBody, CompleteStudioImages(c, studioImageJSONOutputs(respBody)))
+	}
 	writeGrokMediaResponse(c, resp, respBody, s.responseHeaderFilter)
 	usage := grokMediaUsageFromResponse(endpoint, requestInfo, respBody)
 	resultModel := requestModel
@@ -800,6 +804,7 @@ func (s *OpenAIGatewayService) ForwardGrokMedia(
 	}
 	return &OpenAIForwardResult{
 		RequestID:            requestIDHeader,
+		StudioImageOutputs:   studioImageOutputs(c),
 		UpstreamHeaders:      resp.Header,
 		ResponseID:           usage.ResponseID,
 		Usage:                usage.Usage,

@@ -786,20 +786,21 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		if err != nil {
 			if streamCount > 0 {
 				return &OpenAIForwardResult{
-					RequestID:        resp.Header.Get("x-request-id"),
-					UpstreamHeaders:  resp.Header,
-					Usage:            streamUsage,
-					Model:            requestModel,
-					UpstreamModel:    upstreamModel,
-					Stream:           parsed.Stream,
-					ResponseHeaders:  resp.Header.Clone(),
-					Duration:         time.Since(startTime),
-					FirstTokenMs:     ttft,
-					ImageEndpoint:    true,
-					ImageCount:       streamCount,
-					ImageSize:        parsed.SizeTier,
-					ImageInputSize:   parsed.Size,
-					ImageOutputSizes: streamSizes,
+					RequestID:          resp.Header.Get("x-request-id"),
+					StudioImageOutputs: studioImageOutputs(c),
+					UpstreamHeaders:    resp.Header,
+					Usage:              streamUsage,
+					Model:              requestModel,
+					UpstreamModel:      upstreamModel,
+					Stream:             parsed.Stream,
+					ResponseHeaders:    resp.Header.Clone(),
+					Duration:           time.Since(startTime),
+					FirstTokenMs:       ttft,
+					ImageEndpoint:      true,
+					ImageCount:         streamCount,
+					ImageSize:          parsed.SizeTier,
+					ImageInputSize:     parsed.Size,
+					ImageOutputSizes:   streamSizes,
 				}, err
 			}
 			return nil, err
@@ -809,20 +810,21 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		imageOutputSizes := streamSizes
 		firstTokenMs = ttft
 		return &OpenAIForwardResult{
-			RequestID:        resp.Header.Get("x-request-id"),
-			UpstreamHeaders:  resp.Header,
-			Usage:            usage,
-			Model:            requestModel,
-			UpstreamModel:    upstreamModel,
-			Stream:           parsed.Stream,
-			ResponseHeaders:  resp.Header.Clone(),
-			Duration:         time.Since(startTime),
-			FirstTokenMs:     firstTokenMs,
-			ImageEndpoint:    true,
-			ImageCount:       imageCount,
-			ImageSize:        parsed.SizeTier,
-			ImageInputSize:   parsed.Size,
-			ImageOutputSizes: imageOutputSizes,
+			RequestID:          resp.Header.Get("x-request-id"),
+			StudioImageOutputs: studioImageOutputs(c),
+			UpstreamHeaders:    resp.Header,
+			Usage:              usage,
+			Model:              requestModel,
+			UpstreamModel:      upstreamModel,
+			Stream:             parsed.Stream,
+			ResponseHeaders:    resp.Header.Clone(),
+			Duration:           time.Since(startTime),
+			FirstTokenMs:       firstTokenMs,
+			ImageEndpoint:      true,
+			ImageCount:         imageCount,
+			ImageSize:          parsed.SizeTier,
+			ImageInputSize:     parsed.Size,
+			ImageOutputSizes:   imageOutputSizes,
 		}, nil
 	} else {
 		nonStreamUsage, nonStreamCount, nonStreamSizes, err := s.handleOpenAIImagesNonStreamingResponse(upstreamCtx, resp, c, account, parsed)
@@ -832,20 +834,21 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		usage = nonStreamUsage
 		imageCount = resolveBillableImageCount(nonStreamCount, parsed.N, imageCountBillingEnabled(getAPIKeyFromContext(c)))
 		return &OpenAIForwardResult{
-			RequestID:        resp.Header.Get("x-request-id"),
-			UpstreamHeaders:  resp.Header,
-			Usage:            usage,
-			Model:            requestModel,
-			UpstreamModel:    upstreamModel,
-			Stream:           parsed.Stream,
-			ResponseHeaders:  resp.Header.Clone(),
-			Duration:         time.Since(startTime),
-			FirstTokenMs:     firstTokenMs,
-			ImageEndpoint:    true,
-			ImageCount:       imageCount,
-			ImageSize:        parsed.SizeTier,
-			ImageInputSize:   parsed.Size,
-			ImageOutputSizes: nonStreamSizes,
+			RequestID:          resp.Header.Get("x-request-id"),
+			StudioImageOutputs: studioImageOutputs(c),
+			UpstreamHeaders:    resp.Header,
+			Usage:              usage,
+			Model:              requestModel,
+			UpstreamModel:      upstreamModel,
+			Stream:             parsed.Stream,
+			ResponseHeaders:    resp.Header.Clone(),
+			Duration:           time.Since(startTime),
+			FirstTokenMs:       firstTokenMs,
+			ImageEndpoint:      true,
+			ImageCount:         imageCount,
+			ImageSize:          parsed.SizeTier,
+			ImageInputSize:     parsed.Size,
+			ImageOutputSizes:   nonStreamSizes,
 		}, nil
 	}
 }
@@ -903,6 +906,7 @@ func (s *OpenAIGatewayService) buildOpenAIImagesRequest(
 	}
 	// 账号级请求头覆写（仅 openai api_key 账号启用时生效；OAuth 路径 no-op）
 	account.ApplyHeaderOverrides(req.Header)
+	req.Header.Del("X-Studio-Library")
 	return req, nil
 }
 
@@ -1008,6 +1012,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesNonStreamingResponse(
 		return OpenAIUsage{}, 0, nil, err
 	}
 	body = s.backfillOpenAIImagesB64JSON(ctx, account, parsed, body)
+	body = withStudioLibraryStatus(body, CompleteStudioImages(c, studioImageJSONOutputs(body)))
 	responseheaders.WriteFilteredHeaders(c.Writer.Header(), resp.Header, s.responseHeaderFilter)
 	contentType := "application/json"
 	if s.cfg != nil && !s.cfg.Security.ResponseHeaders.Enabled {
@@ -1052,6 +1057,21 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 	fallbackTooLarge := false
 	var sseData openAISSEDataAccumulator
 	var streamErr error
+	// Studio's completion must be persisted before its final data frame. Keep
+	// each raw SSE envelope intact (including id/event/comment fields).
+	bufferStudioSSE := direct == nil && StudioLibraryRequested(c)
+	var rawStudioEvent bytes.Buffer
+	writeRawStudioEvent := func(data []byte) {
+		if clientDisconnected {
+			return
+		}
+		if _, err := c.Writer.Write(data); err != nil {
+			clientDisconnected = true
+		} else {
+			flusher.Flush()
+			lastDownstreamWriteAt = time.Now()
+		}
+	}
 	finish := func() error {
 		if direct == nil {
 			return nil
@@ -1079,7 +1099,27 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		}
 		mergeOpenAIUsage(&usage, dataBytes)
 		imageCounter.AddSSEData(dataBytes)
-		if direct == nil || string(dataBytes) == "[DONE]" {
+		var library *StudioLibraryStatus
+		if strings.HasSuffix(gjson.GetBytes(dataBytes, "type").String(), ".completed") {
+			item := studioImageSource(gjson.GetBytes(dataBytes, "url").String(), gjson.GetBytes(dataBytes, "b64_json").String(), gjson.GetBytes(dataBytes, "output_format").String())
+			if item.URL != "" || len(item.Bytes) > 0 {
+				outputs := append(studioImageOutputs(c), item)
+				library = CompleteStudioImages(c, outputs)
+				dataBytes = withStudioLibraryStatus(dataBytes, library)
+			}
+		}
+		if direct == nil {
+			if bufferStudioSSE {
+				raw := rawStudioEvent.String()
+				rawStudioEvent.Reset()
+				if library != nil {
+					raw = studioSSEDataEnvelope(raw, dataBytes)
+				}
+				writeRawStudioEvent([]byte(raw))
+			}
+			return
+		}
+		if string(dataBytes) == "[DONE]" {
 			return
 		}
 		if directUsage, ok := codexDirectImagesUsage(dataBytes); ok {
@@ -1140,7 +1180,9 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 			ms := int(time.Since(startTime).Milliseconds())
 			firstTokenMs = &ms
 		}
-		if !clientDisconnected && direct == nil {
+		if bufferStudioSSE {
+			_, _ = rawStudioEvent.Write(line)
+		} else if !clientDisconnected && direct == nil {
 			if _, writeErr := c.Writer.Write(line); writeErr != nil {
 				clientDisconnected = true
 				logger.LegacyPrintf("service.openai_gateway", "[OpenAI] Images stream client disconnected, continue draining upstream for billing")
@@ -1153,6 +1195,10 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		trimmedLine := strings.TrimRight(string(line), "\r\n")
 		if _, ok := extractOpenAISSEDataLine(trimmedLine); ok || strings.TrimSpace(trimmedLine) == "" {
 			sseData.AddLine(trimmedLine, processSSEData)
+			if bufferStudioSSE && strings.TrimSpace(trimmedLine) == "" && rawStudioEvent.Len() > 0 {
+				writeRawStudioEvent(rawStudioEvent.Bytes())
+				rawStudioEvent.Reset()
+			}
 			return
 		}
 		if !seenSSEData && !fallbackTooLarge {
@@ -1179,6 +1225,11 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		}
 		mergeOpenAIUsage(&usage, body)
 		imageCounter.AddJSONResponse(body)
+		if bufferStudioSSE {
+			body = withStudioLibraryStatus(body, CompleteStudioImages(c, studioImageJSONOutputs(body)))
+			rawStudioEvent.Reset()
+			writeRawStudioEvent(body)
+		}
 	}
 
 	streamInterval := s.openAIImageStreamDataInterval()

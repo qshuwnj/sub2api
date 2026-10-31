@@ -235,6 +235,8 @@ type OpenAIUsage struct {
 type OpenAIForwardResult struct {
 	RequestID  string
 	ResponseID string
+	// Final provider-success media only; never partial preview frames.
+	StudioImageOutputs []StudioImageOutput
 	// AtlasCloud outputs are released by the handler only after settlement.
 	AtlasCloudVideoResponse map[string]any
 	AtlasCloudImageResponse []byte
