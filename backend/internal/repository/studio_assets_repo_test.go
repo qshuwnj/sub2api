@@ -236,7 +236,7 @@ func TestStudioAssetUpsertPreservesReadyObjectAndTombstone(t *testing.T) {
 func TestStudioAssetDeleteIsOwnedIdempotentTombstone(t *testing.T) {
 	r, mock := newStudioRepo(t)
 	for _, affected := range []int64{1, 0} {
-		mock.ExpectExec(`(?s)UPDATE studio_assets SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
+		mock.ExpectExec(`(?s)UPDATE studio_assets SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, state = CASE WHEN kind = 'image' AND storage_key = '' THEN 'pending' ELSE state END, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
 			WithArgs(int64(16), int64(20), studioTestID).WillReturnResult(sqlmock.NewResult(0, affected))
 		require.NoError(t, r.DeleteStudioAsset(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, studioTestID))
 	}
@@ -244,7 +244,14 @@ func TestStudioAssetDeleteIsOwnedIdempotentTombstone(t *testing.T) {
 
 func TestStudioAssetDeleteDefersCleanupUntilInflightArchiveLeaseExpires(t *testing.T) {
 	r, mock := newStudioRepo(t)
-	mock.ExpectExec(`(?s)SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
+	mock.ExpectExec(`(?s)SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, state = CASE WHEN kind = 'image' AND storage_key = '' THEN 'pending' ELSE state END, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
+		WithArgs(int64(16), int64(20), studioTestID).WillReturnResult(sqlmock.NewResult(0, 1))
+	require.NoError(t, r.DeleteStudioAsset(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, studioTestID))
+}
+
+func TestStudioAssetDeleteInitializesEmptyImageCleanupRegardlessOfArchiveOutcome(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	mock.ExpectExec(`(?s)SET deleted_at = NOW\(\), source_url = '', source_bytes = NULL, state = CASE WHEN kind = 'image' AND storage_key = '' THEN 'pending' ELSE state END, updated_at = NOW\(\) WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NULL`).
 		WithArgs(int64(16), int64(20), studioTestID).WillReturnResult(sqlmock.NewResult(0, 1))
 	require.NoError(t, r.DeleteStudioAsset(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, studioTestID))
 }

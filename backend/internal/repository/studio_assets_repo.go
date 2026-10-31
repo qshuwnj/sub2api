@@ -218,7 +218,10 @@ func (r *usageBillingRepository) DeleteStudioAsset(ctx context.Context, owner se
 	}
 	// Tombstoning invalidates archive completion without erasing its matched
 	// lease: cleanup must wait until an in-flight upload's bounded horizon.
-	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET deleted_at = NOW(), source_url = '', source_bytes = NULL, updated_at = NOW()
+	// An unavailable archive may still have ambiguously uploaded its object;
+	// only a completed tombstone, not an archive outcome, marks cleanup done.
+	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET deleted_at = NOW(), source_url = '', source_bytes = NULL,
+		state = CASE WHEN kind = 'image' AND storage_key = '' THEN 'pending' ELSE state END, updated_at = NOW()
 		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NULL`, owner.UserID, owner.APIKeyID, id)
 	return err
 }

@@ -51,6 +51,17 @@ func (r *studioArchiveMemory) GetStudioAsset(_ context.Context, o StudioAssetOwn
 	}
 	return cloneStudioArchive(r.asset), nil
 }
+func (r *studioArchiveMemory) DeleteStudioAsset(_ context.Context, o StudioAssetOwner, id string) error {
+	if r.asset == nil || r.asset.Owner != o || r.asset.ID != id || r.asset.DeletedAt != nil {
+		return nil
+	}
+	now := time.Now()
+	r.asset.DeletedAt, r.asset.SourceURL, r.asset.SourceBytes = &now, "", nil
+	if r.asset.Kind == "image" && r.asset.StorageKey == "" {
+		r.asset.State = "pending"
+	}
+	return nil
+}
 func (r *studioArchiveMemory) ClaimStudioAssets(ctx context.Context, limit int) ([]*StudioAsset, error) {
 	r.claimLimit = limit
 	if deadline, ok := ctx.Deadline(); ok {
@@ -376,6 +387,40 @@ func TestStudioAssetAmbiguousUploadFailureAfterDeleteRetainsDurableCleanup(t *te
 	require.Equal(t, "pending", r.asset.State)
 	require.NoError(t, s.ProcessCleanup(context.Background()))
 	require.Empty(t, o.data)
+}
+
+func TestStudioAssetAmbiguousUploadThenTerminalRetryDeleteCleansDeterministicObject(t *testing.T) {
+	s, r, o := studioArchiveFixture(1024, nil)
+	collectStudioPNG(t, s)
+	o.afterSave = func() {}
+	require.ErrorIs(t, s.ProcessPending(context.Background()), ErrStudioAssetUnavailable)
+	require.Equal(t, "retrying", r.asset.State)
+	require.Empty(t, r.asset.StorageKey)
+	require.False(t, r.cleanupRecorded, "a live row must not schedule tombstone cleanup")
+	const key = "studio-results/16/20/6b598d3d55679cadfaa60ffa00eaae588211fd2dee326eaf855bbd1f8653c398/0"
+	require.Equal(t, studioPNG(t), o.data[key])
+
+	// A changed effective limit makes the retained source terminal without a second upload.
+	u := NewImageResultUploader(o, "", 1, nil)
+	s.resolve = func() (*ImageResultUploader, bool) { return u, true }
+	require.ErrorIs(t, s.ProcessPending(context.Background()), ErrStudioAssetUnavailable)
+	require.Equal(t, "image_too_large", r.retryCode)
+	require.Equal(t, "unavailable", r.asset.State)
+	require.Empty(t, r.asset.StorageKey)
+	require.Equal(t, 1, o.saved)
+	require.NoError(t, s.ProcessCleanup(context.Background()))
+	require.Zero(t, o.deleted, "terminal live assets must never delete their object")
+
+	require.NoError(t, r.DeleteStudioAsset(context.Background(), studioArchiveOwner, r.asset.ID))
+	require.Empty(t, r.asset.SourceBytes)
+	require.Equal(t, "pending", r.asset.State, "archive failure is not physical cleanup completion")
+	require.NoError(t, s.ProcessCleanup(context.Background()))
+	require.Empty(t, o.data)
+	require.Equal(t, 1, o.deleted)
+	require.Equal(t, "unavailable", r.asset.State)
+	require.NoError(t, r.DeleteStudioAsset(context.Background(), studioArchiveOwner, r.asset.ID))
+	require.NoError(t, s.ProcessCleanup(context.Background()))
+	require.Equal(t, 1, o.deleted, "idempotent deletion must not revive completed cleanup")
 }
 
 // The tombstone itself must recover an orphan even when the post-upload cleanup-record write fails during a DB outage.

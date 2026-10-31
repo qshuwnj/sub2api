@@ -123,4 +123,51 @@ func TestStudioAssetPostgresDeletedInflightUploadRecoversWithoutLateRecord(t *te
 	require.Equal(t, "ready", live.State)
 	require.Equal(t, "studio-results/16/20/newer-live/0", live.StorageKey)
 	require.Empty(t, live.LeaseToken)
+
+	t.Run("terminal archive outcome is not cleanup completion", func(t *testing.T) {
+		terminal := studioFixture()
+		terminal.OutputIndex = 1
+		require.NoError(t, r.UpsertStudioAsset(ctx, terminal))
+		archive, err := r.ClaimStudioAssets(ctx, 1)
+		require.NoError(t, err)
+		require.Len(t, archive, 1)
+		// Save may have accepted this deterministic object before returning an error.
+		const attemptedKey = "studio-results/16/20/6b598d3d55679cadfaa60ffa00eaae588211fd2dee326eaf855bbd1f8653c398/1"
+		archive[0].StorageKey = attemptedKey
+		require.NoError(t, r.RecordStudioAssetCleanup(ctx, archive[0]))
+		require.NoError(t, r.RetryStudioAsset(ctx, archive[0], "storage_unavailable"))
+		stored, err := r.GetStudioAsset(ctx, terminal.Owner, terminal.ID)
+		require.NoError(t, err)
+		require.Equal(t, "retrying", stored.State)
+		require.Empty(t, stored.StorageKey)
+		require.NotEmpty(t, stored.SourceURL)
+		_, err = db.ExecContext(ctx, "UPDATE studio_assets SET next_retry_at=NOW() WHERE id=$1", terminal.ID)
+		require.NoError(t, err)
+		archive, err = r.ClaimStudioAssets(ctx, 1)
+		require.NoError(t, err)
+		require.Len(t, archive, 1)
+		archive[0].State = "unavailable"
+		require.NoError(t, r.RetryStudioAsset(ctx, archive[0], "image_too_large"))
+		stored, err = r.GetStudioAsset(ctx, terminal.Owner, terminal.ID)
+		require.NoError(t, err)
+		require.Equal(t, "unavailable", stored.State)
+		require.Empty(t, stored.StorageKey)
+
+		require.NoError(t, r.DeleteStudioAsset(ctx, terminal.Owner, terminal.ID))
+		require.NoError(t, db.QueryRowContext(ctx, "SELECT state FROM studio_assets WHERE id=$1", terminal.ID).Scan(&state))
+		require.Equal(t, "pending", state, "new empty-key image tombstones must begin unfinished physical cleanup")
+		_, err = db.ExecContext(ctx, "UPDATE studio_assets SET next_retry_at=NOW() WHERE id=$1", terminal.ID)
+		require.NoError(t, err)
+		cleanup, err := r.ClaimDeletedStudioAssets(ctx, 1)
+		require.NoError(t, err)
+		require.Len(t, cleanup, 1)
+		require.Equal(t, terminal.ID, cleanup[0].ID)
+		require.Empty(t, cleanup[0].StorageKey)
+		cleanup[0].StorageKey = attemptedKey
+		require.NoError(t, r.CompleteStudioAssetCleanup(ctx, cleanup[0]))
+		require.NoError(t, r.DeleteStudioAsset(ctx, terminal.Owner, terminal.ID))
+		cleanup, err = r.ClaimDeletedStudioAssets(ctx, 1)
+		require.NoError(t, err)
+		require.Empty(t, cleanup, "repeated delete must not reset a completed tombstone")
+	})
 }
