@@ -31,7 +31,7 @@ var ErrVideoSettingsQuoteRequired = errors.New("video settings require an exact 
 
 func videoSettingLocked(field string) bool {
 	switch field {
-	case "multi_shot", "shot_type", "multi_prompt", "elements", "omni_reference_task_type":
+	case "multi_shot", "shot_type", "multi_prompt", "elements", "omni_reference_task_type", "draft", "return_last_frame":
 		return true
 	}
 	return false
@@ -662,6 +662,9 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		return
 	}
 	if !enrolled {
+		if videoLegacySettings(atlasMediaModel(req.Model, "video"), req.Controls) != nil {
+			return s.videoSettingsTariff(ctx, key, req)
+		}
 		return s.videoConfiguredRuleTariff(ctx, key, req)
 	}
 	var card *ChannelModelPricing
@@ -678,6 +681,9 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 		}
 	}
 	if selected == nil {
+		if videoLegacySettings(atlasMediaModel(req.Model, "video"), req.Controls) != nil {
+			return s.videoSettingsTariff(ctx, key, req)
+		}
 		err = fmt.Errorf("exact video tariff cell is not configured")
 		return
 	}
@@ -707,7 +713,8 @@ func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req
 
 // Existing per-second customer prices can be locked without claiming that they
 // are verified supplier invoices. Non-default cost settings still need a native
-// tariff cell, and an enrolled native card never falls back to these rules.
+// tariff cell or verified calculator ratio; native cards never fall back to
+// unrelated per-second rules.
 func (s *OpenAIGatewayService) videoConfiguredRuleTariff(ctx context.Context, key *APIKey, req VideoQuoteRequest) (base, total, revision, multiplier string, estimated bool, err error) {
 	if s == nil || s.billingService == nil || key == nil || key.Group == nil {
 		err = ErrVideoQuoteUnavailable
@@ -757,6 +764,9 @@ func (s *OpenAIGatewayService) videoConfiguredRuleTariff(ctx context.Context, ke
 	hash := sha256.Sum256(raw)
 	revision = hex.EncodeToString(hash[:])
 	estimated = true
+	if supplier, e := s.videoCalculator.lookup(ctx, req); e == nil {
+		estimated = supplier.Estimated
+	}
 	return
 }
 
@@ -871,6 +881,19 @@ func (s *OpenAIGatewayService) QuoteVideo(ctx context.Context, key *APIKey, req 
 	source := "configured_rule"
 	if enrolled {
 		source = "native_tariff"
+	}
+	if videoLegacySettings(atlasMediaModel(req.Model, "video"), req.Controls) != nil {
+		source = "calculator_settings"
+		if enrolled {
+			label, _ := VideoTariffKey(req)
+			for _, card := range key.Group.ModelPricing {
+				if len(card.Models) == 1 && card.Models[0] == req.Model && card.VideoTariff != nil {
+					if _, exact := card.VideoTariff.Cells[label]; exact {
+						source = "native_tariff"
+					}
+				}
+			}
+		}
 	}
 	return &VideoQuote{Enrolled: true, VideoQuoteRequest: req, ID: claims.ID, Token: payload + "." + base64.RawURLEncoding.EncodeToString(mac), TariffRevision: revision, ContractRevision: contract, ExpiresAt: expires, Currency: "USD", BillingUnit: "job", UnitCount: 1, TotalPrice: total, PriceSource: source, SupplierEstimated: estimated}, nil
 }

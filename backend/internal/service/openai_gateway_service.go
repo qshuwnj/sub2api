@@ -482,6 +482,7 @@ type OpenAIGatewayService struct {
 	videoAuthInvalidator  APIKeyAuthCacheInvalidator
 	videoRuntimeOnce      sync.Once
 	videoReconciler       *VideoReconcileService
+	videoCalculator       *videoPriceCalculator
 
 	openaiWSPoolOnce               sync.Once
 	openaiWSStateStoreOnce         sync.Once
@@ -553,6 +554,7 @@ func NewOpenAIGatewayService(
 		SetCodexIdentityEnforcementEnabled(!cfg.Gateway.DisableCodexIdentityEnforcement)
 	}
 	svc := &OpenAIGatewayService{
+		videoCalculator:     newVideoPriceCalculator(nil),
 		accountRepo:         accountRepo,
 		usageLogRepo:        usageLogRepo,
 		usageBillingRepo:    usageBillingRepo,

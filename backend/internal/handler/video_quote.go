@@ -12,7 +12,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// VideoQuote accepts controls only. It never calls a supplier or reserves money.
+// VideoQuote accepts controls only. Public calculator lookups never generate
+// media or reserve money and never contain customer keys, prompts or references.
 func (h *OpenAIGatewayHandler) VideoQuote(c *gin.Context) {
 	c.Header("Cache-Control", "no-store")
 	key, ok := middleware2.GetAPIKeyFromContext(c)

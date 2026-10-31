@@ -5,6 +5,10 @@ interface NativeProfile {
   mode: string
   contractRevision: string
   variants: { controls: Record<string, unknown>; durations: (number | string)[] }[]
+  settings?: Record<string, {
+    type: string; enum?: unknown[]; default?: unknown; minimum?: number; maximum?: number
+    minLength?: number; maxLength?: number; pattern?: string
+  }>
 }
 const profiles = profilesJSON as Record<string, NativeProfile>
 const policy = 'fixed-customer-price-platform-variance-v1'
@@ -32,6 +36,34 @@ export function nativeVideoCells(model: string) {
     const controls = { ...variant.controls, duration }
     return { key: keyFor(model, profile.mode, controls), controls }
   }))
+}
+function validAdvancedKey(key: string, model: string, profile: NativeProfile, defaults: Set<string>): boolean {
+  try {
+    if (!key.startsWith('video:v1:')) return false
+    const encoded = key.slice('video:v1:'.length).replace(/-/g, '+').replace(/_/g, '/')
+    const [endpoint, mode, controls] = JSON.parse(new TextDecoder('utf-8', { fatal: true })
+      .decode(Uint8Array.from(atob(encoded), char => char.charCodeAt(0))))
+    if (endpoint !== model || mode !== profile.mode || !controls || Array.isArray(controls) ||
+        key !== keyFor(model, mode, controls)) return false
+    const baseline = { ...controls }
+    for (const [field, schema] of Object.entries(profile.settings || {})) {
+      if (!(field in controls)) continue
+      const value = controls[field]
+      if (schema.enum && !schema.enum.some(item => canonical(item) === canonical(value))) return false
+      if (schema.type === 'boolean' && typeof value !== 'boolean' ||
+          schema.type === 'string' && (typeof value !== 'string' ||
+            schema.minLength != null && [...value].length < schema.minLength ||
+            schema.maxLength != null && [...value].length > schema.maxLength ||
+            schema.pattern != null && !new RegExp(schema.pattern).test(value)) ||
+          ['integer', 'number'].includes(schema.type) && (typeof value !== 'number' || !Number.isFinite(value) ||
+            schema.type === 'integer' && !Number.isInteger(value) ||
+            schema.minimum != null && value < schema.minimum ||
+            schema.maximum != null && value > schema.maximum)) return false
+      if ('default' in schema) baseline[field] = schema.default
+      else delete baseline[field]
+    }
+    return defaults.has(keyFor(model, mode, baseline))
+  } catch { return false }
 }
 export function exactVideoPrice(value: unknown): string {
   const text = typeof value === 'string' ? value : String(value)
@@ -84,7 +116,8 @@ export function validateNativeVideoCard(value: unknown): string | null {
     const expected = new Set(nativeVideoCells(model).map(cell => cell.key))
     const seen = new Set<string>()
     for (const row of card.intervals || []) {
-      if (!expected.has(row.tier_label) || seen.has(row.tier_label)) throw new Error('Duplicate, unsupported or mistyped native video cell')
+      if ((!expected.has(row.tier_label) && !validAdvancedKey(row.tier_label, model, profile, expected)) ||
+          seen.has(row.tier_label)) throw new Error('Duplicate, unsupported or mistyped native video cell')
       seen.add(row.tier_label)
       const price = exactVideoPrice(row.per_request_price)
       const evidence = metadata.cells[row.tier_label]
@@ -100,7 +133,7 @@ export function validateNativeVideoCard(value: unknown): string | null {
         if (current != null && current !== '') throw new Error('Video cells cannot contain token prices or multipliers')
       }
     }
-    if (seen.size !== expected.size || Object.keys(metadata.cells).length !== seen.size) {
+    if ([...expected].some(key => !seen.has(key)) || Object.keys(metadata.cells).length !== seen.size) {
       throw new Error(`Incomplete video grid: ${seen.size}/${expected.size}`)
     }
     return null
@@ -217,13 +250,15 @@ export function importNativeVideoDraft(text: string, existing: ChannelModelPrici
       if (priorError) throw new Error(`Existing video card is invalid: ${priorError}`)
       const oldPrices = new Map(prior.intervals.map((row: ChannelModelPricing['intervals'][number]) => [row.tier_label, exactVideoPrice(row.per_request_price)]))
       const incomingPrices = new Map(card.intervals.map((row: ChannelModelPricing['intervals'][number]) => [row.tier_label, exactVideoPrice(row.per_request_price)]))
-      if (oldPrices.size !== incomingPrices.size || [...oldPrices.keys()].some(key => !incomingPrices.has(key))) {
+      if ([...oldPrices.keys()].some(key => !incomingPrices.has(key))) {
         throw new Error(`Conflicting video tariff grid: ${model}`)
       }
       const refreshed = {
         ...prior,
         video_tariff: copyVideoMetadata(card.video_tariff),
-        intervals: prior.intervals.map((row: ChannelModelPricing['intervals'][number]) => ({ ...row })),
+        intervals: card.intervals.map((row: ChannelModelPricing['intervals'][number]) => ({
+          ...row, per_request_price: oldPrices.get(row.tier_label) ?? row.per_request_price,
+        })),
       }
       for (const row of refreshed.intervals as ChannelModelPricing['intervals']) {
         const evidence = refreshed.video_tariff?.cells[row.tier_label]

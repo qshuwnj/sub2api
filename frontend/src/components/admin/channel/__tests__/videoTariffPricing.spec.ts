@@ -10,6 +10,45 @@ const controls = { aspect_ratio: '16:9', duration: 8, generate_audio: false, res
 const key = 'video:v1:' + btoa(JSON.stringify([model, 't2v', controls])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
 const raw = `{"model_pricing":[{"platform":"openai","models":["${model}"],"billing_mode":"video","intervals":[{"tier_label":"${key}","per_request_price":9999999999.12345678}],"video_tariff":{"version":1,"contract_revision":"${'a'.repeat(64)}","cells":{"${key}":{"source":"https://api.atlascloud.ai/api/v1/model/calculate","checked_at":"2026-10-22T00:00:00Z","upstream_price":"1.6","supplier_estimated":true,"policy":"fixed-customer-price-platform-variance-v1"}}}}]}`
 describe('native video administrator money boundary', () => {
+  it('imports verified advanced cells without repricing or deleting existing default cells', () => {
+    const card = parseVideoPricingJSON(raw).model_pricing[0]
+    const evidence = Object.values(card.video_tariff.cells)[0] as Record<string, unknown>
+    card.video_tariff.contract_revision = profiles[model].contractRevision
+    card.intervals = nativeVideoCells(model).map(cell => ({
+      tier_label: cell.key, per_request_price: '9.12345678',
+    }))
+    card.video_tariff.cells = Object.fromEntries(card.intervals.map((row: any) => [row.tier_label, { ...evidence }]))
+    const prior = structuredClone(card)
+    const advancedKey = 'video:v1:' + btoa(JSON.stringify([model, 't2v', {
+      ...controls, generate_audio: true,
+    }])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
+    card.intervals.push({ tier_label: advancedKey, per_request_price: '26.66342400' })
+    card.video_tariff.cells[advancedKey] = { ...evidence, upstream_price: '3.2', supplier_estimated: false }
+    card.intervals[0].per_request_price = '13.33171200'
+    expect(validateNativeVideoCard(card)).toBeNull()
+    const [merged] = importNativeVideoDraft(stringifyVideoPricingJSON([card]), [prior])
+    expect(merged!.intervals).toHaveLength(prior.intervals.length + 1)
+    expect(merged!.intervals[0]!.per_request_price).toBe('9.12345678')
+    expect(merged!.intervals.at(-1)!.per_request_price).toBe('26.66342400')
+    expect(prior.intervals).toHaveLength(nativeVideoCells(model).length)
+    const encode = (value: Record<string, unknown>) => 'video:v1:' +
+      btoa(JSON.stringify([model, 't2v', value])).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '')
+    for (const bad of [
+      { ...controls, generate_audio: 'true' },
+      { ...controls, generate_audio: true, unverified_setting: 42 },
+      { ...controls, generate_audio: true, seed: 42.5 },
+      { ...controls, generate_audio: true, duration: 999 },
+      { ...controls, generate_audio: true, multi_shot: true },
+    ]) {
+      const altered = structuredClone(card)
+      const invalid = encode(bad)
+      altered.intervals.at(-1)!.tier_label = invalid
+      altered.video_tariff.cells[invalid] = altered.video_tariff.cells[advancedKey]
+      delete altered.video_tariff.cells[advancedKey]
+      expect(validateNativeVideoCard(altered)).not.toBeNull()
+    }
+    expect(() => importNativeVideoDraft(stringifyVideoPricingJSON([prior]), [merged!] as never)).toThrow()
+  })
   it('collapses only the reviewed O1 ratio grid when exact stored prices and cost provenance agree', () => {
     const endpoint = 'kwaivgi/kling-video-o1/image-to-video'
     const encode = (controls: Record<string, unknown>) => 'video:v1:' +

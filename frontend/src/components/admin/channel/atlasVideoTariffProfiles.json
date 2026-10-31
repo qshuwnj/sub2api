@@ -754,6 +754,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "f27673317c082556779219b01a1fe892e40648a3537b89d6cdea95622d75f97f"
   },
   "bytedance/seedance-2.0-fast/text-to-video": {
@@ -1511,6 +1535,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "154e4e65473dc402ca15cea45ea5e395a4afe531b6bcd9fa4b870efef4c8f64d"
   },
   "bytedance/seedance-2.0-mini/image-to-video": {
@@ -2268,6 +2316,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "a333d8fc9321adb55b9e48a1f21ede426f58b535f8062d1cefd5edda017e7ba3"
   },
   "bytedance/seedance-2.0-mini/text-to-video": {
@@ -3025,6 +3097,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "fe0a4306c173c9c6138dac9aa1d04f0a6576be48d8b1cf17f566c443959ea132"
   },
   "bytedance/seedance-2.0/image-to-video": {
@@ -4082,6 +4178,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "184dca7a572d5ab23a3ffa137be132703f7f9da9248d0ef1e142fa975dee43fd"
   },
   "bytedance/seedance-2.0/text-to-video": {
@@ -5139,12 +5259,54 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "50cc4c6f7cb30420341d7c18c84d50bf88d8922f28df41bdd73b2a74830f198a"
   },
   "bytedance/seedance-2.5/image-to-video": {
     "mode": "i2v",
     "contractRevision": "10559c136a03e8bfab63090fe76b21d9190b0949ec98fcf75761b77964f57d15",
     "variants": [],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      },
+      "output_format": {
+        "type": "string",
+        "default": "mp4",
+        "enum": [
+          "mp4",
+          "mov"
+        ]
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "bytedance/seedance-2.5/text-to-video": {
@@ -7792,6 +7954,24 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      },
+      "output_format": {
+        "type": "string",
+        "default": "mp4",
+        "enum": [
+          "mp4",
+          "mov"
+        ]
+      }
+    },
     "keysSHA256": "cba3bc3b169878d78805ecc54ff5229c7eba59a2f575b46e6c62fbaff2af2471"
   },
   "bytedance/seedance-v1-pro-fast/image-to-video": {
@@ -8177,6 +8357,16 @@
         ]
       }
     ],
+    "settings": {
+      "camera_fixed": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "0ebfae6994ea56dc137c70d56e4b142253709af6ac439df389a225eb535271e2"
   },
   "bytedance/seedance-v1-pro-fast/text-to-video": {
@@ -8562,6 +8752,16 @@
         ]
       }
     ],
+    "settings": {
+      "camera_fixed": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "95a4277626a229749355f4a7d4d0de3e29cc27a5a84030841dc8684ecde40e53"
   },
   "bytedance/seedance-v1-pro-i2v-1080p": {
@@ -8683,6 +8883,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "7d4fdcca24e5a20e6fbfb3bc562961393e962b572eea7ac8acf2e4e4774cb04b"
   },
   "bytedance/seedance-v1-pro-i2v-480p": {
@@ -8804,6 +9010,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "82e1f2fad907201d7c98223b4c4d958ddbc0872cf16ffb0e7b2b4eaa55d89980"
   },
   "bytedance/seedance-v1-pro-i2v-720p": {
@@ -8925,6 +9137,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "e7d3bd41a58675557900559bc5ff7c4620bc7cae5d4bb4caceabb947a141ae69"
   },
   "bytedance/seedance-v1-pro-t2v-1080p": {
@@ -9052,6 +9270,16 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      },
+      "camera_fixed": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "a6d556046320bf9cabda9c71564dba82f41c901c4f95078c6f81d39ba3bc2651"
   },
   "bytedance/seedance-v1-pro-t2v-480p": {
@@ -9173,6 +9401,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "33c3ac7f233d401dbff720ba5572fd17aa8cfd709efec247bf9d2a755ffeeb02"
   },
   "bytedance/seedance-v1-pro-t2v-720p": {
@@ -9294,6 +9528,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "0e945ebe1224d0cab6af4b74636dc7c399e23d04aa72cc3526add9a9ac6a1ccb"
   },
   "bytedance/seedance-v1.5-pro/image-to-video": {
@@ -9541,6 +9781,20 @@
         ]
       }
     ],
+    "settings": {
+      "camera_fixed": {
+        "default": false,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "36a324146d4f96c621dcc1e1386352e29fbdd5ceb1e80e31270812b45adf1367"
   },
   "bytedance/seedance-v1.5-pro/text-to-video": {
@@ -9788,6 +10042,20 @@
         ]
       }
     ],
+    "settings": {
+      "camera_fixed": {
+        "default": false,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "14e1f40796dfaaaa03d496e5a2753e6bb6a9a0a41d9f4b22431006a8eebc7600"
   },
   "google/gemini-omni-1.1-flash/image-to-video": {
@@ -9939,6 +10207,21 @@
         ]
       }
     ],
+    "settings": {
+      "thinking_level": {
+        "default": "default",
+        "enum": [
+          "default",
+          "high",
+          "low"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "c472e34c033826a5838b61072bc9b3f2a6e5c672836f35d6a4996e909ad7ee2b"
   },
   "google/gemini-omni-1.1-flash/text-to-video": {
@@ -10090,6 +10373,21 @@
         ]
       }
     ],
+    "settings": {
+      "thinking_level": {
+        "default": "default",
+        "enum": [
+          "default",
+          "high",
+          "low"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "365ef303441581ec6472b7d3fdc3fc788df57c2e91086f8fb4bdb120d721f449"
   },
   "google/gemini-omni-flash/image-to-video": {
@@ -10133,6 +10431,21 @@
         ]
       }
     ],
+    "settings": {
+      "thinking_level": {
+        "default": "default",
+        "enum": [
+          "default",
+          "high",
+          "low"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "19321911d03811a8adb3a4188706ff8260c475be60ce48776143d2f7aaa4585f"
   },
   "google/gemini-omni-flash/text-to-video": {
@@ -10176,6 +10489,21 @@
         ]
       }
     ],
+    "settings": {
+      "thinking_level": {
+        "default": "default",
+        "enum": [
+          "default",
+          "high",
+          "low"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "caea963be85089e86b3a1d47a62e0fa5b46af5d226dd411fb37adfd7a92667e3"
   },
   "google/veo3.1-fast/image-to-video": {
@@ -10247,6 +10575,15 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "577669de9951b68168a68da10817db8d8707436b0efa0dc74285b0de111bcea1"
   },
   "google/veo3.1-fast/text-to-video": {
@@ -10318,6 +10655,15 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "23b6d14088484c639b68ee815c40846f1a9cf665b23ed2d8502859f3b91c79c3"
   },
   "google/veo3.1-lite/image-to-video": {
@@ -10369,6 +10715,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "02321dbcab01815ab9ec1ffbb1a94e35dd7f9f1ff62625bfde5a696bda84da74"
   },
   "google/veo3.1-lite/text-to-video": {
@@ -10420,6 +10772,12 @@
         ]
       }
     ],
+    "settings": {
+      "seed": {
+        "default": -1,
+        "type": "integer"
+      }
+    },
     "keysSHA256": "4697c35d72dd2e39eccc5b24d2c4836a971fb4ed22c048991decb9108ce4467c"
   },
   "google/veo3.1/image-to-video": {
@@ -10491,6 +10849,15 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "418b688b7588146a7cc32d5383d23247d94bd51c8b0d6e655848908de32c2d0f"
   },
   "google/veo3.1/text-to-video": {
@@ -10562,18 +10929,43 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "1270058bc3c29f304885745d565c76db9ef3237e70e9dc2ba920b919a6f90e7f"
   },
   "kwaivgi/kling-v1.6-i2v-pro": {
     "mode": "i2v",
     "contractRevision": "d203accd1b3c5e6233f40acb3081b0b53df54f7eb7a3a9d2fe5234960c48032f",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v1.6-i2v-standard": {
     "mode": "i2v",
     "contractRevision": "23b925c1ec7056da0e89edef5ab38c1baf6a249c874377c1a8e598f37f727a90",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v1.6-multi-i2v-pro": {
@@ -10608,6 +11000,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "1f509e0f1e6f36bb77962bc163ee6038d701ed48598023cc218f073eb8c846e2"
   },
   "kwaivgi/kling-v1.6-multi-i2v-standard": {
@@ -10642,6 +11035,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "c34ff5cd9f6a194fed067e5a3c4507a364548294b01317d54be902498e7e327a"
   },
   "kwaivgi/kling-v1.6-t2v-standard": {
@@ -10679,12 +11073,28 @@
         ]
       }
     ],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "4e42e70d9800fbb591b9b8c1e60d0d366c1ce33b6d1d4344199fc925e025f2c9"
   },
   "kwaivgi/kling-v2.0-i2v-master": {
     "mode": "i2v",
     "contractRevision": "c09f9a3dd0349e2016bd72f43cd528b1ebcd07846d6f0b010023207a0c951b29",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.0-t2v-master": {
@@ -10719,24 +11129,49 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "f6f18977beff5c356ec7771e2f0f205654237560c5e72f6f94ce8c9338f6ea44"
   },
   "kwaivgi/kling-v2.1-i2v-master": {
     "mode": "i2v",
     "contractRevision": "8c3f06977796e383073f526beec355618e8360dd97d60126a33fe25e841bf5d4",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "type": "number",
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.1-i2v-pro": {
     "mode": "i2v",
     "contractRevision": "c9ca84c5c3ec68ae05882738bb8e2f4dbb6e7198bfd4e2416c66051c76eadfdd",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.1-i2v-standard": {
     "mode": "i2v",
     "contractRevision": "3cf07144754778ff0170be1b7377f77b1f18c021faf5c9b7d9e1212afe1d48fe",
     "variants": [],
+    "settings": {
+      "guidance_scale": {
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0,
+        "type": "number"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.1-t2v-master": {
@@ -10774,12 +11209,21 @@
         ]
       }
     ],
+    "settings": {
+      "guidance_scale": {
+        "type": "number",
+        "default": 0.5,
+        "maximum": 1,
+        "minimum": 0
+      }
+    },
     "keysSHA256": "ac989c431fe2a3741dc527c6497d65cb44af201be3ae8cf852b11f4beabdc6ee"
   },
   "kwaivgi/kling-v2.5-turbo-pro/image-to-video": {
     "mode": "i2v",
     "contractRevision": "e8304e9f7fb5577a6d18ba424fbc041aa3dd6c70688a346829fff2149b8944d5",
     "variants": [],
+    "settings": {},
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.5-turbo-pro/text-to-video": {
@@ -10814,12 +11258,19 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "1073272b2c583317c9b5c43497011be4d1a91d8a9491996a28736d3e23cd06b8"
   },
   "kwaivgi/kling-v2.6-pro/image-to-video": {
     "mode": "i2v",
     "contractRevision": "67efacc129a90d833923befee1029c70923d302d56b61b85218583566b57b33f",
     "variants": [],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v2.6-pro/text-to-video": {
@@ -10857,12 +11308,24 @@
         ]
       }
     ],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "517ebc5a29ad952828e686d170e52094d6e88c1779cfd1f7c584de951a26dc61"
   },
   "kwaivgi/kling-v3.0-4k/image-to-video": {
     "mode": "i2v",
     "contractRevision": "9dc326a019b267b36fb9618e1c2c3f450dd6160964242bc858799a1eba71ea0e",
     "variants": [],
+    "settings": {
+      "sound": {
+        "type": "boolean",
+        "default": true
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-4k/text-to-video": {
@@ -10936,12 +11399,24 @@
         ]
       }
     ],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "0f000bcbd09f4dcb392c51270ef81202924839b56835f2bbaf21dabdd63ba2fe"
   },
   "kwaivgi/kling-v3.0-pro/image-to-video": {
     "mode": "i2v",
     "contractRevision": "6844ff3de0c3444e106bcfbe42736611512216d29bff43ed13414a9b60159d47",
     "variants": [],
+    "settings": {
+      "sound": {
+        "type": "boolean",
+        "default": true
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-pro/text-to-video": {
@@ -11015,12 +11490,24 @@
         ]
       }
     ],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "cfc5d50bdc823cf2ace5645dce95e0d030dd2f270eddb8df8aed1fcaf329a094"
   },
   "kwaivgi/kling-v3.0-std/image-to-video": {
     "mode": "i2v",
     "contractRevision": "9dfdb09f61ca5a78526c41de6624e7de9c922c300f2e923e6e28026fc9f157e1",
     "variants": [],
+    "settings": {
+      "sound": {
+        "type": "boolean",
+        "default": true
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-std/text-to-video": {
@@ -11094,12 +11581,19 @@
         ]
       }
     ],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "4b901890e1e63d8d1430fc7a11b14a3059f8d1700335827a7bb4e1c4348f0157"
   },
   "kwaivgi/kling-v3.0-turbo/image-to-video": {
     "mode": "i2v",
     "contractRevision": "509db532000a3d59479125b0e6e6d2db2c41b3fce1ba8e49a2dea523f47da23a",
     "variants": [],
+    "settings": {},
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-v3.0-turbo/text-to-video": {
@@ -11233,6 +11727,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "f1ad3d23c1d2046836ad45599c3f85262ea12bfe6c938712a89eced4d664fe82"
   },
   "kwaivgi/kling-video-o1/image-to-video": {
@@ -11247,6 +11742,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "1f466c440ea8ce98b60833b1aa9fdd3fc119fe05c3aa1bbc63fe240adcb07228"
   },
   "kwaivgi/kling-video-o1/text-to-video": {
@@ -11281,12 +11777,19 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "e0b899fc0f4959a4197d1c5e00a5d5e4831b13ce3c1ed92d31bab146ffac2e91"
   },
   "kwaivgi/kling-video-o3-4k/image-to-video": {
     "mode": "i2v",
     "contractRevision": "8efe86aca0fca2fb43eeb81243b3f499e54619dc25789e57541202d6df283a73",
     "variants": [],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "kwaivgi/kling-video-o3-4k/text-to-video": {
@@ -11360,12 +11863,24 @@
         ]
       }
     ],
+    "settings": {
+      "sound": {
+        "default": true,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "cdf8fd8139c3f1af2b3557c51d8381ef8bebaf4ed108aeda73fccdb205e7987a"
   },
   "minimax/h3-developer/image-to-video": {
     "mode": "i2v",
     "contractRevision": "1c99d16e20eb3b7a939e0c99099711c203ee87be1b0cef02d1a7d88470d2696f",
     "variants": [],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "minimax/h3-developer/text-to-video": {
@@ -11877,12 +12392,24 @@
         ]
       }
     ],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "d1375e30b0138d40073442a103f62cac3c14211a9ff5b1b4905200917daaf50a"
   },
   "minimax/h3-fast/image-to-video": {
     "mode": "i2v",
     "contractRevision": "401c75a1ed1d30e224ef2d5035fa4b855f2a14b329442ceb4faf2d7bfc60a016",
     "variants": [],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "minimax/h3-fast/text-to-video": {
@@ -12010,12 +12537,19 @@
         ]
       }
     ],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "13337586064757af9eb9a68912709b90749a0bf20c595bb1614bceb51379c7a3"
   },
   "minimax/h3-max-turbo/image-to-video": {
     "mode": "i2v",
     "contractRevision": "7c545f7faa170aa7701f05391f90e291849952ddf8ecf91b54dbdd4f98797bae",
     "variants": [],
+    "settings": {},
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "minimax/h3-max-turbo/text-to-video": {
@@ -12251,12 +12785,19 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "beec4d08196fd611b03cb98348cbafc5358d0fd82246bfa54721c095c889d23e"
   },
   "minimax/h3-max/image-to-video": {
     "mode": "i2v",
     "contractRevision": "2b153d3894f7dbabb43b443d18e8928ba1906692cb3053eb24ef88207eb9c22b",
     "variants": [],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "minimax/h3-max/text-to-video": {
@@ -12744,12 +13285,24 @@
         ]
       }
     ],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "f45c6862a837e9b57c3f80773166a42e10427c7caf91acc1f522a7ba385fdce5"
   },
   "minimax/h3/image-to-video": {
     "mode": "i2v",
     "contractRevision": "9dbcbd5588912821f0bca3f8e2557f1e9c150b0e9180018bdff26b51e4a2934f",
     "variants": [],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "minimax/h3/text-to-video": {
@@ -13135,18 +13688,63 @@
         ]
       }
     ],
+    "settings": {
+      "prompt_expansion": {
+        "default": false,
+        "type": "boolean"
+      }
+    },
     "keysSHA256": "881f664aa2de6720f0d599787842b7a43d22d765b7b3219534e538597081743d"
   },
   "vidu/image-to-video-2.0": {
     "mode": "i2v",
     "contractRevision": "64e6c747162940b227a6ec36180b368c55f6840efb3136932c51a048d2db4b8c",
     "variants": [],
+    "settings": {
+      "seed": {
+        "type": "integer",
+        "default": 0
+      },
+      "movement_amplitude": {
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string",
+        "default": "auto"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q1/image-to-video": {
     "mode": "i2v",
     "contractRevision": "fcd7cfefba76788676640f3fb030de8d1cc6b91b27dcfe32b51da25eed66b3b4",
     "variants": [],
+    "settings": {
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q1/text-to-video": {
@@ -13193,24 +13791,124 @@
         ]
       }
     ],
+    "settings": {
+      "style": {
+        "default": "general",
+        "enum": [
+          "general",
+          "anime"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "0eeae684b9d3840a08c37d7b83e4928b80c78a1dcaf39e7bd34f426fec0b60d4"
   },
   "vidu/q2-pro-fast/image-to-video": {
     "mode": "i2v",
     "contractRevision": "4f44da8e44d0afa7dbbba7e1b9e8d66c5cb4cc6c88d0e4499141881b1b7f6323",
     "variants": [],
+    "settings": {
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q2-pro/image-to-video": {
     "mode": "i2v",
     "contractRevision": "d6fe5fc093344a0abf376026cd23c98dd6c2fed6aa37f57b5fd389f6c37e9ee8",
     "variants": [],
+    "settings": {
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "bgm": {
+        "default": false,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q2-turbo/image-to-video": {
     "mode": "i2v",
     "contractRevision": "2512ba49710c77d870c5f9589c8ca8e30a771e6a70c9c8455eda335ce75328b7",
     "variants": [],
+    "settings": {
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q2/text-to-video": {
@@ -13518,12 +14216,66 @@
         ]
       }
     ],
+    "settings": {
+      "style": {
+        "default": "general",
+        "enum": [
+          "general",
+          "anime"
+        ],
+        "type": "string"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "3287a7f7db5c69653e38af4c4765f57957cb7d6df9a703fdb2eabbfb9ba7f77c"
   },
   "vidu/q3-pro/image-to-video": {
     "mode": "i2v",
     "contractRevision": "4e30dd0e4b0d1b5b1373bf1b9bd6bb4db3ac8b23d37bbef8dff93b26a4e54244",
     "variants": [],
+    "settings": {
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q3-pro/text-to-video": {
@@ -14231,12 +14983,66 @@
         ]
       }
     ],
+    "settings": {
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "type": "integer"
+      },
+      "style": {
+        "default": "general",
+        "enum": [
+          "general",
+          "anime"
+        ],
+        "type": "string"
+      }
+    },
     "keysSHA256": "126b4be5ae5a8e61ddeff4c7e574e76eb60b46a2a47e76f7efbe9f4f1dc580ca"
   },
   "vidu/q3-turbo/image-to-video": {
     "mode": "i2v",
     "contractRevision": "e68a44c9abb5fa49fbee80d027fce08c0ecacaa9e7b5ea0c258b8737eff19fd4",
     "variants": [],
+    "settings": {
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "type": "integer"
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "vidu/q3-turbo/text-to-video": {
@@ -14944,12 +15750,57 @@
         ]
       }
     ],
+    "settings": {
+      "bgm": {
+        "default": true,
+        "type": "boolean"
+      },
+      "generate_audio": {
+        "default": true,
+        "type": "boolean"
+      },
+      "movement_amplitude": {
+        "default": "auto",
+        "enum": [
+          "auto",
+          "small",
+          "medium",
+          "large"
+        ],
+        "type": "string"
+      },
+      "seed": {
+        "type": "integer"
+      },
+      "style": {
+        "default": "general",
+        "enum": [
+          "general",
+          "anime"
+        ],
+        "type": "string"
+      }
+    },
     "keysSHA256": "28d4beaa958f7dcf7f2d4628f08d68574bbba58fa55781151dc891d68de4f55a"
   },
   "vidu/q4-preview/image-to-video": {
     "mode": "i2v",
     "contractRevision": "bf3f396cf119f43fb8be60755784d260876cbd2bfb853593a0a5a85744b7fe60",
     "variants": [],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "enable_prompt_expansion": {
+        "type": "boolean",
+        "default": false
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1
+      }
+    },
     "keysSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
   },
   "xai/grok-imagine-video-v1.5-developer/image-to-video": {
@@ -15440,6 +16291,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "b6ecc61acf5bfb41e62fa2442ba32ad3c3e1353808b3206e9ce7081e1b1efbe4"
   },
   "xai/grok-imagine-video-v1.5-developer/text-to-video": {
@@ -15930,6 +16782,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "f557cacc1b3758ac5d688ed64d1449236a61c14c4f4f4e96325e0bd6e755ceb0"
   },
   "xai/grok-imagine-video-v1.5-lite-developer/image-to-video": {
@@ -16420,6 +17273,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "c43fdae6a15c6161ae739c6a7c63e401fa7318952b55565adedd7efc785d9b7a"
   },
   "xai/grok-imagine-video-v1.5-lite-developer/text-to-video": {
@@ -16910,6 +17764,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "e4cbd01d7776ede11273dcb1f8d27a68eba42c110e91a48aa41dc2d6af087d7e"
   },
   "xai/grok-imagine-video-v1.5-lite/image-to-video": {
@@ -17565,6 +18420,12 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      }
+    },
     "keysSHA256": "38ebbae2e8ec41ef9947abe3549c9e0b982c19e73745cf5d63b880ef3aa7d77d"
   },
   "xai/grok-imagine-video-v1.5-lite/text-to-video": {
@@ -18220,6 +19081,12 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      }
+    },
     "keysSHA256": "ee0f20a13616d655a581c15aee2fcf91b81378cace09da681ee79b86fa51fe61"
   },
   "xai/grok-imagine-video-v1.5/image-to-video": {
@@ -18710,6 +19577,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "f59846bdc08baaf4120aa56c4cdf507e0c1692e19dddb68c7c747b7a82006fe1"
   },
   "xai/grok-imagine-video-v1.5/text-to-video": {
@@ -19200,6 +20068,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "3c95c664302b9fa3404b165493e6d6685115a82c025bad8165a8cd2e633bc2dd"
   },
   "xai/grok-imagine-video/image-to-video": {
@@ -19529,6 +20398,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "88f32b1eba46eb0623f4741f123acefc11dd2d210506a3f47c5fb71d2e4fbb80"
   },
   "xai/grok-imagine-video/text-to-video": {
@@ -19858,6 +20728,7 @@
         ]
       }
     ],
+    "settings": {},
     "keysSHA256": "a0326c59312645e75e0fd713bd9449f26d6ed16b1e855dc68b7bfe5d9ee63c47"
   },
   "bytedance/seedance-2.0/reference-to-video": {
@@ -20915,6 +21786,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "d476774bd39ac2e2017df7623bee72554a4adc044bad43dff2e2acfd62de0a0c"
   },
   "bytedance/seedance-2.0-mini/reference-to-video": {
@@ -21672,6 +22567,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "315f5d89a72d05e9d1c7471f31b7872289ca7b20a99b1b6137d3feb83c27314b"
   },
   "bytedance/seedance-2.0-fast/reference-to-video": {
@@ -22429,6 +23348,30 @@
         ]
       }
     ],
+    "settings": {
+      "bitrate_mode": {
+        "type": "string",
+        "default": "standard",
+        "enum": [
+          "standard",
+          "high"
+        ]
+      },
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "seed": {
+        "type": "integer",
+        "default": -1,
+        "minimum": -1,
+        "maximum": 4294967295
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      }
+    },
     "keysSHA256": "be5995ca5778254edd32719d51b1804c4fb1fd8f3d27d558a47e9f97bcbc7082"
   },
   "bytedance/seedance-2.5/reference-to-video": {
@@ -25076,6 +26019,24 @@
         ]
       }
     ],
+    "settings": {
+      "generate_audio": {
+        "type": "boolean",
+        "default": true
+      },
+      "watermark": {
+        "type": "boolean",
+        "default": false
+      },
+      "output_format": {
+        "type": "string",
+        "default": "mp4",
+        "enum": [
+          "mp4",
+          "mov"
+        ]
+      }
+    },
     "keysSHA256": "5f50eae42ea89bd98517bab60f1d26cd2fea4fc47eb9cbe12a865a147d05fae2"
   }
 }
