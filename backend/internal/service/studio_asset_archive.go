@@ -36,8 +36,10 @@ type studioAssetVideoReader interface {
 }
 
 type StudioAssetService struct {
-	repo    StudioAssetRepository
-	resolve ImageStorageResolver
+	repo         StudioAssetRepository
+	resolve      ImageStorageResolver
+	imageTasks   *ImageTaskService
+	recoverVideo func(context.Context, StudioAssetOwner, string) error
 }
 
 func NewStudioAssetService(repo StudioAssetRepository, resolve ImageStorageResolver) *StudioAssetService {
@@ -85,40 +87,47 @@ func studioImageMIME(declared string, data []byte) (string, bool) {
 }
 
 func (s *StudioAssetService) CollectImage(ctx context.Context, owner StudioAssetOwner, generationID string, index int, model, prompt string, metadata json.RawMessage, source StudioImageOutput) error {
+	_, err := s.collectImageAt(ctx, owner, generationID, index, model, prompt, metadata, source, time.Now().UTC())
+	return err
+}
+
+// The boolean distinguishes a durable queued source from the independent
+// storage warning, so history counters never label a persisted source lost.
+func (s *StudioAssetService) collectImageAt(ctx context.Context, owner StudioAssetOwner, generationID string, index int, model, prompt string, metadata json.RawMessage, source StudioImageOutput, generatedAt time.Time) (bool, error) {
 	if s == nil || s.repo == nil {
-		return ErrStudioAssetUnavailable
+		return false, ErrStudioAssetUnavailable
 	}
 	u, _, storageErr := s.objects()
 	if len(source.Bytes) > 0 && u == nil {
 		// A failed configuration lookup is not evidence that the default limit
 		// applies. Fail closed instead of persisting potentially oversized bytes.
-		return ErrStudioAssetUnavailable
+		return false, ErrStudioAssetUnavailable
 	}
 	if owner.UserID <= 0 || owner.APIKeyID <= 0 || generationID == "" || len(generationID) > 256 || index < 0 ||
 		len(source.Bytes) == 0 && !validVideoResultURL(source.URL) || int64(len(source.Bytes)) > studioImageLimit(u) {
-		return ErrStudioAssetInvalidRequest
+		return false, ErrStudioAssetInvalidRequest
 	}
 	if len(metadata) == 0 {
 		metadata = json.RawMessage(`{}`)
 	}
 	if !json.Valid(metadata) || !strings.HasPrefix(strings.TrimSpace(string(metadata)), "{") {
-		return ErrStudioAssetInvalidRequest
+		return false, ErrStudioAssetInvalidRequest
 	}
 	mime, valid := studioImageMIME(source.MIME, source.Bytes)
 	if !valid {
-		return ErrStudioAssetInvalidRequest
+		return false, ErrStudioAssetInvalidRequest
 	}
 	a := &StudioAsset{Owner: owner, Kind: "image", GenerationID: generationID, OutputIndex: index,
 		Model: model, Prompt: prompt, Metadata: metadata, MIME: mime, SourceURL: source.URL,
-		SourceBytes: source.Bytes, State: "pending", GeneratedAt: time.Now().UTC()}
+		SourceBytes: source.Bytes, State: "pending", GeneratedAt: generatedAt}
 	if len(source.Bytes) > 0 {
 		a.SourceURL = ""
 	}
 	// Bound and validate bytes before persistence, including when storage is down.
 	if err := s.repo.UpsertStudioAsset(ctx, a); err != nil {
-		return ErrStudioAssetUnavailable
+		return false, ErrStudioAssetUnavailable
 	}
-	return storageErr
+	return true, storageErr
 }
 
 func studioAssetImageKey(a *StudioAsset) string {
@@ -203,6 +212,9 @@ func (s *StudioAssetService) ProcessPending(ctx context.Context) error {
 	}
 	ctx, cancel := context.WithTimeout(ctx, 120*time.Second)
 	defer cancel()
+	if err := s.processVideoIntakes(ctx); err != nil {
+		return err
+	}
 	items, err := s.repo.ClaimStudioAssets(ctx, 1)
 	if err != nil {
 		return ErrStudioAssetUnavailable

@@ -115,6 +115,7 @@ func (s *OpenAIGatewayService) ForwardSeedance(ctx context.Context, c *gin.Conte
 	req.Header.Set("Content-Type", "application/json")
 	req.Header.Set("Accept", "application/json")
 	account.ApplyHeaderOverrides(req.Header)
+	req.Header.Del("X-Studio-Library")
 	proxy := ""
 	if account.ProxyID != nil && account.Proxy != nil {
 		proxy = account.Proxy.URL()
@@ -149,6 +150,12 @@ func (s *OpenAIGatewayService) ForwardSeedance(ctx context.Context, c *gin.Conte
 		if gjson.GetBytes(responseBody, "status").String() == "succeeded" {
 			result.Usage.OutputTokens = max(0, int(gjson.GetBytes(responseBody, "usage.completion_tokens").Int()))
 		}
+		responseBody = withStudioLibraryStatus(responseBody, observeStudioVideo(c, taskID,
+			gjson.GetBytes(responseBody, "content.video_url").String(),
+			gjson.GetBytes(responseBody, "status").String() == "succeeded", account.ID))
+	}
+	if endpoint == SeedanceEndpointCreate {
+		responseBody = withStudioLibraryStatus(responseBody, ObserveStudioVideoSubmission(c, result.ResponseID, account.ID))
 	}
 	writeGrokMediaResponse(c, resp, responseBody, s.responseHeaderFilter)
 	return result, nil

@@ -28,6 +28,9 @@ type AsyncImageHandler struct {
 
 func NewAsyncImageHandler(tasks *service.ImageTaskService, openAI *OpenAIGatewayHandler) *AsyncImageHandler {
 	h := &AsyncImageHandler{tasks: tasks, openAI: openAI}
+	if openAI != nil && openAI.gatewayService != nil {
+		openAI.gatewayService.StudioAssets().SetOwnedImageTasks(tasks)
+	}
 	h.execute = h.executeWithGateway
 	return h
 }

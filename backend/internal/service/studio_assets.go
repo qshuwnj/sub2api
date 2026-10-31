@@ -175,18 +175,18 @@ func (s *StudioAssetService) Delete(ctx context.Context, owner StudioAssetOwner,
 }
 
 func (s *StudioAssetService) Reconcile(ctx context.Context, owner StudioAssetOwner, ids []string) (*StudioAssetReconcileResult, error) {
-	if !validStudioOwner(owner) || len(ids) > 100 {
+	if !validStudioOwner(owner) || len(ids) > 50 {
 		return nil, ErrStudioAssetInvalidRequest
 	}
 	for _, id := range ids {
-		if id == "" || len(id) > 256 || strings.ContainsAny(id, "\r\n\x00") {
+		if !ValidStudioGenerationID(id) {
 			return nil, ErrStudioAssetInvalidRequest
 		}
 	}
 	if s == nil || s.repo == nil {
 		return nil, ErrStudioAssetUnavailable
 	}
-	result, err := s.repo.ReconcileStudioAssets(ctx, owner, ids)
+	result, err := s.reconcileOwnedHistory(ctx, owner, ids)
 	if err == nil && result == nil {
 		return nil, ErrStudioAssetUnavailable
 	}

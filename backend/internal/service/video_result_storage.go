@@ -63,8 +63,9 @@ type VideoPlayback struct {
 }
 
 type VideoResultService struct {
-	repo    VideoResultRepository
-	resolve ImageStorageResolver
+	repo          VideoResultRepository
+	resolve       ImageStorageResolver
+	nativeContent func(context.Context, *VideoResult) (*VideoResultContent, error)
 }
 
 func NewVideoResultService(repo VideoResultRepository, resolve ImageStorageResolver) *VideoResultService {
@@ -81,16 +82,18 @@ func videoResultContentPath(resource string) string {
 	if id, ok := strings.CutPrefix(resource, "attempt:"); ok && ValidVideoAttemptID(id) {
 		return "/v1/videos/attempts/" + id + "/content"
 	}
-	if id, ok := strings.CutPrefix(resource, "task:"); ok && ValidVideoAttemptID(id) && strings.HasPrefix(id, "atlascloud:") {
+	if id, ok := strings.CutPrefix(resource, "task:"); ok && ValidVideoAttemptID(id) {
 		return "/v1/videos/" + id + "/content"
 	}
 	return ""
 }
 
 func (s *VideoResultService) Queue(ctx context.Context, v *VideoResult) error {
+	nativeContent := s != nil && s.nativeContent != nil && v != nil && v.SourceURL == "" && studioNativeContentTask(v)
 	if s == nil || s.repo == nil || v == nil || v.UserID <= 0 || v.APIKeyID <= 0 || v.AccountID <= 0 ||
-		videoResultContentPath(v.Resource) == "" || !strings.HasPrefix(v.TaskID, "atlascloud:") ||
-		!ValidVideoAttemptID(v.TaskID) || !validVideoResultURL(v.SourceURL) ||
+		videoResultContentPath(v.Resource) == "" ||
+		!ValidVideoAttemptID(v.TaskID) || !validVideoResultURL(v.SourceURL) && !nativeContent ||
+		strings.HasPrefix(v.Resource, "attempt:") && !strings.HasPrefix(v.TaskID, "atlascloud:") ||
 		strings.HasPrefix(v.Resource, "task:") && v.Resource != "task:"+v.TaskID {
 		return ErrVideoResultUnavailable
 	}
@@ -206,44 +209,13 @@ func (s *VideoResultService) ArchivePending(ctx context.Context, refresh VideoRe
 }
 
 func (s *VideoResultService) archive(ctx context.Context, u *ImageResultUploader, store VideoObjectStore, v *VideoResult, refresh VideoResultRefresher) error {
-	source := v.SourceURL
-	if source == "" || videoSignedURLExpired(source, time.Now()) {
-		if refresh == nil {
-			return ErrVideoResultExpired
-		}
-		var err error
-		source, err = refresh(ctx, v)
-		if err != nil {
-			return err
-		}
-	}
-	if !validVideoResultURL(source) || videoSignedURLExpired(source, time.Now()) {
-		return ErrVideoResultExpired
-	}
-	client := *u.httpClient
-	client.Timeout = 110 * time.Second
-	// Retain the existing SSRF-safe transport; validate redirects as well.
-	priorRedirect := client.CheckRedirect
-	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
-		if len(via) >= 5 || !validVideoResultURL(req.URL.String()) {
-			return ErrVideoResultUnavailable
-		}
-		if priorRedirect != nil {
-			return priorRedirect(req, via)
-		}
-		return nil
-	}
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, source, nil)
+	body, length, err := s.openArchiveSource(ctx, u, v, refresh)
 	if err != nil {
-		return ErrVideoResultUnavailable
+		return err
 	}
-	resp, err := client.Do(req)
-	if err != nil {
-		return ErrVideoResultUnavailable // Never log bearer-like signed URLs.
-	}
-	defer resp.Body.Close()
+	defer body.Close()
 	const maxBytes = int64(300 << 20)
-	if resp.StatusCode != http.StatusOK || resp.ContentLength > maxBytes {
+	if length > maxBytes {
 		return ErrVideoResultUnavailable
 	}
 	file, err := os.CreateTemp("", "quotaflow-video-*.part")
@@ -251,7 +223,7 @@ func (s *VideoResultService) archive(ctx context.Context, u *ImageResultUploader
 		return ErrVideoResultUnavailable
 	}
 	defer func() { _ = file.Close(); _ = os.Remove(file.Name()) }()
-	size, err := io.Copy(file, io.LimitReader(resp.Body, maxBytes+1))
+	size, err := io.Copy(file, io.LimitReader(body, maxBytes+1))
 	if err != nil || size <= 0 || size > maxBytes {
 		return ErrVideoResultUnavailable
 	}
@@ -281,4 +253,57 @@ func (s *VideoResultService) archive(ctx context.Context, u *ImageResultUploader
 	saveCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 10*time.Second)
 	defer cancel()
 	return s.repo.CompleteVideoResult(saveCtx, &completed)
+}
+
+func (s *VideoResultService) openArchiveSource(ctx context.Context, u *ImageResultUploader, v *VideoResult, refresh VideoResultRefresher) (io.ReadCloser, int64, error) {
+	source := v.SourceURL
+	if s.nativeContent != nil && studioNativeContentTask(v) && (source == "" || videoSignedURLExpired(source, time.Now())) {
+		content, err := s.nativeContent(ctx, v)
+		if err != nil {
+			return nil, 0, err
+		}
+		if content == nil || content.Body == nil {
+			return nil, 0, ErrVideoResultUnavailable
+		}
+		return content.Body, content.Size, nil
+	}
+	if source == "" || videoSignedURLExpired(source, time.Now()) {
+		if refresh == nil {
+			return nil, 0, ErrVideoResultExpired
+		}
+		var err error
+		source, err = refresh(ctx, v)
+		if err != nil {
+			return nil, 0, err
+		}
+	}
+	if !validVideoResultURL(source) || videoSignedURLExpired(source, time.Now()) {
+		return nil, 0, ErrVideoResultExpired
+	}
+	client := *u.httpClient
+	client.Timeout = 110 * time.Second
+	// Retain the existing SSRF-safe transport; validate redirects as well.
+	priorRedirect := client.CheckRedirect
+	client.CheckRedirect = func(req *http.Request, via []*http.Request) error {
+		if len(via) >= 5 || !validVideoResultURL(req.URL.String()) {
+			return ErrVideoResultUnavailable
+		}
+		if priorRedirect != nil {
+			return priorRedirect(req, via)
+		}
+		return nil
+	}
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, source, nil)
+	if err != nil {
+		return nil, 0, ErrVideoResultUnavailable
+	}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, 0, ErrVideoResultUnavailable // Never log bearer-like signed URLs.
+	}
+	if resp.StatusCode != http.StatusOK {
+		resp.Body.Close()
+		return nil, 0, ErrVideoResultUnavailable
+	}
+	return resp.Body, resp.ContentLength, nil
 }

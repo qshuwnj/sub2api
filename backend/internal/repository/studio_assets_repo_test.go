@@ -358,8 +358,9 @@ func TestStudioAssetValidationRejectsUnownedAndMalformedWrites(t *testing.T) {
 	}
 }
 
-func TestStudioAssetReconcileExplicitlyUnavailableUntilOwnedDiscovery(t *testing.T) {
-	r, _ := newStudioRepo(t)
+func TestStudioAssetReconcilePropagatesOwnedDiscoveryDatabaseFailure(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	mock.ExpectQuery(`SELECT resource FROM`).WillReturnError(service.ErrStudioAssetUnavailable)
 	result, err := r.ReconcileStudioAssets(context.Background(), service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, nil)
 	require.Nil(t, result)
 	require.ErrorIs(t, err, service.ErrStudioAssetUnavailable)

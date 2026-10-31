@@ -780,11 +780,18 @@ func (s *OpenAIGatewayService) ForwardGrokMedia(
 		}
 	}
 	if endpoint == GrokMediaEndpointVideoStatus {
+		source, sourceErr := grokMediaSignedVideoContentURL(respBody, requestID)
+		completed := resp.StatusCode >= 200 && resp.StatusCode < 300 && sourceErr == nil && IsGrokVideoStatusBillable(respBody)
+		respBody = withStudioLibraryStatus(respBody, observeStudioVideo(c, requestID, source, completed, account.ID))
 		respBody = rewriteGrokMediaVideoContentURLs(
 			respBody,
 			requestID,
 			grokMediaContentProxyURL(c, requestID),
 		)
+	}
+	if resp.StatusCode >= 200 && resp.StatusCode < 300 &&
+		(endpoint == GrokMediaEndpointVideosGenerations || endpoint == GrokMediaEndpointVideosEdits || endpoint == GrokMediaEndpointVideosExtensions) {
+		respBody = withStudioLibraryStatus(respBody, ObserveStudioVideoSubmission(c, extractGrokMediaVideoRequestID(respBody), account.ID))
 	}
 	if endpoint == GrokMediaEndpointImagesGenerations || endpoint == GrokMediaEndpointImagesEdits {
 		respBody = withStudioLibraryStatus(respBody, CompleteStudioImages(c, studioImageJSONOutputs(respBody)))

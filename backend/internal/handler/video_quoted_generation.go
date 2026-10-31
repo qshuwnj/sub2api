@@ -14,21 +14,22 @@ import (
 )
 
 type videoAttemptResponse struct {
-	AttemptID      string                      `json:"attempt_id"`
-	ID             string                      `json:"id,omitempty"`
-	RequestID      string                      `json:"request_id,omitempty"`
-	Status         string                      `json:"status"`
-	FinancialState string                      `json:"financial_state"`
-	Model          string                      `json:"model"`
-	QuoteID        string                      `json:"quote_id"`
-	LockedPrice    videoLockedPrice            `json:"locked_price"`
-	Outputs        []string                    `json:"outputs,omitempty"`
-	Video          *videoResult                `json:"video,omitempty"`
-	Receipt        *service.VideoChargeReceipt `json:"receipt,omitempty"`
-	RecoveryNeeded bool                        `json:"recovery_required"`
-	ContentPath    string                      `json:"content_path,omitempty"`
-	Archived       bool                        `json:"archived"`
-	Error          *videoAttemptResponseError  `json:"error,omitempty"`
+	AttemptID      string                       `json:"attempt_id"`
+	ID             string                       `json:"id,omitempty"`
+	RequestID      string                       `json:"request_id,omitempty"`
+	Status         string                       `json:"status"`
+	FinancialState string                       `json:"financial_state"`
+	Model          string                       `json:"model"`
+	QuoteID        string                       `json:"quote_id"`
+	LockedPrice    videoLockedPrice             `json:"locked_price"`
+	Outputs        []string                     `json:"outputs,omitempty"`
+	Video          *videoResult                 `json:"video,omitempty"`
+	Receipt        *service.VideoChargeReceipt  `json:"receipt,omitempty"`
+	RecoveryNeeded bool                         `json:"recovery_required"`
+	ContentPath    string                       `json:"content_path,omitempty"`
+	Archived       bool                         `json:"archived"`
+	Error          *videoAttemptResponseError   `json:"error,omitempty"`
+	Library        *service.StudioLibraryStatus `json:"library,omitempty"`
 }
 type videoLockedPrice struct {
 	Amount            string `json:"amount"`
@@ -92,6 +93,7 @@ func (h *OpenAIGatewayHandler) respondVideoAttempt(c *gin.Context, a *service.Vi
 			status = http.StatusServiceUnavailable
 		}
 	}
+	dto.Library = h.collectQuotedStudioVideo(c, a)
 	c.JSON(status, dto)
 }
 
@@ -137,6 +139,9 @@ func (h *OpenAIGatewayHandler) tryQuotedAtlasVideo(c *gin.Context) bool {
 	if err != nil {
 		h.errorResponse(c, 400, "invalid_request_error", err.Error())
 		return true
+	}
+	if service.StudioLibraryRequested(c) {
+		c.Set("studio_video_submission_body", body)
 	}
 	id, token := strings.TrimSpace(c.GetHeader("Idempotency-Key")), strings.TrimSpace(c.GetHeader("X-Video-Quote"))
 	owner := service.VideoAttemptOwner{UserID: key.UserID, APIKeyID: key.ID}

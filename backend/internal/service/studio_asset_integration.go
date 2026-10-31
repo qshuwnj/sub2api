@@ -18,7 +18,34 @@ import (
 const (
 	studioImageCollectorKey = "studio_image_collector"
 	studioImageOutputsKey   = "studio_image_outputs"
+	studioVideoObserverKey  = "studio_video_observer"
 )
+
+// The handler installs this only after authenticating the user/key pair. The
+// upstream account is an association, never a source of customer identity.
+type StudioVideoObserver func(task, source string, completed bool, accountID int64) *StudioLibraryStatus
+
+func SetStudioVideoObserver(c *gin.Context, observe StudioVideoObserver) {
+	if c != nil && observe != nil {
+		c.Set(studioVideoObserverKey, observe)
+	}
+}
+
+func observeStudioVideo(c *gin.Context, task, source string, completed bool, accountID int64) *StudioLibraryStatus {
+	if c == nil {
+		return nil
+	}
+	value, _ := c.Get(studioVideoObserverKey)
+	observe, _ := value.(StudioVideoObserver)
+	if observe == nil {
+		return nil
+	}
+	return observe(task, source, completed, accountID)
+}
+
+func ObserveStudioVideoSubmission(c *gin.Context, task string, accountID int64) *StudioLibraryStatus {
+	return observeStudioVideo(c, task, "", false, accountID)
+}
 
 // StudioLibraryStatus is independent of generation and billing success. Queued
 // means that private retry sources were persisted, not that archival completed.
@@ -150,6 +177,7 @@ func (s *OpenAIGatewayService) SetStudioAssetStorage(resolve ImageStorageResolve
 	}
 	if repo, ok := s.usageBillingRepo.(StudioAssetRepository); ok {
 		s.studioAssets = NewStudioAssetService(repo, resolve)
+		s.studioAssets.recoverVideo = s.recoverStudioVideoResource
 	}
 }
 

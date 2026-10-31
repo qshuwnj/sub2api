@@ -356,11 +356,3 @@ func (r *usageBillingRepository) RecordStudioAssetCleanup(ctx context.Context, a
 		a.Owner.UserID, a.Owner.APIKeyID, a.ID, uuid.NewString(), a.StorageKey)
 	return err
 }
-
-// Owned discovery is implemented separately; never acknowledge missing work.
-func (r *usageBillingRepository) ReconcileStudioAssets(_ context.Context, owner service.StudioAssetOwner, _ []string) (*service.StudioAssetReconcileResult, error) {
-	if !validStudioAssetOwner(owner) {
-		return nil, service.ErrStudioAssetInvalidRequest
-	}
-	return nil, service.ErrStudioAssetUnavailable
-}

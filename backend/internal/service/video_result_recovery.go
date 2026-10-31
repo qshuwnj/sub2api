@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 )
 
@@ -11,6 +12,7 @@ import (
 func (s *OpenAIGatewayService) SetVideoResultStorage(resolve ImageStorageResolver) {
 	if repo, ok := s.usageBillingRepo.(VideoResultRepository); ok {
 		s.videoResults = NewVideoResultService(repo, resolve)
+		s.videoResults.nativeContent = s.openStudioNativeVideoContent
 	}
 }
 
@@ -33,6 +35,9 @@ func (s *OpenAIGatewayService) refreshStoredVideoSource(ctx context.Context, v *
 	account, err := s.accountRepo.GetByID(ctx, v.AccountID)
 	if err != nil || account == nil || account.ID != v.AccountID {
 		return "", ErrVideoResultUnavailable
+	}
+	if !strings.HasPrefix(v.TaskID, "atlascloud:") {
+		return s.refreshNativeVideoSource(ctx, account, v)
 	}
 	result, err := s.requestQuotedAtlasVideo(ctx, account, v.TaskID, nil)
 	if err != nil {
