@@ -109,7 +109,9 @@ func TestImageStorageSettingsToggleTakesEffectWithoutRestart(t *testing.T) {
 
 	uploader, enabled := svc.resolve()
 	require.False(t, enabled, "disabled until an admin turns it on")
-	require.Nil(t, uploader)
+	require.NotNil(t, uploader, "disabled binding retains only its effective source-size limit")
+	_, saveErr := uploader.Save(ctx, "must-not-save", "image/png", []byte("disabled"))
+	require.Error(t, saveErr, "a limit-only binding must not make disabled storage usable")
 
 	_, err := svc.Update(ctx, ImageStorageSettings{Enabled: true, ReuseBackupS3: true})
 	require.NoError(t, err)

@@ -103,22 +103,28 @@ func (s *ImageStorageSettingService) resolve() (*ImageResultUploader, bool) {
 
 	cfg, err := s.effectiveConfig(ctx)
 	if err != nil {
+		// Unknown limits fail closed, but a transient settings outage must not
+		// disable durable retry collection until an admin edits configuration.
+		s.resolved = false
 		logger.L().Warn("image_storage.settings_load_failed; async image tasks stay disabled", zap.Error(err))
 		return nil, false
 	}
+	// Retain the effective byte bound even when no storage operation is usable.
+	// Library collectors must validate private retry bytes before persistence.
+	s.uploader = NewImageResultUploader(nil, cfg.Prefix, cfg.MaxDownloadByte, nil)
 	if !cfg.Enabled {
-		return nil, false
+		return s.uploader, false
 	}
 	if !cfg.IsConfigured() {
 		logger.L().Warn("image_storage is enabled but not fully configured; async image tasks are disabled",
 			zap.Strings("missing_keys", cfg.MissingCredentialKeys()))
-		return nil, false
+		return s.uploader, false
 	}
 
 	storage, err := s.factory(ctx, cfg)
 	if err != nil {
 		logger.L().Error("image_storage.client_build_failed; async image tasks stay disabled", zap.Error(err))
-		return nil, false
+		return s.uploader, false
 	}
 	s.uploader = NewImageResultUploader(storage, cfg.Prefix, cfg.MaxDownloadByte, nil)
 	s.enabled = true
@@ -294,7 +300,10 @@ func (s *ImageStorageSettingService) load(ctx context.Context) (*ImageStorageSet
 		return nil, nil //nolint:nilnil // no repository means no stored settings
 	}
 	raw, err := s.settingRepo.GetValue(ctx, settingKeyImageStorageConfig)
-	if err != nil || strings.TrimSpace(raw) == "" {
+	if err != nil && !errors.Is(err, ErrSettingNotFound) {
+		return nil, err
+	}
+	if errors.Is(err, ErrSettingNotFound) || strings.TrimSpace(raw) == "" {
 		return nil, nil //nolint:nilnil // never configured is a valid state
 	}
 	var settings ImageStorageSettings

@@ -8,6 +8,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path"
 	"strings"
 	"time"
 
@@ -326,6 +327,25 @@ func (r *usageBillingRepository) CompleteStudioAssetCleanup(ctx context.Context,
 		lease_token = '', lease_expires_at = NULL, updated_at = NOW()
 		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND lease_token = $4 AND lease_expires_at > NOW() AND deleted_at IS NOT NULL AND storage_key = $5`,
 		a.Owner.UserID, a.Owner.APIKeyID, a.ID, a.LeaseToken, a.StorageKey))
+}
+
+// RecordStudioAssetCleanup handles an upload racing deletion, without ever
+// changing a live row or claiming ownership of a shared video_results object.
+func (r *usageBillingRepository) RecordStudioAssetCleanup(ctx context.Context, a *service.StudioAsset) error {
+	if a == nil || !validStudioAssetOwner(a.Owner) || !validStudioAssetID(a.ID) || a.Kind != "image" ||
+		!strings.HasPrefix(a.StorageKey, fmt.Sprintf("studio-results/%d/%d/", a.Owner.UserID, a.Owner.APIKeyID)) ||
+		path.Clean(a.StorageKey) != a.StorageKey || strings.Contains(a.StorageKey, `\`) {
+		return service.ErrStudioAssetInvalidRequest
+	}
+	if err := r.studioAssetDB(); err != nil {
+		return err
+	}
+	// Invalidate any cleaner that deleted the key before this late upload
+	// recreated it; its old completion must not erase the fresh cleanup intent.
+	_, err := r.db.ExecContext(ctx, `UPDATE studio_assets SET storage_key = $4, lease_token = '', lease_expires_at = NULL, next_retry_at = NOW(), updated_at = NOW()
+		WHERE user_id = $1 AND api_key_id = $2 AND id = $3 AND deleted_at IS NOT NULL AND (storage_key = '' OR storage_key = $4)`,
+		a.Owner.UserID, a.Owner.APIKeyID, a.ID, a.StorageKey)
+	return err
 }
 
 // Owned discovery is implemented separately; never acknowledge missing work.

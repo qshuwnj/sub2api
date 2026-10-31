@@ -53,6 +53,37 @@ func studioFixture() *service.StudioAsset {
 	return &service.StudioAsset{Owner: service.StudioAssetOwner{UserID: 16, APIKeyID: 20}, Kind: "image", GenerationID: "generation-1", Model: "original-model", Prompt: "original prompt", MIME: "image/png", SourceURL: "https://example.test/private.png", Metadata: json.RawMessage(`{"aspect_ratio":"3:4"}`), GeneratedAt: studioTestTime}
 }
 
+// A stale upload may only attach cleanup work to a tombstone, never overwrite a live worker's object.
+func TestStudioAssetLateUploadCleanupRequiresOwnedTombstone(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	a := studioFixture()
+	a.ID, a.StorageKey = studioTestID, "studio-results/16/20/digest/0"
+	mock.ExpectExec(`(?s)UPDATE studio_assets SET storage_key = \$4, lease_token = '', lease_expires_at = NULL, next_retry_at = NOW\(\), updated_at = NOW\(\).*WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND deleted_at IS NOT NULL AND \(storage_key = '' OR storage_key = \$4\)`).
+		WithArgs(int64(16), int64(20), studioTestID, a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 0))
+	require.NoError(t, r.RecordStudioAssetCleanup(context.Background(), a))
+}
+
+func TestStudioAssetLateUploadInvalidatesEarlierCleanupCompletion(t *testing.T) {
+	r, mock := newStudioRepo(t)
+	a := studioFixture()
+	a.ID, a.StorageKey, a.LeaseToken = studioTestID, "studio-results/16/20/digest/0", "earlier-cleanup"
+	mock.ExpectExec(`(?s)SET storage_key = \$4, lease_token = '', lease_expires_at = NULL.*deleted_at IS NOT NULL`).
+		WithArgs(int64(16), int64(20), studioTestID, a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 1))
+	require.NoError(t, r.RecordStudioAssetCleanup(context.Background(), a))
+	mock.ExpectExec(`(?s)WHERE user_id = \$1 AND api_key_id = \$2 AND id = \$3 AND lease_token = \$4 AND lease_expires_at > NOW\(\) AND deleted_at IS NOT NULL AND storage_key = \$5`).
+		WithArgs(int64(16), int64(20), studioTestID, "earlier-cleanup", a.StorageKey).WillReturnResult(sqlmock.NewResult(0, 0))
+	require.ErrorIs(t, r.CompleteStudioAssetCleanup(context.Background(), a), service.ErrStudioAssetUnavailable)
+}
+
+func TestStudioAssetLateUploadCleanupRejectsSharedAndForeignKeys(t *testing.T) {
+	r, _ := newStudioRepo(t)
+	for _, key := range []string{"video-results/16/20/shared.mp4", "studio-results/16/21/digest/0", "studio-results/16/20/../shared"} {
+		a := studioFixture()
+		a.ID, a.StorageKey = studioTestID, key
+		require.ErrorIs(t, r.RecordStudioAssetCleanup(context.Background(), a), service.ErrStudioAssetInvalidRequest)
+	}
+}
+
 // Removing either owner predicate must fail these boundary-contract tests.
 func TestStudioAssetLookupRequiresBothOwnerIDs(t *testing.T) {
 	r, mock := newStudioRepo(t)
