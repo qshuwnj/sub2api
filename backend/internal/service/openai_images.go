@@ -1061,8 +1061,9 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 	// each raw SSE envelope intact (including id/event/comment fields).
 	bufferStudioSSE := direct == nil && StudioLibraryRequested(c)
 	var rawStudioEvent bytes.Buffer
+	studioSSEDetected := false
 	writeRawStudioEvent := func(data []byte) {
-		if clientDisconnected {
+		if clientDisconnected || len(data) == 0 {
 			return
 		}
 		if _, err := c.Writer.Write(data); err != nil {
@@ -1170,6 +1171,17 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 
 	flushSSEEvent := func() {
 		sseData.Flush(processSSEData)
+		if bufferStudioSSE && studioSSEDetected && rawStudioEvent.Len() > 0 {
+			writeRawStudioEvent(rawStudioEvent.Bytes())
+			rawStudioEvent.Reset()
+		}
+	}
+	flushUncollectedFallback := func() {
+		if bufferStudioSSE && !studioSSEDetected && fallbackBody.Len() > 0 {
+			c.Header("X-Studio-Library-Warning", "studio_asset_unavailable")
+			writeRawStudioEvent(fallbackBody.Bytes())
+			fallbackBody.Reset()
+		}
 	}
 
 	processLine := func(line []byte) {
@@ -1179,6 +1191,36 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		if firstTokenMs == nil {
 			ms := int(time.Since(startTime).Milliseconds())
 			firstTokenMs = &ms
+		}
+		trimmedLine := strings.TrimRight(string(line), "\r\n")
+		_, isDataLine := extractOpenAISSEDataLine(trimmedLine)
+		if bufferStudioSSE && !studioSSEDetected {
+			if fallbackTooLarge {
+				writeRawStudioEvent(line)
+				return
+			}
+			isSSEField := isDataLine || strings.HasPrefix(trimmedLine, ":") ||
+				strings.HasPrefix(trimmedLine, "event:") || strings.HasPrefix(trimmedLine, "id:") ||
+				strings.HasPrefix(trimmedLine, "retry:")
+			if !isSSEField {
+				// Until an SSE field appears, blank lines belong to the JSON
+				// fallback too. Never flush or duplicate that document as an event.
+				fallbackBytes += int64(len(line))
+				if fallbackBytes <= fallbackLimit {
+					_, _ = fallbackBody.Write(line)
+				} else {
+					fallbackTooLarge = true
+					c.Header("X-Studio-Library-Warning", "studio_asset_unavailable")
+					writeRawStudioEvent(fallbackBody.Bytes())
+					fallbackBody.Reset()
+					writeRawStudioEvent(line)
+				}
+				return
+			}
+			studioSSEDetected = true
+			_, _ = rawStudioEvent.Write(fallbackBody.Bytes())
+			fallbackBody.Reset()
+			fallbackBytes = 0
 		}
 		if bufferStudioSSE {
 			_, _ = rawStudioEvent.Write(line)
@@ -1192,8 +1234,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 			}
 		}
 
-		trimmedLine := strings.TrimRight(string(line), "\r\n")
-		if _, ok := extractOpenAISSEDataLine(trimmedLine); ok || strings.TrimSpace(trimmedLine) == "" {
+		if isDataLine || strings.TrimSpace(trimmedLine) == "" {
 			sseData.AddLine(trimmedLine, processSSEData)
 			if bufferStudioSSE && strings.TrimSpace(trimmedLine) == "" && rawStudioEvent.Len() > 0 {
 				writeRawStudioEvent(rawStudioEvent.Bytes())
@@ -1226,10 +1267,36 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		mergeOpenAIUsage(&usage, body)
 		imageCounter.AddJSONResponse(body)
 		if bufferStudioSSE {
-			body = withStudioLibraryStatus(body, CompleteStudioImages(c, studioImageJSONOutputs(body)))
-			rawStudioEvent.Reset()
+			body = withStudioLibraryStatus(fallbackBody.Bytes(), CompleteStudioImages(c, studioImageJSONOutputs(body)))
 			writeRawStudioEvent(body)
+			fallbackBody.Reset()
 		}
+	}
+
+	// Read JSON fallbacks in bounded chunks even when there is no newline.
+	// Ordinary traffic and SSE retain their established line parsing.
+	studioStreamIdentified := false
+	studioJSONFallback := false
+	readLine := func(reader *bufio.Reader) ([]byte, error) {
+		if !bufferStudioSSE {
+			return reader.ReadBytes('\n')
+		}
+		part, err := reader.ReadSlice('\n')
+		if !studioStreamIdentified {
+			if prefix := bytes.TrimSpace(part); len(prefix) > 0 {
+				studioStreamIdentified = true
+				studioJSONFallback = prefix[0] == '{' || prefix[0] == '['
+			}
+		}
+		line := bytes.Clone(part)
+		if err == bufio.ErrBufferFull {
+			if studioJSONFallback || !studioStreamIdentified {
+				return line, nil
+			}
+			rest, readErr := reader.ReadBytes('\n')
+			return append(line, rest...), readErr
+		}
+		return line, err
 	}
 
 	streamInterval := s.openAIImageStreamDataInterval()
@@ -1237,13 +1304,14 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 	if streamInterval <= 0 && keepaliveInterval <= 0 {
 		reader := bufio.NewReader(resp.Body)
 		for {
-			line, err := reader.ReadBytes('\n')
+			line, err := readLine(reader)
 			processLine(line)
 			if err == io.EOF {
 				break
 			}
 			if err != nil {
 				flushSSEEvent()
+				flushUncollectedFallback()
 				return usage, imageCounter.Count(), imageCounter.Sizes(), firstTokenMs, err
 			}
 		}
@@ -1272,7 +1340,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 		defer close(events)
 		reader := bufio.NewReader(resp.Body)
 		for {
-			line, err := reader.ReadBytes('\n')
+			line, err := readLine(reader)
 			if len(line) > 0 {
 				atomic.StoreInt64(&lastReadAt, time.Now().UnixNano())
 			}
@@ -1320,6 +1388,7 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 			}
 			if ev.err != nil {
 				flushSSEEvent()
+				flushUncollectedFallback()
 				return usage, imageCounter.Count(), imageCounter.Sizes(), firstTokenMs, ev.err
 			}
 			processLine(ev.line)
@@ -1332,9 +1401,13 @@ func (s *OpenAIGatewayService) handleOpenAIImagesStreamingResponse(
 				return usage, imageCounter.Count(), imageCounter.Sizes(), firstTokenMs, fmt.Errorf("image stream incomplete after timeout")
 			}
 			logger.LegacyPrintf("service.openai_gateway", "[OpenAI] Images stream data interval timeout: interval=%s", streamInterval)
+			flushUncollectedFallback()
 			_ = s.writeOpenAIImagesStreamEvent(c, flusher, "error", buildOpenAIImagesStreamErrorBody(fmt.Sprintf("upstream image stream idle for %s", streamInterval)))
 			return usage, imageCounter.Count(), imageCounter.Sizes(), firstTokenMs, fmt.Errorf("image stream data interval timeout")
 		case <-keepaliveCh:
+			if bufferStudioSSE && !studioSSEDetected {
+				continue
+			}
 			if clientDisconnected || time.Since(lastDownstreamWriteAt) < keepaliveInterval {
 				continue
 			}

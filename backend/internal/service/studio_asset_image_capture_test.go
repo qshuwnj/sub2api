@@ -202,6 +202,189 @@ func TestStudioAssetImageRawStreamAddsStatusOnlyAtFinalCompletion(t *testing.T) 
 	})
 }
 
+func TestStudioAssetImageRawStreamJSONFallbackDeliversExactlyOnce(t *testing.T) {
+	for _, suffix := range []string{"\n\n", "\r\n\r\n", "\n \n"} {
+		t.Run(strings.ReplaceAll(suffix, "\n", "LF"), func(t *testing.T) {
+			body := `{"data":[{"url":"https://images.example/final.png"}],"usage":{"images":1}}` + suffix
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+			c.Request.Header.Set("X-Studio-Library", "save")
+			calls := 0
+			deliveredBeforeCollection := false
+			SetStudioImageCollector(c, func(outputs []StudioImageOutput) *StudioLibraryStatus {
+				calls++
+				deliveredBeforeCollection = c.Writer.Written()
+				require.Len(t, outputs, 1)
+				require.Equal(t, "https://images.example/final.png", outputs[0].URL)
+				return &StudioLibraryStatus{Status: "queued", GenerationID: "image_fallback"}
+			})
+			resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+			_, count, _, _, err := (&OpenAIGatewayService{}).handleOpenAIImagesStreamingResponse(resp, c, time.Now(), nil)
+			require.NoError(t, err)
+			require.Equal(t, 1, count)
+			require.Equal(t, 1, calls)
+			require.False(t, deliveredBeforeCollection, "persist before fallback JSON delivery")
+			decoder := json.NewDecoder(rec.Body)
+			var delivered map[string]json.RawMessage
+			require.NoError(t, decoder.Decode(&delivered))
+			require.Contains(t, string(delivered["library"]), `"status":"queued"`)
+			require.JSONEq(t, `[{"url":"https://images.example/final.png"}]`, string(delivered["data"]))
+			require.ErrorIs(t, decoder.Decode(&delivered), io.EOF, "deliver one JSON document only")
+		})
+	}
+}
+
+func TestStudioAssetImageRawStreamOversizedJSONFallbackPreservesMedia(t *testing.T) {
+	for _, suffix := range []string{"", "\n\n"} {
+		t.Run(map[bool]string{false: "no_delimiter", true: "blank_delimiter"}[suffix != ""], func(t *testing.T) {
+			body := `{"data":[{"url":"https://images.example/final.png"}],"padding":"` + strings.Repeat("x", 256) + `"}` + suffix
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+			c.Request.Header.Set("X-Studio-Library", "save")
+			calls := 0
+			SetStudioImageCollector(c, func([]StudioImageOutput) *StudioLibraryStatus {
+				calls++
+				return &StudioLibraryStatus{Status: "queued", GenerationID: "must_not_exist"}
+			})
+			cfg := &config.Config{}
+			cfg.Gateway.UpstreamResponseReadMaxBytes = 96
+			resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+			_, _, _, _, err := (&OpenAIGatewayService{cfg: cfg}).handleOpenAIImagesStreamingResponse(resp, c, time.Now(), nil)
+			require.NoError(t, err)
+			require.Equal(t, body, rec.Body.String(), "oversized fallback still delivers original media exactly once")
+			require.Zero(t, calls, "do not collect beyond the bounded parsing limit")
+			require.Empty(t, studioImageOutputs(c))
+			require.Equal(t, "studio_asset_unavailable", rec.Result().Header.Get("X-Studio-Library-Warning"))
+			require.NotContains(t, rec.Body.String(), `"library"`)
+		})
+	}
+}
+
+type studioCaptureObservedReader struct {
+	io.Reader
+	beforeRead func()
+}
+
+func (r studioCaptureObservedReader) Read(p []byte) (int, error) {
+	r.beforeRead()
+	return r.Reader.Read(p)
+}
+
+func TestStudioAssetImageRawStreamOversizedJSONFallbackStreamsBeforeEOF(t *testing.T) {
+	body := `{"data":[{"url":"https://images.example/final.png"}],"padding":"` + strings.Repeat("x", 8192) + `"}`
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+	c.Request.Header.Set("X-Studio-Library", "save")
+	reads := 0
+	reader := studioCaptureObservedReader{Reader: strings.NewReader(body), beforeRead: func() {
+		if reads > 0 {
+			require.NotEmpty(t, rec.Body.String(), "flush bounded fallback before reading the remaining body")
+			require.Equal(t, "studio_asset_unavailable", rec.Result().Header.Get("X-Studio-Library-Warning"))
+		}
+		reads++
+	}}
+	cfg := &config.Config{}
+	cfg.Gateway.UpstreamResponseReadMaxBytes = 96
+	resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(reader)}
+	_, _, _, _, err := (&OpenAIGatewayService{cfg: cfg}).handleOpenAIImagesStreamingResponse(resp, c, time.Now(), nil)
+	require.NoError(t, err)
+	require.Equal(t, body, rec.Body.String())
+	require.Greater(t, reads, 1)
+}
+
+func TestStudioAssetImageNativeDirectCapturePreservesDelivery(t *testing.T) {
+	imageBytes := studioCapturePNG(t, 17)
+	encoded := base64.StdEncoding.EncodeToString(imageBytes)
+	for _, stream := range []bool{false, true} {
+		for _, mode := range []string{"api", "queued", "warning"} {
+			t.Run(map[bool]string{false: "json/", true: "sse/"}[stream]+mode, func(t *testing.T) {
+				rec := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rec)
+				c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+				if mode != "api" {
+					c.Request.Header.Set("X-Studio-Library", "save")
+				}
+				calls := 0
+				SetStudioImageCollector(c, func(outputs []StudioImageOutput) *StudioLibraryStatus {
+					calls++
+					require.Len(t, outputs, 1)
+					require.Equal(t, imageBytes, outputs[0].Bytes)
+					require.NotContains(t, rec.Body.String(), encoded, "persist before native final output")
+					return &StudioLibraryStatus{Status: mode, GenerationID: "image_native", Code: map[string]string{"warning": "studio_asset_unavailable"}[mode]}
+				})
+				body := `{"data":[{"b64_json":"` + encoded + `","model":"supplier-model"}],"usage":{"input_tokens":3,"output_tokens":7}}`
+				if stream {
+					body = "data: " + `{"type":"image_generation.partial_image","b64_json":"cHJldmlldw=="}` + "\n\n" +
+						"data: " + `{"type":"image_generation.completed","b64_json":"` + encoded + `","model":"supplier-model","usage":{"input_tokens":3,"output_tokens":7}}` + "\n\n"
+				}
+				resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+				svc := &OpenAIGatewayService{}
+				parsed := &OpenAIImagesRequest{Model: "client-model", ResponseFormat: "b64_json", OutputFormat: "png"}
+				var usage OpenAIUsage
+				var count int
+				var err error
+				if stream {
+					usage, count, _, _, err = svc.handleOpenAIImagesStreamingResponse(resp, c, time.Now(), parsed)
+				} else {
+					usage, count, _, err = svc.handleCodexDirectImagesNonStreamingResponse(resp, c, parsed)
+				}
+				require.NoError(t, err)
+				require.Equal(t, 1, count)
+				require.Equal(t, 3, usage.InputTokens)
+				require.Equal(t, 7, usage.OutputTokens)
+				require.Contains(t, rec.Body.String(), encoded)
+				require.Contains(t, rec.Body.String(), `"model":"client-model"`)
+				if mode == "api" {
+					require.Zero(t, calls)
+					require.NotContains(t, rec.Body.String(), `"library"`)
+				} else {
+					require.Equal(t, 1, calls)
+					require.Contains(t, rec.Body.String(), `"status":"`+mode+`"`)
+					require.Contains(t, rec.Body.String(), `"generation_id":"image_native"`)
+				}
+			})
+		}
+	}
+}
+
+func TestStudioAssetImageNativeDirectPreviewOnlyNeverCollects(t *testing.T) {
+	for _, stream := range []bool{false, true} {
+		t.Run(map[bool]string{false: "json", true: "sse"}[stream], func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+			c.Request.Header.Set("X-Studio-Library", "save")
+			calls := 0
+			SetStudioImageCollector(c, func([]StudioImageOutput) *StudioLibraryStatus {
+				calls++
+				return &StudioLibraryStatus{Status: "queued", GenerationID: "must_not_exist"}
+			})
+			body := `{"data":[],"partial_image_b64":"cHJldmlldw=="}`
+			if stream {
+				body = "data: " + `{"type":"image_generation.partial_image","b64_json":"cHJldmlldw=="}` + "\n\n"
+			}
+			resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+			svc := &OpenAIGatewayService{}
+			parsed := &OpenAIImagesRequest{Model: "client-model", ResponseFormat: "b64_json"}
+			var count int
+			var err error
+			if stream {
+				_, count, _, _, err = svc.handleOpenAIImagesStreamingResponse(resp, c, time.Now(), parsed)
+			} else {
+				_, count, _, err = svc.handleCodexDirectImagesNonStreamingResponse(resp, c, parsed)
+			}
+			require.Error(t, err, "preserve existing no-final-output error")
+			require.Zero(t, count)
+			require.Zero(t, calls)
+			require.Empty(t, studioImageOutputs(c))
+			require.NotContains(t, rec.Body.String(), `"library"`)
+		})
+	}
+}
+
 func TestStudioAssetImageGrokAdaptersReturnTypedFinalOutputsAndStripOptIn(t *testing.T) {
 	t.Setenv(xai.EnvAllowUnsafeURLOverrides, "true")
 	for _, endpoint := range []GrokMediaEndpoint{GrokMediaEndpointImagesGenerations, GrokMediaEndpointImagesEdits} {
