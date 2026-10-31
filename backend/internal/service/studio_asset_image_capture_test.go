@@ -45,6 +45,41 @@ func TestStudioLibraryOptInIsExact(t *testing.T) {
 	require.False(t, StudioLibraryRequested(c))
 }
 
+// Sparse upstream arrays keep their delivered shape, but empty placeholders
+// never consume the library collector's source-bearing output identities.
+func TestStudioAssetImageSparseRawCompletionUsesSourceOrdinals(t *testing.T) {
+	first, second := studioCapturePNG(t, 30), studioCapturePNG(t, 230)
+	raw, err := json.Marshal(map[string]any{"data": []any{
+		map[string]any{},
+		map[string]string{"b64_json": base64.StdEncoding.EncodeToString(first)},
+		map[string]any{},
+		map[string]string{"b64_json": base64.StdEncoding.EncodeToString(second)},
+	}})
+	require.NoError(t, err)
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+	c.Request.Header.Set("X-Studio-Library", "save")
+	calls := 0
+	SetStudioImageCollector(c, func(outputs []StudioImageOutput) *StudioLibraryStatus {
+		calls++
+		require.Len(t, outputs, 2)
+		require.Equal(t, first, outputs[0].Bytes)
+		require.Equal(t, second, outputs[1].Bytes)
+		return &StudioLibraryStatus{Status: "queued", GenerationID: "imgtask_sparse"}
+	})
+	resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(bytes.NewReader(raw))}
+	svc := &OpenAIGatewayService{}
+	_, _, _, err = svc.handleOpenAIImagesNonStreamingResponse(context.Background(), resp, c, &Account{}, &OpenAIImagesRequest{})
+	require.NoError(t, err)
+	require.Equal(t, 1, calls)
+	var delivered map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(rec.Body.Bytes(), &delivered))
+	var original map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(raw, &original))
+	require.JSONEq(t, string(original["data"]), string(delivered["data"]))
+}
+
 func TestStudioAssetImagePartialPreviewsNeverCollect(t *testing.T) {
 	for _, transport := range []string{"raw", "responses"} {
 		t.Run(transport, func(t *testing.T) {

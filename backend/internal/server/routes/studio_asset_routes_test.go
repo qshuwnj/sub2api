@@ -225,10 +225,11 @@ func TestStudioAssetRoutesOwnerIsolationAndPublicShape(t *testing.T) {
 			}
 			w = studioRouteRequest(r, "POST", "/v1/studio/assets/reconcile", key, `{"generation_ids":["generation-1"]}`, "")
 			require.Equal(t, 200, w.Code, w.Body.String())
-			require.Equal(t, key == "owner", repo.reconcileOwner == repo.asset.Owner)
-			if key != "owner" {
-				require.Contains(t, w.Body.String(), `"queued":0`)
-			}
+			// An existing image row and caller-supplied generic ID are not
+			// owned successful video-task/receipt proof, even for this owner.
+			require.Equal(t, service.StudioAssetOwner{}, repo.reconcileOwner)
+			require.Contains(t, w.Body.String(), `"queued":0`)
+			require.Contains(t, w.Body.String(), `"unrecoverable":1`)
 			w = studioRouteRequest(r, "DELETE", "/v1/studio/assets/"+studioRouteID, key, "", "")
 			require.Equal(t, 204, w.Code)
 			require.Equal(t, key == "owner", repo.asset.DeletedAt != nil)

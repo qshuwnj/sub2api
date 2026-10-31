@@ -32,11 +32,13 @@ func newGatewayRoutesTestRouterWithConfig(cfg *config.Config, platform ...string
 	if len(platform) > 0 && platform[0] != "" {
 		groupPlatform = platform[0]
 	}
+	gateway := service.NewOpenAIGatewayService(nil, nil, nil, nil, nil, nil, nil, cfg,
+		nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil, nil)
 	RegisterGatewayRoutes(
 		router,
 		&handler.Handlers{
 			Gateway:       &handler.GatewayHandler{},
-			OpenAIGateway: &handler.OpenAIGatewayHandler{},
+			OpenAIGateway: handler.NewOpenAIGatewayHandler(gateway, nil, nil, nil, nil, nil, nil, nil, cfg),
 			AsyncImage:    handler.NewAsyncImageHandler(nil, nil),
 		},
 		servermiddleware.APIKeyAuthMiddleware(func(c *gin.Context) {

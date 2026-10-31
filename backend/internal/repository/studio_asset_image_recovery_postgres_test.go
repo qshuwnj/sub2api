@@ -211,7 +211,7 @@ func TestStudioAssetPostgresImageRecoveryPartialRequiresLiveOwnedSuccess(t *test
 	}
 }
 
-func TestStudioAssetPostgresImageRecoveryKeepsOriginalOutputIndex(t *testing.T) {
+func TestStudioAssetPostgresImageRecoveryUsesCompletionOutputOrdinal(t *testing.T) {
 	base, ctx := studioHistoryDB(t)
 	objects := &studioRecoveryObjects{uploads: map[string]int{}}
 	uploader := service.NewImageResultUploader(objects, "images/", 1<<20, nil)
@@ -226,6 +226,74 @@ func TestStudioAssetPostgresImageRecoveryKeepsOriginalOutputIndex(t *testing.T) 
 	page, err := base.ListStudioAssets(ctx, owner, service.StudioAssetQuery{})
 	require.NoError(t, err)
 	require.Len(t, page.Items, 1)
-	require.Equal(t, 1, page.Items[0].OutputIndex, "filtering absent output sources must not shift original indices")
+	require.Equal(t, 0, page.Items[0].OutputIndex, "source-bearing ordinals must match the existing completion collector, not raw empty slots")
 	require.Empty(t, objects.uploads)
+}
+
+// Completion already numbers source-bearing outputs densely. Reconciliation
+// must retain those identities, including after a supported storage hot-disable.
+func TestStudioAssetPostgresImageRecoverySparseCompletionDoesNotDuplicateOrResurrect(t *testing.T) {
+	for _, deleted := range []bool{false, true} {
+		t.Run(map[bool]string{false: "ready", true: "deleted"}[deleted], func(t *testing.T) {
+			base, ctx := studioHistoryDB(t)
+			objects := &studioRecoveryObjects{uploads: map[string]int{}}
+			uploader := service.NewImageResultUploader(objects, "images/", 1<<20, nil)
+			disabledUploader := service.NewImageResultUploader(nil, "images/", 1<<20, nil)
+			enabled := true
+			resolve := func() (*service.ImageResultUploader, bool) {
+				if enabled {
+					return uploader, true
+				}
+				return disabledUploader, false
+			}
+			store := &studioRecoveryTaskStore{}
+			tasks := service.NewImageTaskServiceWithResolver(store, resolve, time.Hour, time.Minute)
+			library := service.NewStudioAssetService(base, resolve)
+			library.SetOwnedImageTasks(tasks)
+			owner := service.StudioAssetOwner{UserID: 16, APIKeyID: 20}
+			task, err := tasks.Create(ctx, service.ImageTaskOwner{UserID: 16, APIKeyID: 20})
+			require.NoError(t, err)
+			require.True(t, tasks.Enabled())
+			var data bytes.Buffer
+			require.NoError(t, png.Encode(&data, image.NewRGBA(image.Rect(0, 0, 2, 2))))
+			raw := json.RawMessage(`{"data":[{},{"b64_json":"` + base64.StdEncoding.EncodeToString(data.Bytes()) + `"}]}`)
+			enabled = false
+			// This is the existing completion collector's source-bearing ordinal.
+			require.ErrorIs(t, library.CollectImage(ctx, owner, task.ID, 0, "original-model", "original prompt",
+				json.RawMessage(`{"aspect_ratio":"3:4"}`), service.StudioImageOutput{Bytes: data.Bytes()}), service.ErrStudioAssetUnavailable)
+			require.NoError(t, tasks.Complete(ctx, task.ID, 200, raw))
+			require.Equal(t, service.ImageTaskStatusCompleted, store.task.Status)
+			require.JSONEq(t, string(raw), string(store.task.Result))
+			enabled = true
+			require.NoError(t, library.ProcessPending(ctx))
+			first, err := base.FindStudioAssetOutput(ctx, owner, task.ID, 0)
+			require.NoError(t, err)
+			require.Equal(t, "ready", first.State)
+			if deleted {
+				require.NoError(t, library.Delete(ctx, owner, first.ID))
+			}
+			var before string
+			require.NoError(t, base.db.QueryRow(`SELECT json_agg(a ORDER BY output_index)::text FROM studio_assets a`).Scan(&before))
+			for i := 0; i < 2; i++ {
+				result, err := library.Reconcile(ctx, owner, []string{task.ID})
+				require.NoError(t, err)
+				require.Zero(t, result.Queued, "a sparse task must not create a second identity for a captured output")
+				require.Equal(t, map[bool]int{false: 1, true: 0}[deleted], result.AlreadySaved)
+				require.Equal(t, map[bool]int{false: 0, true: 1}[deleted], result.Unrecoverable)
+				require.NoError(t, library.ProcessPending(ctx))
+			}
+			var after string
+			require.NoError(t, base.db.QueryRow(`SELECT json_agg(a ORDER BY output_index)::text FROM studio_assets a`).Scan(&after))
+			require.JSONEq(t, before, after, "ready metadata and tombstones must remain unchanged")
+			require.Len(t, objects.uploads, 1)
+			for _, uploads := range objects.uploads {
+				require.Equal(t, 1, uploads)
+			}
+			var count int
+			require.NoError(t, base.db.QueryRow(`SELECT count(*) FROM usage_logs`).Scan(&count))
+			require.Zero(t, count)
+			require.NoError(t, base.db.QueryRow(`SELECT count(*) FROM usage_billing_dedup`).Scan(&count))
+			require.Zero(t, count)
+		})
+	}
 }

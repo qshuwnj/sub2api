@@ -6,8 +6,6 @@ import (
 	"errors"
 	"strings"
 	"time"
-
-	"github.com/tidwall/gjson"
 )
 
 // StudioVideoIntake is private library intent, never an immutable quote input.
@@ -222,7 +220,10 @@ func (s *StudioAssetService) recoverImageTask(ctx context.Context, owner StudioA
 		task.HTTPStatus < 200 || task.HTTPStatus >= 300 || task.ExpiresAt <= time.Now().Unix() {
 		return false, false
 	}
-	outputs := gjson.GetBytes(task.Result, "data").Array()
+	// Completion collectors index source-bearing outputs, not empty raw data
+	// slots. Reuse the exact parser so recovery cannot invent a second identity
+	// for an existing output (especially an authoritative deletion tombstone).
+	outputs := studioImageJSONOutputs(task.Result)
 	if len(outputs) == 0 {
 		return false, false
 	}
@@ -234,10 +235,7 @@ func (s *StudioAssetService) recoverImageTask(ctx context.Context, owner StudioA
 	if task.CompletedAt != nil {
 		generatedAt = time.Unix(*task.CompletedAt, 0).UTC()
 	}
-	for index, item := range outputs {
-		if item.Get("url").String() == "" && item.Get("b64_json").String() == "" {
-			continue
-		}
+	for index, output := range outputs {
 		if canFindOutput {
 			a, err := indexed.FindStudioAssetOutput(ctx, owner, id, index)
 			if err == nil {
@@ -253,8 +251,6 @@ func (s *StudioAssetService) recoverImageTask(ctx context.Context, owner StudioA
 				return queued, false
 			}
 		}
-		output := studioImageSource(item.Get("url").String(), item.Get("b64_json").String(),
-			firstNonEmpty(item.Get("output_format").String(), gjson.GetBytes(task.Result, "output_format").String()))
 		if persisted, _ := s.collectImageAt(ctx, owner, id, index, "", "", nil, output, generatedAt); persisted {
 			queued = true
 		} else {
