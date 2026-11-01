@@ -225,6 +225,13 @@ func (h *AsyncImageHandler) executeWithGateway(platform string, c *gin.Context) 
 
 func (h *AsyncImageHandler) run(taskID, platform string, taskCtx *gin.Context, recorder *httptest.ResponseRecorder, cancel context.CancelFunc) {
 	defer cancel()
+	started := time.Now()
+	log := logger.FromContext(taskCtx.Request.Context()).With(zap.String("task_id", taskID))
+	taskCtx.Request = taskCtx.Request.WithContext(logger.IntoContext(taskCtx.Request.Context(), log))
+	log.Info("image_task.execution_started")
+	defer func() {
+		log.Info("image_task.execution_finished", zap.Int64("elapsed_ms", time.Since(started).Milliseconds()))
+	}()
 	// Nested synchronous delivery uses this server task identity exactly once.
 	taskCtx.Set(studioImageGenerationKey, taskID)
 	defer func() {
@@ -235,6 +242,9 @@ func (h *AsyncImageHandler) run(taskID, platform string, taskCtx *gin.Context, r
 	}()
 
 	h.execute(platform, taskCtx)
+	log.Info("image_task.gateway_returned",
+		zap.Int64("elapsed_ms", time.Since(started).Milliseconds()),
+		zap.Int("http_status", recorder.Code))
 	body := bytes.TrimSpace(recorder.Body.Bytes())
 	if err := taskCtx.Request.Context().Err(); err != nil && len(body) == 0 {
 		h.failTask(taskID, http.StatusGatewayTimeout, imageTaskErrorPayload("timeout_error", "image generation task timed out"))
@@ -249,8 +259,9 @@ func (h *AsyncImageHandler) run(taskID, platform string, taskCtx *gin.Context, r
 			h.failTask(taskID, http.StatusBadGateway, imageTaskErrorPayload("api_error", "upstream returned an invalid image response"))
 			return
 		}
-		if err := h.tasks.Complete(context.Background(), taskID, statusCode, json.RawMessage(body)); err != nil {
-			logger.L().Error("image_task.complete_store_failed", zap.String("task_id", taskID), zap.Error(err))
+		// Preserve trace attribution while retaining detached result persistence.
+		if err := h.tasks.Complete(context.WithoutCancel(taskCtx.Request.Context()), taskID, statusCode, json.RawMessage(body)); err != nil {
+			log.Error("image_task.complete_store_failed")
 		}
 		return
 	}

@@ -164,3 +164,35 @@ For URL responses, `image_url` mirrors the first `data[].url` for simple clients
 All submit and poll responses include `Cache-Control: no-store`, preventing a CDN from caching the `processing` state. Tasks and results expire 24 hours after their latest state update. A task executes for at most 30 minutes.
 
 Task ownership is scoped to both user and API key. Unknown task IDs and IDs owned by another key both return `404`, avoiding task-existence disclosure. Polling remains available when the completed generation used the key's remaining balance; normal authentication, disabled-key, user, IP, and group checks still apply.
+
+## Diagnosing slow AtlasCloud image tasks
+
+Filter structured logs by the owned server `task_id` (and its original
+`request_id`) rather than submitting another paid generation to check progress.
+These timings do not change the task response, billing, model, quality or image
+bytes, and exclude prompts, media, URLs, credentials and raw supplier errors.
+
+| Event | Meaning |
+| --- | --- |
+| `image_task.execution_started` / `execution_finished` | Background execution, including final result delivery. |
+| `image_generation.stage_completed` | `stage_ms` for `preflight`, `reference_preparation`, `submission`, `upstream_wait` and `response_preparation`. A failed attempt ends at its current stage. |
+| `image_generation.upstream_request` | Reference-upload or submission HTTP duration and status code. |
+| `image_generation.upstream_status` | Locally observed supplier status changes, with at most one repeated-status heartbeat every 30 seconds. |
+| `image_generation.finished` | Forwarding outcome and separate submission, reference-upload and poll HTTP counts/times. `returned` means forwarding succeeded, not that billing or final delivery succeeded. |
+| `image_task.gateway_returned` | Elapsed time through gateway routing, generation and its existing accounting/collection gates. |
+| `image_task.result_download` / `result_upload` | Per-image source retrieval and object-storage duration, with success flags. Source retrieval includes inline/base64 decoding when no download is needed. |
+| `image_task.delivery_finished` | `offload_ms`, `persist_ms`, and delivery status. A delivery failure does not imply the supplier job failed or that it was uncharged. |
+
+`upstream_wait` includes polling, HTTP transit and local waiting. It is **not**
+an exact provider-side queue or inference timer; only the supplier can expose
+that breakdown. A missing reference-upload event is normal for references that
+the model accepts inline or by URL.
+
+Supplier poll requests start at least two seconds apart, measured from the
+previous request's start. A slow HTTP response therefore does not incur another
+full two-second sleep. This reduces avoidable result-detection delay; it does not
+accelerate supplier inference or add retries of the paid submission.
+
+Offline tests verify those boundaries and failure cases without contacting a
+paid provider. End-to-end latency still requires a deployed build and an
+explicitly authorized live generation.

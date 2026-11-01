@@ -220,6 +220,9 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	ctx context.Context, c *gin.Context, account *Account, parsed *OpenAIImagesRequest, upstreamModel string,
 ) (*OpenAIForwardResult, error) {
 	started := time.Now()
+	ctx, timing := newImageGenerationTiming(ctx, upstreamModel, account.ID)
+	returned := false
+	defer func() { timing.finish(returned) }()
 	quoted, _ := ctx.Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot)
 	if quoted != nil {
 		defer func() {
@@ -269,12 +272,14 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	}
 	ctx, cancel := context.WithDeadline(context.WithoutCancel(ctx), deadline)
 	defer cancel()
+	timing.transition("reference_preparation")
 	payload, err = s.prepareAtlasCloudImageReferences(ctx, account, token, upstreamModel, payload)
 	if err != nil {
 		return atlasCloudImagesError(c, http.StatusBadRequest, err.Error())
 	}
 	method, target, body := http.MethodPost, base+atlasCloudImagesPath, payload
 	predictionID := ""
+	timing.transition("submission")
 	if quoted != nil {
 		if err := quoted.markSubmitting(ctx, account.ID); err != nil {
 			_ = quoted.markOutcome(ctx, "not_submitted", "")
@@ -282,6 +287,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 		}
 	}
 	for {
+		requestStarted := time.Now()
 		raw, statusCode, requestErr := s.doAtlasCloudImagesRequest(ctx, account, method, target, token, body)
 		if requestErr != nil {
 			if ctx.Err() != nil {
@@ -311,8 +317,10 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			}
 		}
 		status := strings.ToLower(strings.TrimSpace(atlasCloudValue(raw, "status").String()))
+		timing.observeStatus(status)
 		switch status {
 		case "completed", "succeeded", "success":
+			timing.transition("response_preparation")
 			outputs := atlasCloudOutputURLs(raw)
 			if len(outputs) == 0 {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no image output")
@@ -343,6 +351,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 				}
 			}
 			if IsAtlasCloudPricedImageModel(upstreamModel) {
+				returned = true
 				return &OpenAIForwardResult{
 					RequestID: predictionID, UpstreamModel: upstreamModel, Model: parsed.Model,
 					ImageCount: len(images), ImageSize: tier, ImageInputSize: strings.ReplaceAll(size, "*", "x"),
@@ -363,6 +372,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if err != nil {
 				return nil, err
 			}
+			returned = true
 			return &OpenAIForwardResult{
 				RequestID: predictionID, UpstreamModel: upstreamModel, Model: parsed.Model, Usage: usage,
 				StudioImageOutputs: studioImageOutputs(c),
@@ -374,6 +384,7 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if predictionID == "" {
 				return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud returned no prediction ID")
 			}
+			timing.transition("upstream_wait")
 		case "failed", "error", "cancelled", "canceled":
 			if quoted != nil {
 				_ = quoted.markOutcome(ctx, "failed", predictionID)
@@ -390,7 +401,13 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 		default:
 			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed or returned an unsupported status")
 		}
-		timer := time.NewTimer(atlasCloudPollDelay)
+		// Keep request starts at least two seconds apart, without adding another
+		// full sleep after a slow HTTP response. Paid POSTs are never repeated.
+		wait := atlasCloudPollDelay - time.Since(requestStarted)
+		if wait < 0 {
+			wait = 0
+		}
+		timer := time.NewTimer(wait)
 		select {
 		case <-ctx.Done():
 			timer.Stop()
@@ -421,14 +438,21 @@ func (s *OpenAIGatewayService) doAtlasCloudImagesRequest(
 	if account.ProxyID != nil && account.Proxy != nil {
 		proxyURL = account.Proxy.URL()
 	}
+	started := time.Now()
+	status, failed := 0, true
+	defer func() {
+		recordImageUpstreamTiming(ctx, method, req.URL.Path, time.Since(started), status, failed)
+	}()
 	resp, err := s.httpUpstream.Do(req, proxyURL, account.ID, account.Concurrency)
 	if err != nil {
 		return nil, 0, err
 	}
+	status = resp.StatusCode
 	defer resp.Body.Close()
 	raw, err := io.ReadAll(io.LimitReader(resp.Body, atlasCloudBodyLimit+1))
 	if err == nil && len(raw) > atlasCloudBodyLimit {
 		err = fmt.Errorf("AtlasCloud response exceeds size limit")
 	}
+	failed = err != nil
 	return raw, resp.StatusCode, err
 }

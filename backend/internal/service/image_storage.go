@@ -17,7 +17,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/Wei-Shaw/sub2api/internal/pkg/logger"
 	"github.com/Wei-Shaw/sub2api/internal/util/urlvalidator"
+	"go.uber.org/zap"
 )
 
 const defaultImageMaxDownloadBytes int64 = 32 << 20 // 32 MiB
@@ -228,13 +230,24 @@ func (u *ImageResultUploader) Rewrite(ctx context.Context, taskID string, result
 	if len(items) == 0 {
 		return result, nil
 	}
+	log := logger.FromContext(ctx).With(zap.String("task_id", taskID))
 	for i, item := range items {
+		started := time.Now()
 		data, contentType, err := u.fetchImageBytes(ctx, item)
+		log.Info("image_task.result_download",
+			zap.Int("image_index", i),
+			zap.Int64("elapsed_ms", time.Since(started).Milliseconds()),
+			zap.Bool("success", err == nil))
 		if err != nil {
 			return nil, fmt.Errorf("image %d: %w", i, err)
 		}
 		key := u.buildKey(taskID, i, contentType)
+		started = time.Now()
 		url, err := u.storage.Save(ctx, key, contentType, data)
+		log.Info("image_task.result_upload",
+			zap.Int("image_index", i),
+			zap.Int64("elapsed_ms", time.Since(started).Milliseconds()),
+			zap.Bool("success", err == nil))
 		if err != nil {
 			return nil, fmt.Errorf("image %d: upload to object storage: %w", i, err)
 		}

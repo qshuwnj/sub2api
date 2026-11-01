@@ -10,15 +10,56 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Wei-Shaw/sub2api/internal/pkg/logger"
 	middleware2 "github.com/Wei-Shaw/sub2api/internal/server/middleware"
 	"github.com/Wei-Shaw/sub2api/internal/service"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/require"
+	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest/observer"
 )
 
 type asyncImageMemoryStore struct {
 	mu    sync.RWMutex
 	tasks map[string]*service.ImageTaskRecord
+}
+
+func TestAsyncImageLifecycleTimingKeepsTaskAndRequestAttribution(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	core, logs := observer.New(zap.InfoLevel)
+	ctx := logger.IntoContext(context.Background(), zap.New(core).With(zap.String("request_id", "async-timing-request")))
+	store := &asyncImageMemoryStore{tasks: make(map[string]*service.ImageTaskRecord)}
+	tasks := service.NewImageTaskServiceWithUploader(store, nil, time.Hour, time.Minute)
+	owner := service.ImageTaskOwner{UserID: 7, APIKeyID: 9}
+	task, err := tasks.Create(ctx, owner)
+	require.NoError(t, err)
+	c, _ := gin.CreateTestContext(httptest.NewRecorder())
+	body := []byte(`{"model":"test-model","prompt":"private-prompt"}`)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations/async", strings.NewReader(string(body))).WithContext(ctx)
+	taskCtx, recorder, cancel := newAsyncImageContext(c, body, time.Minute)
+	h := &AsyncImageHandler{tasks: tasks, execute: func(_ string, c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{"data": []gin.H{{"url": "https://cdn.example/image.png?token=private-token"}}})
+	}}
+	h.run(task.ID, service.PlatformOpenAI, taskCtx, recorder, cancel)
+	completed, err := tasks.Get(ctx, owner, task.ID)
+	require.NoError(t, err)
+	require.Equal(t, service.ImageTaskStatusCompleted, completed.Status)
+	for _, message := range []string{"image_task.execution_started", "image_task.gateway_returned", "image_task.delivery_started", "image_task.delivery_finished", "image_task.execution_finished"} {
+		entries := logs.FilterMessage(message).All()
+		require.Len(t, entries, 1, message)
+		fields := entries[0].ContextMap()
+		require.Equal(t, "async-timing-request", fields["request_id"], message)
+		require.Equal(t, task.ID, fields["task_id"], message)
+		encoded, err := json.Marshal(fields)
+		require.NoError(t, err)
+		require.NotContains(t, string(encoded), "private-prompt")
+		require.NotContains(t, string(encoded), "private-token")
+		require.NotContains(t, string(encoded), "cdn.example")
+	}
+	fields := logs.FilterMessage("image_task.delivery_finished").All()[0].ContextMap()
+	require.Equal(t, "completed", fields["status"])
+	require.GreaterOrEqual(t, fields["offload_ms"], int64(0))
+	require.GreaterOrEqual(t, fields["persist_ms"], int64(0))
 }
 
 func TestExtractImageTaskErrorPreservesOutcomeAndBilling(t *testing.T) {

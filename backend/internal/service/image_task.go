@@ -196,19 +196,45 @@ func (s *ImageTaskService) Get(ctx context.Context, owner ImageTaskOwner, id str
 }
 
 func (s *ImageTaskService) Complete(ctx context.Context, id string, statusCode int, result json.RawMessage) error {
+	log := logger.FromContext(ctx).With(zap.String("task_id", id))
+	started := time.Now()
+	var offloadDuration time.Duration
+	var persistStarted time.Time
+	status := ImageTaskStatusFailed
+	log.Info("image_task.delivery_started")
+	defer func() {
+		var persistDuration time.Duration
+		if !persistStarted.IsZero() {
+			persistDuration = time.Since(persistStarted)
+		}
+		log.Info("image_task.delivery_finished",
+			zap.String("status", status),
+			zap.Int64("elapsed_ms", time.Since(started).Milliseconds()),
+			zap.Int64("offload_ms", offloadDuration.Milliseconds()),
+			zap.Int64("persist_ms", persistDuration.Milliseconds()))
+	}()
 	if !json.Valid(result) {
+		persistStarted = time.Now()
 		return s.Fail(ctx, id, http.StatusBadGateway, imageTaskErrorJSON("api_error", "upstream returned a non-JSON image response"))
 	}
 	if uploader, _ := s.current(); uploader != nil {
+		offloadStarted := time.Now()
 		rewritten, err := uploader.Rewrite(ctx, id, result)
+		offloadDuration = time.Since(offloadStarted)
 		if err != nil {
 			// 转存失败不回退存 base64，避免大 blob 撑爆 Redis：直接把任务标记为失败。
-			logger.L().Error("image_task.offload_failed", zap.String("task_id", id), zap.Error(err))
+			log.Error("image_task.offload_failed")
+			persistStarted = time.Now()
 			return s.Fail(ctx, id, http.StatusBadGateway, imageTaskErrorJSON("api_error", "failed to store generated image to object storage"))
 		}
 		result = rewritten
 	}
-	return s.finish(ctx, id, ImageTaskStatusCompleted, statusCode, result, nil)
+	persistStarted = time.Now()
+	err := s.finish(ctx, id, ImageTaskStatusCompleted, statusCode, result, nil)
+	if err == nil {
+		status = ImageTaskStatusCompleted
+	}
+	return err
 }
 
 func (s *ImageTaskService) Fail(ctx context.Context, id string, statusCode int, taskErr json.RawMessage) error {
