@@ -264,7 +264,7 @@ func (h *AsyncImageHandler) failTask(taskID string, statusCode int, taskErr json
 }
 
 func newAsyncImageContext(c *gin.Context, body []byte, timeoutDuration time.Duration) (*gin.Context, *httptest.ResponseRecorder, context.CancelFunc) {
-	base := context.WithoutCancel(c.Request.Context())
+	base := service.WithAsyncImageExecution(context.WithoutCancel(c.Request.Context()))
 	executionCtx, cancel := context.WithTimeout(base, timeoutDuration)
 	request := c.Request.Clone(executionCtx)
 	request.Body = io.NopCloser(bytes.NewReader(body))
@@ -302,9 +302,22 @@ func imageTaskPollURL(submitPath, taskID string) string {
 func extractImageTaskError(body []byte) json.RawMessage {
 	if json.Valid(body) {
 		var envelope struct {
-			Error json.RawMessage `json:"error"`
+			Error        json.RawMessage `json:"error"`
+			ImageOutcome json.RawMessage `json:"image_outcome"`
+			Billing      json.RawMessage `json:"billing"`
 		}
 		if json.Unmarshal(body, &envelope) == nil && len(envelope.Error) > 0 && json.Valid(envelope.Error) {
+			var detail map[string]json.RawMessage
+			if json.Unmarshal(envelope.Error, &detail) == nil && detail != nil {
+				if len(envelope.ImageOutcome) > 0 {
+					detail["image_outcome"] = envelope.ImageOutcome
+				}
+				if len(envelope.Billing) > 0 {
+					detail["billing"] = envelope.Billing
+				}
+				encoded, _ := json.Marshal(detail)
+				return encoded
+			}
 			return envelope.Error
 		}
 		return json.RawMessage(body)

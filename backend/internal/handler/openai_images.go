@@ -363,6 +363,11 @@ func (h *OpenAIGatewayHandler) Images(c *gin.Context) {
 					code, message := "image_outcome_unknown", "Generation outcome is uncertain; do not resubmit this image"
 					if state := imagePricing.Outcome().Status; state == "failed" || state == "not_submitted" {
 						code, message = "image_generation_failed", "Image generation failed; this image was not charged to your balance"
+						var imageUpstreamErr *service.OpenAIImagesUpstreamError
+						if errors.As(err, &imageUpstreamErr) &&
+							imageUpstreamErr.Code == "atlascloud_temporarily_unavailable" {
+							code, message = imageUpstreamErr.Code, imageUpstreamErr.Message
+						}
 					}
 					h.imageQualityErrorResponse(c, http.StatusBadGateway, code, message, imagePricing)
 				}

@@ -198,12 +198,15 @@ func atlasCloudOutputURLs(raw []byte) []string {
 	return outputs
 }
 
-func atlasCloudImagesError(c *gin.Context, status int, message string) (*OpenAIForwardResult, error) {
+func atlasCloudImagesError(c *gin.Context, status int, message string, codes ...string) (*OpenAIForwardResult, error) {
 	errorType := "upstream_error"
 	if status == http.StatusBadRequest {
 		errorType = "invalid_request_error"
 	}
 	err := &OpenAIImagesUpstreamError{StatusCode: status, ErrorType: errorType, Message: message}
+	if len(codes) > 0 {
+		err.Code = codes[0]
+	}
 	if snapshot, _ := c.Request.Context().Value(imageQualityContextKey{}).(*ImageQualityPriceSnapshot); snapshot != nil {
 		// Quoted requests add their durable per-child outcome in the handler.
 		return nil, err
@@ -258,6 +261,9 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 	// Finish accounting for an accepted paid job even if the browser disconnects.
 	// Preserve any caller deadline and impose a hard bound on the whole job.
 	deadline := started.Add(atlasCloudTimeout)
+	if async, _ := ctx.Value(asyncImageExecutionKey{}).(bool); async {
+		deadline = started.Add(defaultImageTaskExecutionTimeout)
+	}
 	if earlier, ok := ctx.Deadline(); ok && earlier.Before(deadline) {
 		deadline = earlier
 	}
@@ -372,7 +378,15 @@ func (s *OpenAIGatewayService) forwardAtlasCloudImages(
 			if quoted != nil {
 				_ = quoted.markOutcome(ctx, "failed", predictionID)
 			}
-			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed")
+			// Return an allowlisted explanation, never the supplier's raw error
+			// (which can contain credentials, internal URLs, or other secrets).
+			reason := strings.ToLower(atlasCloudValue(raw, "error").String())
+			if strings.Contains(reason, "temporarily unavailable") {
+				return atlasCloudImagesError(c, http.StatusBadGateway,
+					"AtlasCloud is temporarily unavailable; this image generation failed",
+					"atlascloud_temporarily_unavailable")
+			}
+			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed", "atlascloud_image_generation_failed")
 		default:
 			return atlasCloudImagesError(c, http.StatusBadGateway, "AtlasCloud image generation failed or returned an unsupported status")
 		}

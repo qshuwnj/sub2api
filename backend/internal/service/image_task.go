@@ -23,6 +23,14 @@ const (
 	defaultImageTaskExecutionTimeout = 30 * time.Minute
 )
 
+type asyncImageExecutionKey struct{}
+
+// WithAsyncImageExecution marks only server-owned detached task executions.
+// Client headers must never be able to extend the synchronous request budget.
+func WithAsyncImageExecution(ctx context.Context) context.Context {
+	return context.WithValue(ctx, asyncImageExecutionKey{}, true)
+}
+
 var (
 	ErrImageTaskNotFound    = infraerrors.New(http.StatusNotFound, "IMAGE_TASK_NOT_FOUND", "image task not found")
 	ErrImageTaskForbidden   = infraerrors.New(http.StatusForbidden, "IMAGE_TASK_FORBIDDEN", "image task does not belong to this API key")

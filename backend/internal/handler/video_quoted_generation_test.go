@@ -405,7 +405,9 @@ func TestQuotedVideoHandlerFreshAdmissionAndImmediateCapture(t *testing.T) {
 					wantStatus = "completed"
 					require.Equal(t, "configured_rule", quote.PriceSource)
 					require.Contains(t, w.Body.String(), `"amount":"2.00000000"`)
-					require.True(t, repo.attempt.SupplierEstimated)
+					// A verified supplier cost can coexist with configured retail pricing.
+					require.Equal(t, quote.SupplierEstimated, repo.attempt.SupplierEstimated,
+						"admission must preserve the signed quote's supplier-cost provenance")
 				}
 				require.Equal(t, wantStatus, response["status"])
 				if scenario == "processing" {

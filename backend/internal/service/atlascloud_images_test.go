@@ -108,15 +108,19 @@ func TestAtlasCloudImagesRequireAPIKey(t *testing.T) {
 
 type atlasImageUpstream struct {
 	HTTPUpstream
-	replies []string
-	status  int
-	methods []string
-	urls    []string
-	auth    []string
-	bodies  [][]byte
+	replies   []string
+	status    int
+	methods   []string
+	urls      []string
+	auth      []string
+	bodies    [][]byte
+	deadlines []time.Duration
 }
 
 func (u *atlasImageUpstream) Do(req *http.Request, _ string, _ int64, _ int) (*http.Response, error) {
+	if deadline, ok := req.Context().Deadline(); ok {
+		u.deadlines = append(u.deadlines, time.Until(deadline))
+	}
 	u.methods = append(u.methods, req.Method)
 	u.urls = append(u.urls, req.URL.String())
 	u.auth = append(u.auth, req.Header.Get("Authorization"))
@@ -231,6 +235,47 @@ func TestAtlasCloudImagesHonorsDeadline(t *testing.T) {
 	require.Nil(t, result)
 	require.Equal(t, 504, rec.Code)
 	require.Len(t, upstream.methods, 1)
+}
+
+func TestAtlasCloudImagesReportsSafeTemporaryFailure(t *testing.T) {
+	upstream := &atlasImageUpstream{replies: []string{`{"data":{"id":"original-task","status":"failed","error":"Service temporarily unavailable, please retry later; upstream-only"}}`}}
+	svc, c, rec, account, parsed := atlasImageFixture(t, upstream)
+	_, err := svc.ForwardImages(context.Background(), c, account, parsed.Body, parsed, "")
+	require.Error(t, err)
+	require.Equal(t, "atlascloud_temporarily_unavailable", gjson.Get(rec.Body.String(), "error.code").String())
+	require.Contains(t, gjson.Get(rec.Body.String(), "error.message").String(), "temporarily unavailable")
+	require.NotContains(t, rec.Body.String(), "upstream-only")
+	require.Equal(t, []string{"POST"}, upstream.methods)
+}
+
+func TestAtlasCloudImagesAsyncBudgetIsTrustedAndBounded(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		async    bool
+		timeout  time.Duration
+		expected time.Duration
+	}{
+		{"sync", false, time.Hour, atlasCloudTimeout},
+		{"async", true, 20 * time.Minute, 20 * time.Minute},
+		{"async_bounded", true, time.Hour, defaultImageTaskExecutionTimeout},
+		{"async_short_deadline", true, time.Minute, time.Minute},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			upstream := &atlasImageUpstream{replies: []string{`{"id":"ready","status":"completed","outputs":["https://cdn.example/1.png"]}`}}
+			svc, c, _, account, parsed := atlasImageFixture(t, upstream)
+			c.Request.Header.Set("X-Async-Image-Execution", "true") // never trusted
+			ctx, cancel := context.WithTimeout(context.Background(), tc.timeout)
+			defer cancel()
+			if tc.async {
+				ctx = WithAsyncImageExecution(ctx)
+			}
+			_, err := svc.ForwardImages(ctx, c, account, parsed.Body, parsed, "")
+			require.NoError(t, err)
+			require.Len(t, upstream.deadlines, 1)
+			require.InDelta(t, tc.expected.Seconds(), upstream.deadlines[0].Seconds(), 2)
+			require.Equal(t, []string{"POST"}, upstream.methods)
+		})
+	}
 }
 
 func TestAtlasCloudImagesBillingUsesProviderPresetTier(t *testing.T) {

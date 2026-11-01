@@ -21,6 +21,15 @@ type asyncImageMemoryStore struct {
 	tasks map[string]*service.ImageTaskRecord
 }
 
+func TestExtractImageTaskErrorPreservesOutcomeAndBilling(t *testing.T) {
+	raw := []byte(`{"error":{"code":"atlascloud_temporarily_unavailable","message":"AtlasCloud is temporarily unavailable"},"image_outcome":{"status":"failed","billing_status":"not_charged","upstream_request_id":"original-task"},"billing":{"total":"0.20"}}`)
+	var got map[string]json.RawMessage
+	require.NoError(t, json.Unmarshal(extractImageTaskError(raw), &got))
+	require.JSONEq(t, `{"status":"failed","billing_status":"not_charged","upstream_request_id":"original-task"}`, string(got["image_outcome"]))
+	require.JSONEq(t, `{"total":"0.20"}`, string(got["billing"]))
+	require.Equal(t, `"atlascloud_temporarily_unavailable"`, string(got["code"]))
+}
+
 func (s *asyncImageMemoryStore) Save(_ context.Context, task *service.ImageTaskRecord, _ time.Duration) error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
