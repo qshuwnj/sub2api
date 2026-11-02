@@ -13,6 +13,27 @@ import (
 
 var videoByteRange = regexp.MustCompile(`^bytes=(?:[0-9]{1,18}-[0-9]{0,18}|-[0-9]{1,18})$`)
 
+// A receipt read never polls the supplier, reprices a task or executes billing.
+func (h *OpenAIGatewayHandler) VideoChargeReceipt(c *gin.Context) {
+	c.Header("Cache-Control", "no-store")
+	key, ok := middleware.GetAPIKeyFromContext(c)
+	if !ok {
+		h.errorResponse(c, http.StatusUnauthorized, "authentication_error", "Invalid API key")
+		return
+	}
+	receipt, err := h.gatewayService.LookupVideoChargeReceipt(c.Request.Context(),
+		service.VideoAttemptOwner{UserID: key.UserID, APIKeyID: key.ID}, c.Param("request_id"))
+	if err != nil {
+		if errors.Is(err, service.ErrVideoResultNotFound) {
+			h.errorResponse(c, http.StatusNotFound, "video_receipt_unavailable", "Actual video charge is unavailable")
+		} else {
+			h.errorResponse(c, http.StatusServiceUnavailable, "video_receipt_unavailable", "Actual video charge is temporarily unavailable")
+		}
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"receipt": receipt})
+}
+
 func (h *OpenAIGatewayHandler) videoPlaybackError(c *gin.Context, err error) {
 	status, code, message := http.StatusServiceUnavailable, "video_playback_unavailable", "视频暂时无法读取，请稍后重新读取；不会重新生成或扣费。"
 	if errors.Is(err, service.ErrVideoResultNotFound) || errors.Is(err, service.ErrVideoAttemptNotFound) {

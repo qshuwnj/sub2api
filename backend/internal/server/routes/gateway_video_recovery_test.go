@@ -45,10 +45,18 @@ func (r *videoRecoveryRouteRepo) GetVideoAttempt(_ context.Context, owner servic
 	return &copy, nil
 }
 
+func (r *videoRecoveryRouteRepo) FindVideoChargeReceipt(_ context.Context, owner service.VideoAttemptOwner, task string) (*service.VideoChargeReceipt, error) {
+	r.reads++
+	if owner.UserID != 7 || owner.APIKeyID != 100 || task != "atlascloud:legacy" {
+		return nil, service.ErrVideoResultNotFound
+	}
+	return &service.VideoChargeReceipt{Amount: "3.2500000000", Currency: "USD", UsageLogID: 42}, nil
+}
+
 func TestGatewayVideoAcceptedRecoveryPrecedesNewAdmissionMiddleware(t *testing.T) {
 	const body = `{"model":"google/veo3.1/text-to-video","prompt":"private","aspect_ratio":"16:9","duration":8,"generate_audio":false,"resolution":"720p"}`
 	for _, prefix := range []string{"/v1", ""} {
-		for _, scenario := range []string{"owned", "owned balance", "owned expired", "body mismatch", "model mismatch", "foreign", "new", "new balance", "disabled", "disappeared", "lookup failure", "legacy model", "get attempt", "get balance"} {
+		for _, scenario := range []string{"owned", "owned balance", "owned expired", "body mismatch", "model mismatch", "foreign", "new", "new balance", "disabled", "disappeared", "lookup failure", "legacy model", "get attempt", "get balance", "get receipt", "foreign receipt"} {
 			t.Run(prefix+"/"+scenario, func(t *testing.T) {
 				gin.SetMode(gin.TestMode)
 				_, native, err := service.SerializeAtlasCloudVideoRequest([]byte(body))
@@ -68,7 +76,7 @@ func TestGatewayVideoAcceptedRecoveryPrecedesNewAdmissionMiddleware(t *testing.T
 				key := &service.APIKey{ID: 100, UserID: 7, Key: "client-key", Status: service.StatusAPIKeyQuotaExhausted,
 					Group: group, GroupID: &group.ID, Quota: 1, QuotaUsed: 1,
 					User: &service.User{ID: 7, Status: service.StatusActive, Balance: 0}}
-				if scenario == "foreign" {
+				if scenario == "foreign" || scenario == "foreign receipt" {
 					key.ID = 101
 				}
 				if scenario == "disabled" {
@@ -102,6 +110,8 @@ func TestGatewayVideoAcceptedRecoveryPrecedesNewAdmissionMiddleware(t *testing.T
 					id = "new-attempt"
 				case "get attempt", "get balance":
 					method, path, submit = http.MethodGet, prefix+"/videos/attempts/attempt", ""
+				case "get receipt", "foreign receipt":
+					method, path, submit = http.MethodGet, prefix+"/videos/atlascloud:legacy/receipt", ""
 				}
 				req := httptest.NewRequest(method, path, strings.NewReader(submit))
 				req.Header.Set("X-API-Key", "client-key")
@@ -113,6 +123,13 @@ func TestGatewayVideoAcceptedRecoveryPrecedesNewAdmissionMiddleware(t *testing.T
 				case "owned", "owned balance", "owned expired", "get attempt", "get balance":
 					require.Equal(t, 200, w.Code, w.Body.String())
 					require.Contains(t, w.Body.String(), "result.mp4")
+				case "get receipt":
+					require.Equal(t, 200, w.Code, w.Body.String())
+					require.Contains(t, w.Body.String(), `"amount":"3.2500000000"`)
+					require.Equal(t, "no-store", w.Header().Get("Cache-Control"))
+				case "foreign receipt":
+					require.Equal(t, 404, w.Code, w.Body.String())
+					require.NotContains(t, w.Body.String(), "3.2500000000")
 				case "body mismatch":
 					require.Equal(t, 409, w.Code, w.Body.String())
 				case "disappeared":
