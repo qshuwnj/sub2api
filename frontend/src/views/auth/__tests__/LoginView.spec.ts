@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import LoginView from '@/views/auth/LoginView.vue'
 
 const { getPublicSettingsMock, pushMock } = vi.hoisted(() => ({
@@ -73,14 +73,14 @@ function mountLogin() {
   return mount(LoginView, {
     global: {
       stubs: {
-        AuthLayout: { template: '<div><slot /><slot name="footer" /></div>' },
+        AuthLayout: { name: 'AuthLayout', props: { magicRings: Boolean }, template: '<div><slot /><slot name="footer" /></div>' },
         DingTalkOAuthSection: true,
         EmailOAuthButtons: true,
         Icon: true,
         LinuxDoOAuthSection: true,
         LoginAgreementPrompt: true,
         OidcOAuthSection: true,
-        RouterLink: { template: '<a><slot /></a>' },
+        RouterLink: { props: ['to'], template: '<a :href="to"><slot /></a>' },
         TotpLoginModal: true,
         TurnstileWidget: true,
         WechatOAuthSection: true,
@@ -91,6 +91,9 @@ function mountLogin() {
 }
 
 describe('LoginView registration entry', () => {
+  const originalURL = window.location.href
+  afterEach(() => window.history.replaceState({}, '', originalURL))
+
   beforeEach(() => {
     getPublicSettingsMock.mockReset()
     pushMock.mockReset()
@@ -102,6 +105,7 @@ describe('LoginView registration entry', () => {
     await flushPromises()
 
     expect(wrapper.text()).toContain('auth.signUp')
+    expect(wrapper.get('a').attributes('href')).toBe('/register')
   })
 
   it('hides the registration entry when registration is disabled', async () => {
@@ -114,5 +118,14 @@ describe('LoginView registration entry', () => {
     await flushPromises()
 
     expect(wrapper.text()).not.toContain('auth.signUp')
+  })
+
+  it.each(['/login', '/login?preview=magic-rings'])('enables the released design at %s without preview links', async (url) => {
+    window.history.replaceState({}, '', url)
+    const wrapper = mountLogin()
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'AuthLayout' }).props('magicRings')).toBe(true)
+    expect(wrapper.get('a').attributes('href')).toBe('/register')
+    wrapper.unmount()
   })
 })

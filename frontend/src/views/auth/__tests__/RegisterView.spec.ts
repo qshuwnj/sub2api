@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import RegisterView from '@/views/auth/RegisterView.vue'
 
 const {
@@ -77,7 +77,7 @@ function mountRegister() {
   return mount(RegisterView, {
     global: {
       stubs: {
-        AuthLayout: { template: '<div><slot /><slot name="footer" /></div>' },
+        AuthLayout: { name: 'AuthLayout', props: { magicRings: Boolean }, template: '<div><slot /><slot name="footer" /></div>' },
         Icon: true,
         TurnstileWidget: {
           template: '<div data-testid="turnstile-widget" />',
@@ -88,7 +88,7 @@ function mountRegister() {
         LinuxDoOAuthSection: true,
         WechatOAuthSection: true,
         OidcOAuthSection: true,
-        RouterLink: true,
+        RouterLink: { name: 'RouterLink', props: ['to'], template: '<a :href="to"><slot /></a>' },
         transition: false
       }
     }
@@ -96,6 +96,26 @@ function mountRegister() {
 }
 
 describe('RegisterView', () => {
+  const originalURL = window.location.href
+  afterEach(() => window.history.replaceState({}, '', originalURL))
+
+  it('uses the released design even for an existing preview URL', async () => {
+    window.history.replaceState({}, '', '/register?preview=magic-rings')
+    const wrapper = mountRegister()
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'AuthLayout' }).props('magicRings')).toBe(true)
+    expect(wrapper.findComponent({ name: 'RouterLink' }).props('to')).toBe('/login')
+    wrapper.unmount()
+  })
+
+  it('enables the shared design at the normal registration entry', async () => {
+    const wrapper = mountRegister()
+    await flushPromises()
+    expect(wrapper.findComponent({ name: 'AuthLayout' }).props('magicRings')).toBe(true)
+    expect(wrapper.findComponent({ name: 'RouterLink' }).props('to')).toBe('/login')
+    wrapper.unmount()
+  })
+
   beforeEach(() => {
     getPublicSettingsMock.mockReset()
     registerMock.mockReset()
