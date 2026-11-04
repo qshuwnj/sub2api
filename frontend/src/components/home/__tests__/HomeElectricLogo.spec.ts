@@ -1,6 +1,11 @@
 import { mount } from '@vue/test-utils'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { createElectricLogo } from '../electric-logo/renderer.js'
 import HomeElectricLogo from '../HomeElectricLogo.vue'
+
+vi.mock('../electric-logo/renderer.js', () => ({
+  createElectricLogo: vi.fn(),
+}))
 
 describe('HomeElectricLogo static fallback', () => {
   let media: MediaQueryList
@@ -19,6 +24,7 @@ describe('HomeElectricLogo static fallback', () => {
 
   afterEach(() => {
     vi.restoreAllMocks()
+    vi.mocked(createElectricLogo).mockReset()
     vi.unstubAllGlobals()
   })
 
@@ -63,6 +69,48 @@ describe('HomeElectricLogo static fallback', () => {
     expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('fallback')
     expect(wrapper.get('img').attributes('src')).toBe('/current.svg')
     expect(wrapper.get('[role="img"]').attributes('aria-label')).toBe('Current brand')
+    wrapper.unmount()
+  })
+
+  it('uses the electric tone while a slow renderer initializes and after an error', async () => {
+    vi.stubGlobal('WebGL2RenderingContext', class {})
+    const dispose = vi.fn()
+    vi.mocked(createElectricLogo).mockReturnValue({ dispose })
+    const wrapper = mount(HomeElectricLogo, { props: { src: '/quota.svg' } })
+    await wrapper.vm.$nextTick()
+
+    expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('loading')
+    expect(wrapper.get('[role="img"]').attributes('data-tone')).toBe('dark')
+    expect(wrapper.get('img').attributes('src')).toBe('/quota.svg')
+
+    const options = vi.mocked(createElectricLogo).mock.calls[0]![2]
+    options.onReady?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('animated')
+    options.onError?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('fallback')
+    expect(wrapper.get('[role="img"]').attributes('data-tone')).toBe('dark')
+    wrapper.unmount()
+    expect(dispose).toHaveBeenCalledOnce()
+  })
+
+  it('updates the fallback tone and ignores callbacks from a disposed renderer', async () => {
+    vi.stubGlobal('WebGL2RenderingContext', class {})
+    vi.mocked(createElectricLogo).mockImplementation(() => ({ dispose: vi.fn() }))
+    const wrapper = mount(HomeElectricLogo)
+    const oldOptions = vi.mocked(createElectricLogo).mock.calls[0]![2]
+    await wrapper.setProps({ dark: false })
+
+    oldOptions.onReady?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('loading')
+    expect(wrapper.get('[role="img"]').attributes('data-tone')).toBe('light')
+
+    const currentOptions = vi.mocked(createElectricLogo).mock.calls[1]![2]
+    currentOptions.onReady?.()
+    await wrapper.vm.$nextTick()
+    expect(wrapper.get('[role="img"]').attributes('data-renderer')).toBe('animated')
     wrapper.unmount()
   })
 })

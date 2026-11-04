@@ -5,6 +5,7 @@
       class="home-electric-logo"
       data-testid="electric-logo"
       :data-renderer="state"
+      :data-tone="dark ? 'dark' : 'light'"
       role="img"
       :aria-label="alt"
     >
@@ -132,6 +133,19 @@ onBeforeUnmount(() => {
   height: 96px;
   object-fit: contain;
   transform: translate(-50%, -50%);
+  /* Match the electric palette from the first paint, including static/error states. */
+  filter:
+    brightness(0) invert(89%) sepia(20%) saturate(1231%) hue-rotate(206deg)
+    brightness(103%) contrast(101%)
+    drop-shadow(0 0 4px rgb(173 109 255 / 70%))
+    drop-shadow(0 0 10px rgb(173 109 255 / 35%));
+}
+
+.home-electric-logo[data-tone='light'] .home-electric-logo__fallback {
+  filter:
+    brightness(0) invert(34%) sepia(82%) saturate(1368%) hue-rotate(239deg)
+    brightness(91%) contrast(95%)
+    drop-shadow(0 0 5px rgb(140 84 220 / 25%));
 }
 
 .home-electric-logo:not([data-renderer='animated']) .home-electric-logo__canvas { visibility: hidden; }
