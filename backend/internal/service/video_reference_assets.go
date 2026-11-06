@@ -34,6 +34,9 @@ var videoReferenceModelFamilies = map[string]string{
 // VideoReferenceFamilyForModel is intentionally exact. Reference admission
 // must not infer a family from a loose suffix or trust a client-supplied tier.
 func VideoReferenceFamilyForModel(model string) (string, error) {
+	if p := dapacaiVideoModel(model); p != nil && !p.disabled {
+		return "dapacai:" + model, nil
+	}
 	family, ok := videoReferenceModelFamilies[strings.TrimSpace(model)]
 	if !ok {
 		return "", errors.New("unsupported reference video endpoint model")
@@ -45,6 +48,9 @@ func VideoReferenceFamilyForModel(model string) (string, error) {
 // reference-to-video sibling. Their storage grant accepts images only.
 func VideoFrameFamilyForModel(model string) (string, error) {
 	model = strings.TrimSpace(model)
+	if p := dapacaiVideoModel(model); p != nil && !p.disabled {
+		return "frame:" + model, nil
+	}
 	switch model {
 	case "grok-imagine-video", "doubao-seedance-1-0-pro-250528", "doubao-seedance-2-0-260128":
 		return "frame:" + model, nil
@@ -278,6 +284,22 @@ type videoReferenceLimits struct {
 }
 
 func videoReferenceLimit(family string, kind VideoReferenceKind) (videoReferenceLimits, bool) {
+	if model, ok := strings.CutPrefix(family, "dapacai:"); ok {
+		p := dapacaiVideoModel(model)
+		if p == nil || p.disabled {
+			return videoReferenceLimits{}, false
+		}
+		switch kind {
+		case VideoReferenceImage:
+			return videoReferenceLimits{MaxBytes: 30 << 20}, p.images > 0
+		case VideoReferenceVideo:
+			return videoReferenceLimits{MaxBytes: 50 << 20, MinDuration: 0.1, MaxDuration: 600}, p.videos > 0
+		case VideoReferenceAudio:
+			return videoReferenceLimits{MaxBytes: 15 << 20, MinDuration: 0.1, MaxDuration: 600}, p.audios > 0
+		default:
+			return videoReferenceLimits{}, false
+		}
+	}
 	if strings.HasPrefix(family, "frame:") {
 		_, err := VideoFrameFamilyForModel(strings.TrimPrefix(family, "frame:"))
 		return videoReferenceLimits{MaxBytes: 30 << 20}, err == nil && kind == VideoReferenceImage
@@ -310,7 +332,7 @@ func ValidateVideoReferenceDescriptor(asset *VideoReferenceAsset) error {
 	if asset.Kind == VideoReferenceImage {
 		aspect := float64(asset.Width) / float64(asset.Height)
 		minimum := 300
-		frame := strings.HasPrefix(asset.EndpointFamily, "frame:")
+		frame := strings.HasPrefix(asset.EndpointFamily, "frame:") || strings.HasPrefix(asset.EndpointFamily, "dapacai:")
 		if frame {
 			minimum = 1
 		}

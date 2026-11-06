@@ -2335,6 +2335,15 @@ func (s *BillingService) getImageUnitPrice(model string, imageSize string, group
 }
 
 func (s *BillingService) getVideoUnitPrice(model string, resolution string, groupConfig *VideoPriceConfig) float64 {
+	// New supplier has no inherited xAI/AtlasCloud fallback or guessed conversion.
+	if IsDapacaiVideoModel(model) {
+		if groupConfig != nil {
+			if price := LookupVideoModelPrice(groupConfig.ModelPrices, model, resolution); price != nil {
+				return *price
+			}
+		}
+		return 0 // Admission and settlement reject a missing exact price.
+	}
 	// Order: (a) per-model map (b) flat group video_price_* (c) model-aware code defaults.
 	if groupConfig != nil {
 		if price := LookupVideoModelPrice(groupConfig.ModelPrices, model, resolution); price != nil {

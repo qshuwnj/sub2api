@@ -8,6 +8,16 @@ import {
 } from '../groupsVideoModelPricing'
 
 describe('Grok video model pricing form', () => {
+  it('keeps Dapacai rates explicit, separate and empty without changing saved Atlas rates', () => {
+    const old = { 'minimax/h3-developer/text-to-video': { '768p': 0.3 } }
+    const form = createVideoModelPricesForm(old)
+    expect(serializeVideoModelPrices(form)).toEqual(old)
+    expect(videoPriceResolutionsForModel('seedance-2.0')).toEqual([{ key: 'native', label: 'native' }])
+    expect(videoPriceResolutionsForModel('seedance-2.5-plus-4').map(row => row.key)).toEqual(['720p'])
+    expect(form['seedance-2.0'].native).toBeNull()
+    form['seedance-2.0'].native = 0.2
+    expect(serializeVideoModelPrices(form)).toEqual({ ...old, 'seedance-2.0': { native: 0.2 } })
+  })
   it('provides editable rows for both canonical Grok video families', () => {
     const form = createVideoModelPricesForm()
 

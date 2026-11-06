@@ -160,7 +160,12 @@ func (s *OpenAIGatewayService) refreshNativeVideoSource(ctx context.Context, acc
 		return "", err
 	}
 	source := ""
-	if strings.HasPrefix(v.TaskID, "seedance:") {
+	if strings.HasPrefix(v.TaskID, "dapacai:") {
+		if !dapacaiCompletedStatus(body, v.TaskID) {
+			return "", ErrVideoResultExpired
+		}
+		return "", errStudioNativeContent
+	} else if strings.HasPrefix(v.TaskID, "seedance:") {
 		id := gjson.GetBytes(body, "id").String()
 		if gjson.GetBytes(body, "status").String() != "succeeded" || id != "" && SeedanceTaskKey(id) != v.TaskID {
 			return "", ErrVideoResultExpired
@@ -190,7 +195,10 @@ func (s *OpenAIGatewayService) loadStudioNativeVideoStatus(ctx context.Context, 
 	target, token := "", ""
 	var err error
 	seedance := strings.HasPrefix(v.TaskID, "seedance:")
-	if seedance && account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilitySeedance) {
+	if strings.HasPrefix(v.TaskID, "dapacai:") && account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityDapacaiVideo) {
+		target, err = dapacaiVideoURL(v.TaskID, false)
+		token = strings.TrimSpace(account.GetCredential("api_key"))
+	} else if seedance && account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilitySeedance) {
 		base, baseErr := s.validateUpstreamBaseURL(account.GetCredential("base_url"))
 		if baseErr != nil {
 			return nil, "", ErrVideoResultUnavailable
@@ -255,7 +263,9 @@ func (s *OpenAIGatewayService) openStudioNativeVideoContent(ctx context.Context,
 		return nil, ErrVideoResultUnavailable
 	}
 	account, err := s.accountRepo.GetByID(ctx, v.AccountID)
-	if err != nil || account == nil || account.Platform != PlatformGrok {
+	dapacai := strings.HasPrefix(v.TaskID, "dapacai:")
+	if err != nil || account == nil || (dapacai && !account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityDapacaiVideo)) ||
+		(!dapacai && account.Platform != PlatformGrok) {
 		return nil, ErrVideoResultUnavailable
 	}
 	body, token, err := s.loadStudioNativeVideoStatus(ctx, account, v)
@@ -263,16 +273,23 @@ func (s *OpenAIGatewayService) openStudioNativeVideoContent(ctx context.Context,
 		return nil, err
 	}
 	id := extractGrokMediaVideoRequestID(body)
-	if !IsGrokVideoStatusBillable(body) || id != "" && id != v.TaskID {
+	if dapacai && !dapacaiCompletedStatus(body, v.TaskID) || !dapacai && (!IsGrokVideoStatusBillable(body) || id != "" && id != v.TaskID) {
 		return nil, ErrVideoResultExpired
 	}
-	target, err := grokMediaSignedVideoContentURL(body, v.TaskID)
+	target := ""
+	if !dapacai {
+		target, err = grokMediaSignedVideoContentURL(body, v.TaskID)
+	}
 	if err != nil {
 		return nil, ErrVideoResultExpired
 	}
 	signed := target != ""
 	if !signed {
-		target, err = buildGrokMediaURL(account, s.cfg, GrokMediaEndpointVideoContent, v.TaskID)
+		if dapacai {
+			target, err = dapacaiVideoURL(v.TaskID, true)
+		} else {
+			target, err = buildGrokMediaURL(account, s.cfg, GrokMediaEndpointVideoContent, v.TaskID)
+		}
 		if err != nil {
 			return nil, ErrVideoResultUnavailable
 		}
@@ -303,7 +320,8 @@ func (s *OpenAIGatewayService) openStudioNativeVideoContent(ctx context.Context,
 		cancel()
 		return nil, ErrVideoResultUnavailable
 	}
-	if resp.StatusCode != http.StatusOK || resp.ContentLength > 300<<20 {
+	if resp.StatusCode != http.StatusOK || resp.ContentLength > 300<<20 ||
+		dapacai && !strings.HasPrefix(resp.Header.Get("Content-Type"), "video/") && resp.Header.Get("Content-Type") != "application/octet-stream" {
 		resp.Body.Close()
 		cancel()
 		return nil, ErrVideoResultUnavailable

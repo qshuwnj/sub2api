@@ -626,6 +626,12 @@ func (s *OpenAIGatewayService) calculateOpenAIRecordUsageCost(
 		return s.billingService.CalculateWebSearchCost(result.WebSearchCalls, webSearchPricePerCallFromAPIKey(apiKey), webSearchMultiplier), nil
 	}
 	if isGrokVideoUsageResult(result, billingModels) {
+		if IsDapacaiVideoModel(billingModel) {
+			if !HasDapacaiVideoPrice(apiKey, billingModel, result.VideoResolution) {
+				return nil, fmt.Errorf("Dapacai video requires an exact group USD price card")
+			}
+			return s.calculateOpenAIVideoCost(ctx, billingModel, apiKey, result, videoMultiplier), nil
+		}
 		if IsAtlasCloudVideoModel(billingModel) {
 			return s.calculateOpenAIVideoCost(ctx, billingModel, apiKey, result, videoMultiplier), nil
 		}
@@ -876,6 +882,9 @@ func (s *OpenAIGatewayService) calculateOpenAIVideoCost(
 	}
 	resolution := NormalizeVideoBillingResolutionForModel(billingModel, result.VideoResolution)
 	durationSeconds := NormalizeVideoBillingDurationForModel(billingModel, result.VideoDurationSeconds)
+	if IsDapacaiVideoModel(billingModel) {
+		return calculateDapacaiVideoCost(apiKey, billingModel, resolution, videoCount, durationSeconds, multiplier)
+	}
 	if IsAtlasCloudVideoModel(billingModel) {
 		return s.billingService.CalculateVideoCost(billingModel, resolution, videoCount, durationSeconds, videoPriceConfigFromAPIKey(apiKey), multiplier)
 	}

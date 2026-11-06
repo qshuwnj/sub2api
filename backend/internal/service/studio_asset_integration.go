@@ -47,6 +47,12 @@ func ObserveStudioVideoSubmission(c *gin.Context, task string, accountID int64) 
 	return observeStudioVideo(c, task, "", false, accountID)
 }
 
+// Content-only providers archive through the owned authenticated GET endpoint.
+// The caller must commit settlement before marking the video completed.
+func ObserveStudioVideoCompletion(c *gin.Context, task string, accountID int64) *StudioLibraryStatus {
+	return observeStudioVideo(c, task, "", true, accountID)
+}
+
 // StudioLibraryStatus is independent of generation and billing success. Queued
 // means that private retry sources were persisted, not that archival completed.
 type StudioLibraryStatus struct {

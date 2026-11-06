@@ -239,6 +239,8 @@ type OpenAIForwardResult struct {
 	StudioImageOutputs []StudioImageOutput
 	// AtlasCloud outputs are released by the handler only after settlement.
 	AtlasCloudVideoResponse map[string]any
+	// Isolated OpenAI-compatible video provider; release only after durable settlement.
+	DapacaiVideoResponse    map[string]any
 	AtlasCloudImageResponse []byte
 	ImageQualityPricing     *ImageQualityPriceSnapshot
 	// UpstreamHeaders 是直接上游的响应头，用于按账户配置解析上游请求标识。

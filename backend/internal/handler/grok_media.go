@@ -86,6 +86,10 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		platform = service.PlatformOpenAI
 		noAccountCode, noAccountMessage = "atlascloud_no_eligible_account", "No eligible AtlasCloud accounts"
 	}
+	if endpoint.IsDapacaiVideo() {
+		platform = service.PlatformOpenAI
+		noAccountCode, noAccountMessage = "dapacai_no_eligible_account", "此分组没有可调用该模型的 Dapacai API-key 账号"
+	}
 	streamStarted := false
 	defer h.recoverResponsesPanic(c, &streamStarted)
 
@@ -133,6 +137,17 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 
 	contentType := c.GetHeader("Content-Type")
 	requestInfo := service.ParseGrokMediaRequest(contentType, body)
+	if endpoint == service.DapacaiEndpointVideoCreate {
+		requestInfo, err = service.ParseDapacaiVideoRequest(body)
+		if err != nil {
+			h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", err.Error())
+			return
+		}
+		if !service.HasDapacaiVideoPrice(apiKey, requestInfo.Model, requestInfo.Resolution) {
+			h.errorResponse(c, http.StatusBadRequest, "pricing_not_configured", "请为新分组配置此 Dapacai 型号和清晰度的 USD 价卡，并对齐上游按次或按秒计费；未套用旧线路价格")
+			return
+		}
+	}
 	if endpoint == service.SeedanceEndpointCreate {
 		requestInfo, err = service.ParseSeedanceRequest(body)
 		if err != nil {
@@ -403,7 +418,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		)
 
 		account := selection.Account
-		if endpoint.IsGenerationRequest() && !endpoint.IsSeedance() && !endpoint.IsAtlasCloudVideo() {
+		if endpoint.IsGenerationRequest() && !endpoint.IsSeedance() && !endpoint.IsAtlasCloudVideo() && !endpoint.IsDapacaiVideo() {
 			eligible, eligibilityReason, eligibilityErr := h.ensureGrokMediaAccountEligibility(requestCtx, account)
 			if !eligible {
 				releaseAccount()
@@ -454,6 +469,13 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		writerSizeBeforeForward := c.Writer.Size()
 		result, err := func() (*service.OpenAIForwardResult, error) {
 			defer releaseAccount()
+			if endpoint.IsDapacaiVideo() {
+				forwardCtx := requestCtx
+				if endpoint == service.DapacaiEndpointVideoCreate {
+					forwardCtx = context.WithoutCancel(requestCtx)
+				}
+				return h.gatewayService.ForwardDapacaiVideo(forwardCtx, c, account, endpoint, requestID, body)
+			}
 			if endpoint.IsAtlasCloudVideo() {
 				forwardCtx := requestCtx
 				if endpoint == service.AtlasCloudEndpointVideoCreate {
@@ -496,7 +518,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 					h.handleFailoverExhausted(c, failoverErr, false)
 					return
 				}
-				if endpoint.IsVideoLookupRequest() {
+				if endpoint.IsVideoLookupRequest() || endpoint.IsDapacaiVideo() {
 					h.handleFailoverExhausted(c, failoverErr, false)
 					return
 				}
@@ -551,7 +573,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 			return
 		}
 
-		if endpoint == service.AtlasCloudEndpointVideoCreate {
+		if endpoint == service.AtlasCloudEndpointVideoCreate || endpoint == service.DapacaiEndpointVideoCreate {
 			// Persist ownership/accounting for an accepted job after client disconnect.
 			var cancel context.CancelFunc
 			requestCtx, cancel = context.WithTimeout(context.WithoutCancel(requestCtx), time.Minute)
@@ -567,7 +589,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 					zap.String("request_id", result.ResponseID),
 					zap.Error(err),
 				)
-				if endpoint.IsAtlasCloudVideo() {
+				if endpoint.IsAtlasCloudVideo() || endpoint.IsDapacaiVideo() {
 					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video ownership could not be saved; do not resubmit generation")
 					return
 				}
@@ -599,7 +621,7 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 						zap.String("request_id", result.ResponseID),
 						zap.Error(err2),
 					)
-					if endpoint.IsAtlasCloudVideo() {
+					if endpoint.IsAtlasCloudVideo() || endpoint.IsDapacaiVideo() {
 						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video billing state could not be saved; do not resubmit generation")
 						return
 					}
@@ -608,7 +630,45 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		}
 		// Status poll OR content download can observe official done+video.url.
 		// Both paths share the same claim key so the customer is charged once.
-		if endpoint.IsAtlasCloudVideo() {
+		if endpoint.IsDapacaiVideo() && endpoint != service.DapacaiEndpointVideoContent {
+			taskID := firstNonEmptyString(requestID, result.ResponseID)
+			if result.VideoCount > 0 {
+				receipt, receiptErr := h.gatewayService.LookupVideoChargeReceipt(requestCtx,
+					service.VideoAttemptOwner{UserID: subject.UserID, APIKeyID: apiKey.ID}, taskID)
+				if receiptErr != nil || receipt == nil {
+					pending, err := h.gatewayService.LoadGrokVideoPendingBilling(requestCtx, taskID, subject.UserID, apiKey.ID)
+					if err != nil || pending == nil || !service.IsDapacaiVideoModel(pending.BillingModel) {
+						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video billing state is unavailable; retry status later")
+						return
+					}
+					if !service.HasDapacaiVideoPrice(apiKey, pending.BillingModel, pending.VideoResolution) {
+						h.errorResponse(c, http.StatusServiceUnavailable, "pricing_not_configured", "请恢复该任务对应的新分组模型价格；不会套用旧价格")
+						return
+					}
+					billResult := prepareGrokVideoCompletionBilling(requestCtx, h, reqLog, apiKey, subject, taskID, result)
+					if billResult == nil || recordGrokMediaUsage(c, h, reqLog, apiKey, subject, subscription, account, billResult, billResult.Model, body, taskID) != nil {
+						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video settlement is unavailable; retry status, do not resubmit")
+						return
+					}
+					receipt, receiptErr = h.gatewayService.LookupVideoChargeReceipt(requestCtx,
+						service.VideoAttemptOwner{UserID: subject.UserID, APIKeyID: apiKey.ID}, taskID)
+				}
+				if receiptErr != nil || receipt == nil {
+					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video charge receipt is unavailable; retry status later")
+					return
+				}
+				result.DapacaiVideoResponse["receipt"] = receipt
+				if status := service.ObserveStudioVideoCompletion(c, taskID, account.ID); status != nil {
+					result.DapacaiVideoResponse["library"] = status
+				}
+			}
+			if endpoint == service.DapacaiEndpointVideoCreate {
+				if status := service.ObserveStudioVideoSubmission(c, result.ResponseID, account.ID); status != nil {
+					result.DapacaiVideoResponse["library"] = status
+				}
+			}
+			c.JSON(http.StatusOK, result.DapacaiVideoResponse)
+		} else if endpoint.IsAtlasCloudVideo() {
 			taskID := firstNonEmptyString(requestID, result.ResponseID)
 			if result.VideoCount > 0 {
 				pending, loadErr := h.gatewayService.LoadGrokVideoPendingBilling(requestCtx, taskID, subject.UserID, apiKey.ID)
@@ -687,6 +747,9 @@ func (h *OpenAIGatewayHandler) ensureGrokMediaAccountEligibility(ctx context.Con
 }
 
 func grokMediaRequiredCapability(endpoint service.GrokMediaEndpoint) service.OpenAIEndpointCapability {
+	if endpoint.IsDapacaiVideo() {
+		return service.OpenAIEndpointCapabilityDapacaiVideo
+	}
 	if endpoint.IsAtlasCloudVideo() {
 		return service.OpenAIEndpointCapabilityAtlasCloudVideo
 	}
@@ -711,7 +774,7 @@ func grokMediaScheduleModel(account *service.Account, routingModel string, resul
 
 func isGrokVideoCreateEndpoint(endpoint service.GrokMediaEndpoint) bool {
 	switch endpoint {
-	case service.AtlasCloudEndpointVideoCreate, service.SeedanceEndpointCreate, service.GrokMediaEndpointVideosGenerations,
+	case service.DapacaiEndpointVideoCreate, service.AtlasCloudEndpointVideoCreate, service.SeedanceEndpointCreate, service.GrokMediaEndpointVideosGenerations,
 		service.GrokMediaEndpointVideosEdits,
 		service.GrokMediaEndpointVideosExtensions:
 		return true
@@ -768,7 +831,7 @@ func prepareGrokVideoCompletionBilling(
 		reqLog.Warn("grok_media.video_pending_billing_load_failed", zap.String("request_id", taskRequestID), zap.Error(loadErr))
 	}
 	if pending == nil {
-		if strings.HasPrefix(taskRequestID, "atlascloud:") {
+		if strings.HasPrefix(taskRequestID, "atlascloud:") || strings.HasPrefix(taskRequestID, "dapacai:") {
 			return nil
 		}
 		// Status omits resolution; without pending we would silently default to 480p and underbill.
@@ -933,7 +996,7 @@ func recordGrokMediaUsage(
 		}
 		return nil
 	}
-	if strings.HasPrefix(videoTaskID, "atlascloud:") {
+	if strings.HasPrefix(videoTaskID, "atlascloud:") || strings.HasPrefix(videoTaskID, "dapacai:") {
 		ctx, cancel := context.WithTimeout(context.WithoutCancel(c.Request.Context()), time.Minute)
 		defer cancel()
 		return record(ctx)

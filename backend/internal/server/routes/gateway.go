@@ -105,6 +105,10 @@ func RegisterGatewayRoutes(
 				return
 			}
 			requestmodel.ResetRequestBody(c.Request, body)
+			if service.IsDapacaiVideoModel(gjson.GetBytes(body, "model").String()) {
+				h.OpenAIGateway.DapacaiVideoGeneration(c)
+				return
+			}
 			if service.IsAtlasCloudVideoModel(gjson.GetBytes(body, "model").String()) {
 				h.OpenAIGateway.AtlasCloudVideoGeneration(c)
 				return
@@ -126,6 +130,10 @@ func RegisterGatewayRoutes(
 		})
 	}
 	videoStatusHandler := func(c *gin.Context) {
+		if strings.HasPrefix(c.Param("request_id"), "dapacai:") {
+			h.OpenAIGateway.DapacaiVideoStatus(c)
+			return
+		}
 		if strings.HasPrefix(c.Param("request_id"), "atlascloud:") && h.OpenAIGateway.QuotedVideoStatus(c) {
 			return
 		}
@@ -150,6 +158,10 @@ func RegisterGatewayRoutes(
 		})
 	}
 	videoContentHandler := func(c *gin.Context) {
+		if strings.HasPrefix(c.Param("request_id"), "dapacai:") {
+			h.OpenAIGateway.DapacaiVideoContent(c)
+			return
+		}
 		if strings.HasPrefix(c.Param("request_id"), "atlascloud:") {
 			h.OpenAIGateway.AtlasCloudVideoContent(c)
 			return

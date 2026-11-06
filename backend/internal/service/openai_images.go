@@ -15,6 +15,7 @@ import (
 	"net/http"
 	"net/textproto"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 	"sync/atomic"
@@ -552,6 +553,9 @@ func validateCompatibleImagesModel(model string) error {
 // RequiredCapabilityForModel also applies the API-key-only fence when channel
 // mapping introduces a compatible provider model after request parsing.
 func (req *OpenAIImagesRequest) RequiredCapabilityForModel(model string) OpenAIImagesCapability {
+	if model == "gpt-image-2.5-cdn" {
+		return OpenAIImagesCapabilityAPIKey
+	}
 	if isGeminiCompatibleImageModel(model) || isAtlasCloudImageModel(model) {
 		return OpenAIImagesCapabilityAPIKey
 	}
@@ -573,6 +577,9 @@ func normalizeOpenAIImagesEndpointPath(path string) string {
 func classifyOpenAIImagesCapability(req *OpenAIImagesRequest) OpenAIImagesCapability {
 	if req == nil {
 		return OpenAIImagesCapabilityNative
+	}
+	if req.Model == "gpt-image-2.5-cdn" {
+		return OpenAIImagesCapabilityAPIKey
 	}
 	if isGeminiCompatibleImageModel(req.Model) || isAtlasCloudImageModel(req.Model) {
 		return OpenAIImagesCapabilityAPIKey
@@ -665,6 +672,36 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	upstreamModel := account.GetMappedModel(requestModel)
+	if requestModel == "gpt-image-2.5-cdn" || upstreamModel == "gpt-image-2.5-cdn" {
+		if requestModel != upstreamModel || !account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityDapacaiVideo) {
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Use the new Dapacai API-key account with the exact CDN image model")
+		}
+		if parsed.IsEdits() || parsed.N != 1 || parsed.Quality != "" || gjson.GetBytes(body, "resolution").Exists() ||
+			len(parsed.InputImageURLs) > 0 || len(parsed.Uploads) > 0 ||
+			!slices.Contains([]string{"1024x1024", "1536x1024", "1024x1536"}, parsed.Size) {
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN supports text-to-image only, one image, and its three native sizes")
+		}
+		if len([]rune(parsed.Prompt)) == 0 || len([]rune(parsed.Prompt)) > 4000 ||
+			(parsed.ResponseFormat != "" && parsed.ResponseFormat != "url") {
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN requires a 1-4000 character prompt and URL output")
+		}
+		validOptions := true
+		gjson.ParseBytes(body).ForEach(func(key, _ gjson.Result) bool {
+			if !slices.Contains([]string{"model", "prompt", "n", "size", "response_format"}, key.String()) {
+				validOptions = false
+			}
+			return validOptions
+		})
+		if !validOptions {
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN does not support reference images or extra generation options")
+		}
+		key := getAPIKeyFromContext(c)
+		if key == nil || key.Group == nil ||
+			(!validAtlasCloudImagePrice(key.Group.GetImagePrice(parsed.SizeTier)) &&
+				atlasCloudConfiguredImageTierPrice(s.resolveOpenAIChannelPricing(ctx, upstreamModel, key), parsed.SizeTier) == nil) {
+			return atlasCloudImagesError(c, http.StatusBadRequest, "请为新分组配置此 Dapacai 图片型号的图片单价；未套用默认价格")
+		}
+	}
 	if err := validateCompatibleImagesModel(upstreamModel); err != nil {
 		return nil, err
 	}

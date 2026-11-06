@@ -1917,6 +1917,10 @@ func (a *Account) SupportsOpenAIEndpointCapability(capability OpenAIEndpointCapa
 	if a == nil {
 		return false
 	}
+	if capability == OpenAIEndpointCapabilityDapacaiVideo {
+		return a.Platform == PlatformOpenAI && a.Type == AccountTypeAPIKey &&
+			dapacaiAPIBaseValid(a.GetCredential("base_url"))
+	}
 	if capability == OpenAIEndpointCapabilityAtlasCloudVideo {
 		return a.Platform == PlatformOpenAI && a.Type == AccountTypeAPIKey &&
 			atlasCloudAPIBaseValid(a.GetCredential("base_url"))

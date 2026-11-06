@@ -41,11 +41,11 @@ func (e GrokMediaEndpoint) RequiresRequestBody() bool {
 }
 
 func (e GrokMediaEndpoint) IsVideoLookupRequest() bool {
-	return e == GrokMediaEndpointVideoStatus || e == GrokMediaEndpointVideoContent || e == SeedanceEndpointStatus || e == SeedanceEndpointDelete || e == AtlasCloudEndpointVideoStatus
+	return e == GrokMediaEndpointVideoStatus || e == GrokMediaEndpointVideoContent || e == SeedanceEndpointStatus || e == SeedanceEndpointDelete || e == AtlasCloudEndpointVideoStatus || e == DapacaiEndpointVideoStatus || e == DapacaiEndpointVideoContent
 }
 
 func (e GrokMediaEndpoint) IsGenerationRequest() bool {
-	if e == SeedanceEndpointCreate || e == AtlasCloudEndpointVideoCreate {
+	if e == SeedanceEndpointCreate || e == AtlasCloudEndpointVideoCreate || e == DapacaiEndpointVideoCreate {
 		return true
 	}
 	switch e {

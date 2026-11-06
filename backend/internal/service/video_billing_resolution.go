@@ -58,6 +58,18 @@ func NormalizeVideoBillingResolutionOrDefault(resolution string) string {
 
 // AtlasCloud tiers must not collapse into an unrelated provider's 480p price.
 func LookupVideoBillingResolutionForModel(model, resolution string) (string, bool) {
+	if p := dapacaiVideoModel(model); p != nil {
+		tier := strings.ToLower(strings.TrimSpace(resolution))
+		if len(p.resolutions) == 0 {
+			return "native", tier == "" || tier == "native"
+		}
+		for _, allowed := range p.resolutions {
+			if tier == allowed {
+				return tier, true
+			}
+		}
+		return "", false
+	}
 	if !IsAtlasCloudVideoModel(model) {
 		return LookupVideoBillingResolution(resolution)
 	}
@@ -87,6 +99,14 @@ func LookupVideoBillingResolutionForModel(model, resolution string) (string, boo
 }
 
 func NormalizeVideoBillingDurationForModel(model string, durationSeconds int) int {
+	if p := dapacaiVideoModel(model); p != nil {
+		for _, allowed := range p.durations {
+			if durationSeconds == allowed {
+				return durationSeconds
+			}
+		}
+		return 0
+	}
 	if IsAtlasCloudVideoModel(model) && durationSeconds > 0 && durationSeconds <= 120 {
 		return durationSeconds
 	}
@@ -94,7 +114,7 @@ func NormalizeVideoBillingDurationForModel(model string, durationSeconds int) in
 }
 
 func NormalizeVideoBillingResolutionForModel(model, resolution string) string {
-	if IsAtlasCloudVideoModel(model) {
+	if IsAtlasCloudVideoModel(model) || IsDapacaiVideoModel(model) {
 		tier, _ := LookupVideoBillingResolutionForModel(model, resolution)
 		return tier
 	}
