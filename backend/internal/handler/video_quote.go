@@ -33,6 +33,15 @@ func (h *OpenAIGatewayHandler) VideoQuote(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Invalid quote JSON")
 		return
 	}
+	if service.IsDapacaiVideoModel(input.Model) {
+		preview, err := h.gatewayService.PreviewDapacaiVideoPrice(c.Request.Context(), key, input, time.Now())
+		if err != nil {
+			h.dapacaiPricePreviewError(c, err)
+			return
+		}
+		c.JSON(http.StatusOK, preview)
+		return
+	}
 	if _, err := service.VideoTariffKey(input); err != nil {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", err.Error())
 		return

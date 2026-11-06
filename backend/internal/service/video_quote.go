@@ -625,16 +625,21 @@ func (s *OpenAIGatewayService) RefreshVideoQuoteKey(ctx context.Context, key *AP
 		return nil, ErrVideoQuoteUnavailable
 	}
 	eligible := false
+	capability := OpenAIEndpointCapabilityAtlasCloudVideo
+	dapacai := IsDapacaiVideoModel(model) || model == "gpt-image-2.5-cdn"
+	if dapacai {
+		capability = OpenAIEndpointCapabilityDapacaiVideo
+	}
 	scheduler := &defaultOpenAIAccountScheduler{service: s}
 	for i := range accounts {
 		a := &accounts[i]
 		if a.ID <= 0 || !slices.Contains(a.GroupIDs, group.ID) || strings.TrimSpace(a.GetCredential("api_key")) == "" ||
-			!a.IsSchedulable() || !a.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityAtlasCloudVideo) || !a.IsModelSupported(model) || a.GetMappedModel(model) != model ||
+			!a.IsSchedulable() || !a.SupportsOpenAIEndpointCapability(capability) || !a.IsModelSupported(model) || a.GetMappedModel(model) != model ||
 			group.RequireOAuthOnly || group.RequirePrivacySet && !a.IsPrivacySet() {
 			continue
 		}
 		if !scheduler.isAccountRequestCompatible(WithOpenAIProfitControlSuppressed(ctx), a, OpenAIAccountScheduleRequest{
-			RequestedModel: model, Platform: PlatformOpenAI, RequiredCapability: OpenAIEndpointCapabilityAtlasCloudVideo, RequirePrivacySet: group.RequirePrivacySet,
+			RequestedModel: model, Platform: PlatformOpenAI, RequiredCapability: capability, RequirePrivacySet: group.RequirePrivacySet,
 		}) {
 			continue
 		}
@@ -642,6 +647,9 @@ func (s *OpenAIGatewayService) RefreshVideoQuoteKey(ctx context.Context, key *AP
 		break
 	}
 	if !eligible {
+		if dapacai {
+			return nil, fmt.Errorf("no exact capable Dapacai account available")
+		}
 		return nil, fmt.Errorf("no exact capable AtlasCloud video account available")
 	}
 	copy := *fresh
