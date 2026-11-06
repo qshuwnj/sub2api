@@ -67,7 +67,8 @@ func dapacaiVideoModel(model string) *dapacaiVideoProfile {
 		p.ratios, p.images, p.videos, p.audios, p.audioOnly = wide[:5], 9, 3, 3, true
 	case "seedance-2.5-plus-6", "seedance-2.5-plus-7":
 		p.durations, p.ratios, p.resolutions = durationRange(4, 30), wide, []string{"480p"}
-		p.images, p.audios, p.requiresReference, p.audioOnly = 30, 10, true, true
+		// Catalog mode omissions are not an explicit ban on prompt-only requests.
+		p.images, p.audios, p.audioOnly = 30, 10, true
 		if model == "seedance-2.5-plus-7" {
 			p.resolutions = append(p.resolutions, "720p")
 		}

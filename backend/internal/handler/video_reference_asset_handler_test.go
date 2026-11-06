@@ -10,6 +10,9 @@ import (
 	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -23,14 +26,130 @@ type testVideoReferenceBlobStore struct {
 	saved   int
 	deleted int
 	err     error
+	mime    string
 }
 
-func (s *testVideoReferenceBlobStore) Save(context.Context, string, string, []byte) (string, error) {
+func (s *testVideoReferenceBlobStore) Save(_ context.Context, _ string, contentType string, _ []byte) (string, error) {
 	if s.err != nil {
 		return "", s.err
 	}
 	s.saved++
+	s.mime = contentType
 	return s.url, nil
+}
+
+func TestVideoReferenceAssetHandlerDapacaiImageAndAudioAdmission(t *testing.T) {
+	gin.SetMode(gin.TestMode)
+	var imageBytes bytes.Buffer
+	if err := png.Encode(&imageBytes, image.NewRGBA(image.Rect(0, 0, 32, 32))); err != nil {
+		t.Fatal(err)
+	}
+	models := []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "wan-3.0"}
+	for _, model := range models {
+		for _, kind := range []string{"image", "audio"} {
+			t.Run(model+"/"+kind, func(t *testing.T) {
+				store := service.NewVideoReferenceAssetStore(time.Now)
+				blobs := &testVideoReferenceBlobStore{url: "https://cdn.example/reference." + map[string]string{"image": "png", "audio": "mp3"}[kind]}
+				probe := service.NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
+					return []byte(`{"streams":[{"codec_type":"audio","duration":"8.25"},{"codec_type":"video","width":600,"height":600,"disposition":{"attached_pic":1}}],"format":{"duration":"8.25","format_name":"mp3"}}`), nil
+				})
+				h := NewVideoReferenceAssetHandler(service.NewVideoReferenceAssetService(store, probe), blobs)
+				data := imageBytes.Bytes()
+				if kind == "audio" {
+					data = []byte("ID3synthetic audio fixture; metadata supplied by probe stub")
+				}
+				body, contentType := multipartBody(t, data, "reference", map[string]string{
+					"model": model, "endpoint_family": "dapacai:" + model, "kind": kind,
+				})
+				rec := httptest.NewRecorder()
+				c, _ := gin.CreateTestContext(rec)
+				c.Request = httptest.NewRequest(http.MethodPost, "/v1/video-reference-assets", body)
+				c.Request.Header.Set("Content-Type", contentType)
+				c.Set(string(middleware.ContextKeyAPIKey), &service.APIKey{ID: 8, UserID: 7})
+				c.Set(string(middleware.ContextKeyUser), middleware.AuthSubject{UserID: 7})
+				h.Upload(c)
+				audioSupported := model == "seedance-2.0-plus" || model == "seedance-2.5-plus" || model == "seedance-2.5-plus-4" || model == "seedance-2.5-plus-6" || model == "seedance-2.5-plus-7"
+				if kind == "audio" && !audioSupported {
+					if rec.Code != http.StatusBadRequest || blobs.saved != 0 {
+						t.Fatalf("unsupported audio accepted: status=%d saved=%d", rec.Code, blobs.saved)
+					}
+					return
+				}
+				if rec.Code != http.StatusCreated || blobs.saved != 1 {
+					t.Fatalf("upload failed: status=%d body=%s", rec.Code, rec.Body.String())
+				}
+				var result struct {
+					Asset service.VideoReferenceAsset `json:"asset"`
+				}
+				if err := json.Unmarshal(rec.Body.Bytes(), &result); err != nil {
+					t.Fatal(err)
+				}
+				asset, err := store.GetOwned(result.Asset.ID, 7, 8)
+				wantMIME := map[string]string{"image": "image/png", "audio": "audio/mpeg"}[kind]
+				if err != nil || asset.SourceURL != blobs.url || string(asset.Kind) != kind || asset.EndpointFamily != "dapacai:"+model || blobs.mime != wantMIME {
+					t.Fatalf("upload changed source model/kind/MIME: asset=%+v mime=%s err=%v", asset, blobs.mime, err)
+				}
+			})
+		}
+	}
+}
+
+func TestVideoReferenceAssetHandlerRealMP3WithCover(t *testing.T) {
+	if _, err := exec.LookPath("ffmpeg"); err != nil {
+		t.Skip("ffmpeg is not installed")
+	}
+	if _, err := exec.LookPath("ffprobe"); err != nil {
+		t.Skip("ffprobe is not installed")
+	}
+	dir := t.TempDir()
+	path := filepath.Join(dir, "reference-with-cover.mp3")
+	audioPath := filepath.Join(dir, "audio.mp3")
+	coverPath := filepath.Join(dir, "cover.png")
+	var cover bytes.Buffer
+	if err := png.Encode(&cover, image.NewRGBA(image.Rect(0, 0, 32, 32))); err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(coverPath, cover.Bytes(), 0600); err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
+	defer cancel()
+	command := exec.CommandContext(ctx, "ffmpeg", "-v", "error", "-y", "-f", "lavfi", "-i", "sine=frequency=440:duration=1", "-c:a", "libmp3lame", audioPath)
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("generate audio fixture: %v %s", err, output)
+	}
+	command = exec.CommandContext(ctx, "ffmpeg", "-v", "error", "-y", "-i", audioPath, "-i", coverPath, "-map", "0:a", "-map", "1:v", "-c:a", "copy", "-c:v", "mjpeg", "-disposition:v:0", "attached_pic", path)
+	if output, err := command.CombinedOutput(); err != nil {
+		t.Fatalf("attach audio cover: %v %s", err, output)
+	}
+	data, err := os.ReadFile(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	blobs := &testVideoReferenceBlobStore{url: "https://cdn.example/reference-with-cover.mp3"}
+	h := NewVideoReferenceAssetHandler(service.NewVideoReferenceAssetService(service.NewVideoReferenceAssetStore(time.Now), nil), blobs)
+	body, contentType := multipartBody(t, data, "reference-with-cover.mp3", map[string]string{
+		"model": "seedance-2.5-plus-7", "endpoint_family": "dapacai:seedance-2.5-plus-7", "kind": "audio",
+	})
+	rec := httptest.NewRecorder()
+	c, _ := gin.CreateTestContext(rec)
+	c.Request = httptest.NewRequest(http.MethodPost, "/v1/video-reference-assets", body)
+	c.Request.Header.Set("Content-Type", contentType)
+	c.Set(string(middleware.ContextKeyAPIKey), &service.APIKey{ID: 8, UserID: 7})
+	c.Set(string(middleware.ContextKeyUser), middleware.AuthSubject{UserID: 7})
+	h.Upload(c)
+	if rec.Code != http.StatusCreated || blobs.saved != 1 || blobs.mime != "audio/mpeg" {
+		t.Fatalf("real audio upload rejected: status=%d MIME=%s body=%s", rec.Code, blobs.mime, rec.Body.String())
+	}
+	var result struct {
+		Asset service.VideoReferenceAsset `json:"asset"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.Asset.Kind != service.VideoReferenceAudio || result.Asset.Duration < 1 || result.Asset.Width != 0 || result.Asset.Height != 0 {
+		t.Fatalf("cover art changed real MP3 metadata: %+v", result.Asset)
+	}
 }
 
 func (s *testVideoReferenceBlobStore) Delete(context.Context, string) error {

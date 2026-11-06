@@ -22,6 +22,41 @@ func TestVideoReferenceFFProbeParsesBoundedMetadata(t *testing.T) {
 	}
 }
 
+func TestVideoReferenceFFProbeTreatsAudioCoverArtAsAudio(t *testing.T) {
+	for _, streams := range []string{
+		`{"codec_type":"audio","codec_name":"mp3","duration":"8.25"},{"codec_type":"video","codec_name":"mjpeg","width":600,"height":600,"r_frame_rate":"90000/1","disposition":{"attached_pic":1}}`,
+		`{"codec_type":"video","codec_name":"mjpeg","width":600,"height":600,"r_frame_rate":"90000/1","disposition":{"attached_pic":1}},{"codec_type":"audio","codec_name":"mp3","duration":"8.25"}`,
+	} {
+		probe := NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
+			return []byte(`{"streams":[` + streams + `],"format":{"duration":"8.25","format_name":"mp3"}}`), nil
+		})
+		got, err := probe.Probe(context.Background(), "reference-with-cover.mp3")
+		if err != nil {
+			t.Fatal(err)
+		}
+		if got.Kind != VideoReferenceAudio || got.MIME != "audio/mpeg" || got.Duration != 8.25 || got.Width != 0 || got.Height != 0 {
+			t.Fatalf("cover art changed audio reference metadata: %+v", got)
+		}
+		asset := &VideoReferenceAsset{
+			ID: "audio-cover", UserID: 7, APIKeyID: 8,
+			EndpointFamily: "dapacai:seedance-2.5-plus-7",
+			Kind:           got.Kind, MIME: got.MIME, Duration: got.Duration, Size: 1024,
+		}
+		if err := ValidateVideoReferenceDescriptor(asset); err != nil {
+			t.Fatalf("valid MP3 reference rejected: %v", err)
+		}
+	}
+}
+
+func TestVideoReferenceFFProbeRejectsCoverArtWithoutPlayableMedia(t *testing.T) {
+	probe := NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
+		return []byte(`{"streams":[{"codec_type":"video","width":600,"height":600,"disposition":{"attached_pic":1}}],"format":{"format_name":"mp3"}}`), nil
+	})
+	if _, err := probe.Probe(context.Background(), "cover-only.mp3"); err == nil {
+		t.Fatal("cover art alone is not an audio or video reference")
+	}
+}
+
 func TestVideoReferenceFFProbeRejectsOversizedOutput(t *testing.T) {
 	probe := NewVideoReferenceFFProbe(func(context.Context, ...string) ([]byte, error) {
 		return make([]byte, 2<<20), nil

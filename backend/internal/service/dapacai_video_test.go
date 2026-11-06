@@ -68,7 +68,7 @@ func TestDapacaiContractsUseExactVariantControls(t *testing.T) {
 		`{"model":"seedance-2.0","prompt":"test","duration":5,"ratio":"16:9","resolution":"720p"}`,
 		`{"model":"seedance-2.5-plus-4","prompt":"test","duration":5,"ratio":"16:9","resolution":"720p"}`,
 		`{"model":"seedance-2.5-plus-4","prompt":"test","duration":15,"ratio":"16:9","resolution":"1080p"}`,
-		`{"model":"seedance-2.5-plus-6","prompt":"test","duration":5,"ratio":"16:9","resolution":"480p"}`,
+		`{"model":"seedance-2.5-plus","prompt":"test","duration":5,"ratio":"16:9","resolution":"480p"}`,
 		`{"model":"seedance-2.0","prompt":"test","duration":5,"ratio":"16:9","images":["http://example.com/a.png"]}`,
 		`{"model":"seedance-2.0","prompt":"test","duration":5,"ratio":"16:9","images":["https://127.0.0.1/a.png"]}`,
 		`{"model":"seedance-2.0","prompt":"test","duration":5,"ratio":"16:9","speed":"fast"}`,
@@ -110,6 +110,122 @@ func TestForwardDapacaiSubmitsExactlyOnceAndNamespacesTask(t *testing.T) {
 	require.Empty(t, upstream.request.Header.Get("x-api-key"))
 	require.Empty(t, upstream.request.Header.Get("Cookie"))
 	require.Empty(t, upstream.request.Header.Get("Idempotency-Key"))
+}
+
+func TestForwardDapacaiNumberedPlusAllowsPromptOnlyWithoutSubstitution(t *testing.T) {
+	for _, model := range []string{"seedance-2.5-plus-6", "seedance-2.5-plus-7"} {
+		t.Run(model, func(t *testing.T) {
+			body := dapacaiTestBody(model)
+			info, err := ParseDapacaiVideoRequest(body)
+			require.NoError(t, err)
+			require.Equal(t, model, info.Model)
+			upstream := &grokMediaContentUpstreamStub{response: grokMediaContentStatusResponse(`{"id":"task_text","status":"queued","model":"` + model + `"}`)}
+			svc := &OpenAIGatewayService{cfg: &config.Config{}, httpUpstream: upstream}
+			c, recorder := grokMediaContentTestContext("POST", "https://gateway.example/v1/videos", nil)
+			result, err := svc.ForwardDapacaiVideo(context.Background(), c, dapacaiTestAccount(), DapacaiEndpointVideoCreate, "", body)
+			require.NoError(t, err)
+			require.Equal(t, "dapacai:task_text", result.ResponseID)
+			require.Empty(t, recorder.Body.String())
+			require.Len(t, upstream.requests, 1)
+			require.Equal(t, "/v1/videos", upstream.request.URL.Path)
+			forwarded, err := io.ReadAll(upstream.request.Body)
+			require.NoError(t, err)
+			require.JSONEq(t, string(body), string(forwarded), "preserve the model and do not inject dummy media")
+			var payload map[string]any
+			require.NoError(t, json.Unmarshal(forwarded, &payload))
+			require.Equal(t, model, payload["model"])
+			for _, field := range []string{"input", "images", "image_url", "media", "videos", "audios"} {
+				require.NotContains(t, payload, field)
+			}
+		})
+	}
+}
+
+func TestForwardDapacaiUploadedMediaKeepsExactURLsAndTypes(t *testing.T) {
+	for _, model := range []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "wan-3.0"} {
+		t.Run(model, func(t *testing.T) {
+			var payload map[string]any
+			require.NoError(t, json.Unmarshal(dapacaiTestBody(model), &payload))
+			delete(payload, "images")
+			media := []map[string]string{{"type": "image", "url": "https://r2.example/reference.png"}}
+			if dapacaiVideoModel(model).audios > 0 {
+				media = append(media, map[string]string{"type": "audio", "url": "https://r2.example/reference.mp3?signature=fixture"})
+			}
+			payload["input"] = map[string]any{"prompt": "test", "media": media}
+			body, err := json.Marshal(payload)
+			require.NoError(t, err)
+			upstream := &grokMediaContentUpstreamStub{response: grokMediaContentStatusResponse(`{"id":"task_media","status":"queued","model":"` + model + `"}`)}
+			svc := &OpenAIGatewayService{cfg: &config.Config{}, httpUpstream: upstream}
+			c, _ := grokMediaContentTestContext("POST", "https://gateway.example/v1/videos", nil)
+			result, err := svc.ForwardDapacaiVideo(context.Background(), c, dapacaiTestAccount(), DapacaiEndpointVideoCreate, "", body)
+			require.NoError(t, err)
+			require.Equal(t, model, result.UpstreamModel)
+			require.Len(t, upstream.requests, 1)
+			require.Equal(t, "https://api.dapacai.com/v1/videos", upstream.request.URL.String())
+			forwarded, err := io.ReadAll(upstream.request.Body)
+			require.NoError(t, err)
+			require.JSONEq(t, string(body), string(forwarded))
+		})
+	}
+}
+
+func TestForwardDapacaiEveryModelPreservesExactIDAndRejectsRemapping(t *testing.T) {
+	for _, model := range []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "wan-3.0"} {
+		t.Run(model, func(t *testing.T) {
+			body := dapacaiTestBody(model)
+			upstream := &grokMediaContentUpstreamStub{response: grokMediaContentStatusResponse(`{"id":"task_exact","status":"queued","model":"` + model + `"}`)}
+			svc := &OpenAIGatewayService{cfg: &config.Config{}, httpUpstream: upstream}
+			account := dapacaiTestAccount()
+			account.Credentials["model_mapping"] = map[string]any{model: model}
+			c, _ := grokMediaContentTestContext("POST", "https://gateway.example/v1/videos", nil)
+			result, err := svc.ForwardDapacaiVideo(context.Background(), c, account, DapacaiEndpointVideoCreate, "", body)
+			require.NoError(t, err)
+			require.Equal(t, model, result.Model)
+			require.Equal(t, model, result.UpstreamModel)
+			require.Equal(t, model, result.BillingModel)
+			require.Len(t, upstream.requests, 1)
+			require.Equal(t, "https://api.dapacai.com/v1/videos", upstream.request.URL.String())
+			forwarded, err := io.ReadAll(upstream.request.Body)
+			require.NoError(t, err)
+			require.JSONEq(t, string(body), string(forwarded))
+
+			for _, target := range []string{"seedance-2.5-plus-7", "bytedance/seedance-2.0/text-to-video"} {
+				if target == model {
+					target = "seedance-2.0"
+				}
+				account = dapacaiTestAccount()
+				account.Credentials["model_mapping"] = map[string]any{model: target}
+				c, _ = grokMediaContentTestContext("POST", "https://gateway.example/v1/videos", nil)
+				_, err = svc.ForwardDapacaiVideo(context.Background(), c, account, DapacaiEndpointVideoCreate, "", body)
+				require.ErrorContains(t, err, "requires the exact upstream model ID")
+				require.Len(t, upstream.requests, 1, "reject substitution before contacting the supplier")
+			}
+		})
+	}
+}
+
+func TestDapacaiFramesRequireExplicitModelRoles(t *testing.T) {
+	for _, model := range []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "wan-3.0"} {
+		t.Run(model, func(t *testing.T) {
+			var payload map[string]any
+			require.NoError(t, json.Unmarshal(dapacaiTestBody(model), &payload))
+			delete(payload, "images")
+			payload["input"] = map[string]any{"prompt": "test", "media": []map[string]string{
+				{"type": "first_frame", "url": "https://assets.example/first.png"},
+				{"type": "last_frame", "url": "https://assets.example/last.png"},
+			}}
+			body, err := json.Marshal(payload)
+			require.NoError(t, err)
+			info, err := ParseDapacaiVideoRequest(body)
+			if model == "seedance-2.0" {
+				require.NoError(t, err)
+				require.Equal(t, model, info.Model)
+				require.Len(t, info.InputImageURLs, 2)
+			} else {
+				require.ErrorContains(t, err, "does not support start/end frames")
+			}
+		})
+	}
 }
 
 func TestForwardDapacaiCompletionNeedsNoPublicOutputURL(t *testing.T) {

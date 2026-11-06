@@ -28,7 +28,9 @@ func TestDapacaiPricePreviewEndpointsAreAuthenticatedControlOnlyAndFailClosed(t 
 		{"no video caller price", "videos", `{"model":"seedance-2.0","mode":"text","controls":{"duration":5,"ratio":"16:9","unit_price":0}}`, true, 400},
 		{"no image content", "images", `{"model":"gpt-image-2.5-cdn","quality":"none","size":"1024x1024","count":1,"prompt":"private"}`, true, 400},
 		{"no image caller price", "images", `{"model":"gpt-image-2.5-cdn","quality":"none","size":"1024x1024","count":1,"total_price":0}`, true, 400},
-		{"no unsupported video mode", "videos", `{"model":"seedance-2.5-plus-7","mode":"text","controls":{"duration":15,"ratio":"16:9","resolution":"720p"}}`, true, 400},
+		{"explicit prompt-only ban", "videos", `{"model":"seedance-2.5-plus","mode":"text","controls":{"duration":10,"ratio":"16:9","resolution":"480p"}}`, true, 400},
+		{"plus6 text still requires fresh prices", "videos", `{"model":"seedance-2.5-plus-6","mode":"text","controls":{"duration":30,"ratio":"16:9","resolution":"480p"}}`, true, 503},
+		{"plus7 text still requires fresh prices", "videos", `{"model":"seedance-2.5-plus-7","mode":"text","controls":{"duration":15,"ratio":"16:9","resolution":"720p"}}`, true, 503},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			w := httptest.NewRecorder()

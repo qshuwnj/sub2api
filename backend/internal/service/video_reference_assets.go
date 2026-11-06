@@ -107,13 +107,16 @@ type VideoReferenceMediaMetadata struct {
 
 type ffprobeDocument struct {
 	Streams []struct {
-		CodecType string `json:"codec_type"`
-		CodecName string `json:"codec_name"`
-		Width     int    `json:"width"`
-		Height    int    `json:"height"`
-		Duration  string `json:"duration"`
-		FrameRate string `json:"r_frame_rate"`
-		AvgRate   string `json:"avg_frame_rate"`
+		CodecType   string `json:"codec_type"`
+		CodecName   string `json:"codec_name"`
+		Width       int    `json:"width"`
+		Height      int    `json:"height"`
+		Duration    string `json:"duration"`
+		FrameRate   string `json:"r_frame_rate"`
+		AvgRate     string `json:"avg_frame_rate"`
+		Disposition struct {
+			AttachedPic int `json:"attached_pic"`
+		} `json:"disposition"`
 	} `json:"streams"`
 	Format struct {
 		Duration   string `json:"duration"`
@@ -223,6 +226,9 @@ func (p *VideoReferenceFFProbe) Probe(ctx context.Context, path string) (VideoRe
 	for _, stream := range doc.Streams {
 		switch stream.CodecType {
 		case "video":
+			if stream.Disposition.AttachedPic != 0 {
+				continue
+			}
 			out.Kind = VideoReferenceVideo
 			out.Width, out.Height = stream.Width, stream.Height
 			if stream.Duration != "" {
