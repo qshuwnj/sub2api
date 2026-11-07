@@ -5,6 +5,8 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
@@ -235,6 +237,33 @@ func TestStudioAssetImageRawStreamAddsStatusOnlyAtFinalCompletion(t *testing.T) 
 			require.True(t, json.Valid(data), "rewritten completion remains valid SSE JSON")
 		}
 	})
+}
+
+func TestStudioAssetImageRawStreamHonorsEventLimits(t *testing.T) {
+	for _, keepalive := range []int{0, 1} {
+		t.Run(fmt.Sprintf("keepalive_%d", keepalive), func(t *testing.T) {
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = httptest.NewRequest(http.MethodPost, "/v1/images/generations", nil)
+			c.Request.Header.Set("X-Studio-Library", "save")
+			calls := 0
+			SetStudioImageCollector(c, func([]StudioImageOutput) *StudioLibraryStatus {
+				calls++
+				return nil
+			})
+			cfg := &config.Config{}
+			cfg.Gateway.MaxLineSize = 128
+			cfg.Gateway.SSEEventMaxBytes = 128
+			cfg.Gateway.ImageStreamKeepaliveInterval = keepalive
+			body := "event: image_generation.completed\ndata: " + strings.Repeat("x", 160) + "\n\n"
+			resp := &http.Response{StatusCode: http.StatusOK, Header: make(http.Header), Body: io.NopCloser(strings.NewReader(body))}
+			_, count, _, _, err := (&OpenAIGatewayService{cfg: cfg}).handleOpenAIImagesStreamingResponse(resp, c, time.Now(), nil)
+			require.True(t, errors.Is(err, errSSETransportLimit))
+			require.Zero(t, count)
+			require.Zero(t, calls)
+			require.NotContains(t, rec.Body.String(), "event: image_generation.completed")
+		})
+	}
 }
 
 func TestStudioAssetImageRawStreamJSONFallbackDeliversExactlyOnce(t *testing.T) {

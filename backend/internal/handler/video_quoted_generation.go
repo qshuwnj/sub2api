@@ -127,11 +127,11 @@ func (h *OpenAIGatewayHandler) tryQuotedAtlasVideo(c *gin.Context) bool {
 	}
 	body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
 	if err != nil {
-		if maxErr, ok := extractMaxBytesError(err); ok {
-			h.errorResponse(c, http.StatusRequestEntityTooLarge, "invalid_request_error", buildBodyTooLargeMessage(maxErr.Limit))
+		if handleRequestBodyReadError(c, nil, err) {
 			return true
 		}
-		h.errorResponse(c, 400, "invalid_request_error", "Failed to read video request")
+		status, message := requestBodyReadFailure(nil, c.Request, err)
+		h.errorResponse(c, status, "invalid_request_error", message)
 		return true
 	}
 	requestmodel.ResetRequestBody(c.Request, body)
@@ -280,11 +280,11 @@ func (h *OpenAIGatewayHandler) RecoverVideoSubmission(c *gin.Context) {
 	}
 	body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
 	if err != nil {
-		if maxErr, ok := extractMaxBytesError(err); ok {
-			h.errorResponse(c, http.StatusRequestEntityTooLarge, "invalid_request_error", buildBodyTooLargeMessage(maxErr.Limit))
+		if handleRequestBodyReadError(c, nil, err) {
 			return
 		}
-		h.errorResponse(c, 400, "invalid_request_error", "Failed to read video recovery request")
+		status, message := requestBodyReadFailure(nil, c.Request, err)
+		h.errorResponse(c, status, "invalid_request_error", message)
 		return
 	}
 	_, native, err := service.SerializeAtlasCloudVideoRequest(body)

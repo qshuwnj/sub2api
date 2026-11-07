@@ -162,7 +162,8 @@ func TestStudioAssetImageAsyncStableTaskIdentity(t *testing.T) {
 		service.CompleteStudioImages(taskCtx, []service.StudioImageOutput{{URL: "https://images.example/one.png"}})
 		taskCtx.JSON(http.StatusOK, gin.H{"data": []gin.H{{"url": "https://images.example/one.png"}}, "library": status})
 	}}
-	taskCtx, recorder, cancel := newAsyncImageContext(c, []byte(`{"model":"model","prompt":"prompt"}`), time.Minute)
+	taskCtx, recorder, cancel, err := newAsyncImageContext(c, []byte(`{"model":"model","prompt":"prompt"}`), time.Minute)
+	require.NoError(t, err)
 	async.run(task.ID, service.PlatformOpenAI, taskCtx, recorder, cancel)
 	require.Len(t, repo.assets, 1)
 	require.Equal(t, task.ID, repo.assets[0].GenerationID)
