@@ -39,10 +39,18 @@ func TestVideoFrameAssetMigrationPreservesReferencesAndRejectsNonImageFrames(t *
 	require.NoError(t, err)
 	_, err = tx.ExecContext(ctx, insert, "frame", "frame:bytedance/seedance-2.0-fast/image-to-video", "image")
 	require.NoError(t, err)
+	dapacaiMigration, err := dbmigrations.FS.ReadFile("252_dapacai_video_reference_assets.sql")
+	require.NoError(t, err)
+	_, err = tx.ExecContext(ctx, string(dapacaiMigration))
+	require.NoError(t, err)
+	_, err = tx.ExecContext(ctx, insert, "dapacai", "dapacai:seedance-2.0-plus", "image")
+	require.NoError(t, err)
 	for _, tc := range []struct{ family, kind string }{
 		{"unrecognized", "image"},
 		{"frame:bytedance/seedance-2.0/image-to-video", "video"},
 		{"frame:bytedance/seedance-2.0/image-to-video", "audio"},
+		{"dapacai:", "image"},
+		{"dapacai:Seedance 2.0", "image"},
 	} {
 		_, err = tx.ExecContext(ctx, "SAVEPOINT invalid_frame")
 		require.NoError(t, err)
@@ -52,11 +60,11 @@ func TestVideoFrameAssetMigrationPreservesReferencesAndRejectsNonImageFrames(t *
 		require.NoError(t, err)
 	}
 	// The migration is replayable and never rewrites or removes staged rows.
-	_, err = tx.ExecContext(ctx, string(migration))
+	_, err = tx.ExecContext(ctx, string(dapacaiMigration))
 	require.NoError(t, err)
 	var count int
 	require.NoError(t, tx.QueryRowContext(ctx, "SELECT COUNT(*) FROM video_reference_assets").Scan(&count))
-	require.Equal(t, 2, count)
+	require.Equal(t, 3, count)
 	var family string
 	require.NoError(t, tx.QueryRowContext(ctx, "SELECT endpoint_family FROM video_reference_assets WHERE id='legacy'").Scan(&family))
 	require.Equal(t, "2.0", family)
