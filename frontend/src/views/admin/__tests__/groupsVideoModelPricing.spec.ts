@@ -14,6 +14,10 @@ describe('Grok video model pricing form', () => {
     expect(serializeVideoModelPrices(form)).toEqual(old)
     expect(videoPriceResolutionsForModel('seedance-2.0')).toEqual([{ key: 'native', label: 'native' }])
     expect(videoPriceResolutionsForModel('seedance-2.5-plus-4').map(row => row.key)).toEqual(['720p'])
+    expect(videoPriceResolutionsForModel('seedance-2.5-plus-8')).toEqual([{ key: '720p', label: '720p' }])
+    expect(videoPriceResolutionsForModel('minimax-h3')).toEqual([{ key: '768p', label: '768P' }])
+    expect(form['seedance-2.5-plus-8']['720p']).toBeNull()
+    expect(form['minimax-h3']['768p']).toBeNull()
     expect(form['seedance-2.0'].native).toBeNull()
     form['seedance-2.0'].native = 0.2
     expect(serializeVideoModelPrices(form)).toEqual({ ...old, 'seedance-2.0': { native: 0.2 } })

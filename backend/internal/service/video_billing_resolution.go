@@ -64,7 +64,7 @@ func LookupVideoBillingResolutionForModel(model, resolution string) (string, boo
 			return "native", tier == "" || tier == "native"
 		}
 		for _, allowed := range p.resolutions {
-			if tier == allowed {
+			if strings.EqualFold(tier, allowed) {
 				return tier, true
 			}
 		}

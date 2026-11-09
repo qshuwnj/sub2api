@@ -46,7 +46,8 @@ func (s *OpenAIGatewayService) PreviewDapacaiVideoPrice(ctx context.Context, key
 		return nil, fmt.Errorf("unsupported Dapacai video model")
 	}
 	if !slices.Contains([]string{"text", "image", "frames", "references"}, req.Mode) ||
-		req.Mode == "text" && profile.requiresReference || req.Mode == "frames" && !profile.frames {
+		req.Mode == "text" && profile.requiresReference || req.Mode == "frames" && !profile.frames ||
+		profile.textOnly && req.Mode != "text" {
 		return nil, fmt.Errorf("unsupported Dapacai video mode")
 	}
 	var controls struct {

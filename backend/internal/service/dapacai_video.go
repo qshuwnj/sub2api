@@ -31,13 +31,13 @@ func (e GrokMediaEndpoint) IsDapacaiVideo() bool {
 }
 
 type dapacaiVideoProfile struct {
-	durations                                      []int
-	ratios, resolutions                            []string
-	images, videos, audios                         int
-	frames, requiresReference, audioOnly, disabled bool
+	durations                                                []int
+	ratios, resolutions                                      []string
+	images, videos, audios                                   int
+	frames, requiresReference, audioOnly, disabled, textOnly bool
 }
 
-// Public guide + OpenAPI verified 2026-11-06. Never infer arbitrary bare IDs or
+// Public guide + OpenAPI/catalog refreshed 2026-11-10. Never infer arbitrary bare IDs or
 // use AtlasCloud contracts, defaults, prices or alternate speed/model variants.
 func dapacaiVideoModel(model string) *dapacaiVideoProfile {
 	p := &dapacaiVideoProfile{ratios: []string{"16:9", "9:16", "1:1"}, images: 10}
@@ -72,8 +72,11 @@ func dapacaiVideoModel(model string) *dapacaiVideoProfile {
 		if model == "seedance-2.5-plus-7" {
 			p.resolutions = append(p.resolutions, "720p")
 		}
+	case "seedance-2.5-plus-8":
+		p.durations, p.ratios, p.resolutions = durationRange(4, 30), append(wide, "auto"), []string{"720p"}
+		p.images, p.videos, p.audios, p.audioOnly = 30, 10, 10, true
 	case "minimax-h3":
-		p.durations, p.disabled = durationRange(5, 30), true
+		p.durations, p.resolutions, p.images, p.textOnly = durationRange(1, 15), []string{"768P"}, 0, true
 	default:
 		return nil
 	}

@@ -14,8 +14,7 @@ func dapacaiVideoCardPrice(key *APIKey, model, resolution string) (float64, Bill
 	profile := dapacaiVideoModel(model)
 	tier, validTier := LookupVideoBillingResolutionForModel(model, resolution)
 	if profile == nil || profile.disabled || !validTier ||
-		(len(profile.resolutions) == 0 && tier != "native") ||
-		(len(profile.resolutions) > 0 && !slices.Contains(profile.resolutions, tier)) {
+		(len(profile.resolutions) == 0 && tier != "native") {
 		return 0, "", false
 	}
 	for _, card := range key.Group.ModelPricing {
@@ -24,6 +23,9 @@ func dapacaiVideoCardPrice(key *APIKey, model, resolution string) (float64, Bill
 			continue
 		}
 		if card.BillingMode != BillingModePerRequest && card.BillingMode != BillingModeVideo {
+			return 0, "", false
+		}
+		if model == "seedance-2.5-plus-8" && card.BillingMode != BillingModePerRequest {
 			return 0, "", false
 		}
 		price := card.PerRequestPrice
@@ -41,6 +43,10 @@ func dapacaiVideoCardPrice(key *APIKey, model, resolution string) (float64, Bill
 			return 0, "", false
 		}
 		return *price, card.BillingMode, true
+	}
+	// Plus-8 is a confirmed fixed-job product; never inherit legacy USD/s fallback.
+	if model == "seedance-2.5-plus-8" {
+		return 0, "", false
 	}
 	// Preserve explicitly entered per-second prices from the initial adapter.
 	price := LookupVideoModelPrice(key.Group.VideoModelPrices, model, tier)

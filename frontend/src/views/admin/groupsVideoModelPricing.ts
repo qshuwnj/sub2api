@@ -14,7 +14,7 @@ export const grokVideoPriceFamilies = [
     'seedance-2.0', 'seedance-2.0-plus', 'seedance-2.5-plus',
     'seedance-2.5-plus-1', 'seedance-2.5-plus-2', 'seedance-2.5-plus-3',
     'seedance-2.5-plus-4', 'seedance-2.5-plus-5', 'seedance-2.5-plus-6',
-    'seedance-2.5-plus-7', 'wan-3.0'
+    'seedance-2.5-plus-7', 'seedance-2.5-plus-8', 'wan-3.0', 'minimax-h3'
   ].map(key => ({ key, label: `${key} (Dapacai)` }))
 ] as const
 
@@ -34,7 +34,10 @@ export function videoPriceResolutionsForModel(model: string) {
     case 'seedance-2.5-plus-3':
       return ['720p', '1080p'].map(key => ({ key, label: key }))
     case 'seedance-2.5-plus-4':
+    case 'seedance-2.5-plus-8':
       return [{ key: '720p', label: '720p' }]
+    case 'minimax-h3':
+      return [{ key: '768p', label: '768P' }]
     case 'seedance-2.5-plus-7':
       return ['480p', '720p'].map(key => ({ key, label: key }))
     case 'google/gemini-omni-1.1-flash/text-to-video':

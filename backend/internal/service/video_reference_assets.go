@@ -34,7 +34,7 @@ var videoReferenceModelFamilies = map[string]string{
 // VideoReferenceFamilyForModel is intentionally exact. Reference admission
 // must not infer a family from a loose suffix or trust a client-supplied tier.
 func VideoReferenceFamilyForModel(model string) (string, error) {
-	if p := dapacaiVideoModel(model); p != nil && !p.disabled {
+	if p := dapacaiVideoModel(model); p != nil && !p.disabled && !p.textOnly {
 		return "dapacai:" + model, nil
 	}
 	family, ok := videoReferenceModelFamilies[strings.TrimSpace(model)]
@@ -48,7 +48,7 @@ func VideoReferenceFamilyForModel(model string) (string, error) {
 // reference-to-video sibling. Their storage grant accepts images only.
 func VideoFrameFamilyForModel(model string) (string, error) {
 	model = strings.TrimSpace(model)
-	if p := dapacaiVideoModel(model); p != nil && !p.disabled {
+	if p := dapacaiVideoModel(model); p != nil && !p.disabled && !p.textOnly {
 		return "frame:" + model, nil
 	}
 	switch model {
