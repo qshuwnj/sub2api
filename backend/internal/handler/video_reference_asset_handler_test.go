@@ -27,14 +27,19 @@ type testVideoReferenceBlobStore struct {
 	deleted int
 	err     error
 	mime    string
+	key     string
 }
 
-func (s *testVideoReferenceBlobStore) Save(_ context.Context, _ string, contentType string, _ []byte) (string, error) {
+func (s *testVideoReferenceBlobStore) Save(_ context.Context, key string, contentType string, _ []byte) (string, error) {
 	if s.err != nil {
 		return "", s.err
 	}
 	s.saved++
 	s.mime = contentType
+	s.key = key
+	if s.url == "" {
+		return "https://cdn.example/" + key + "?signature=fixture", nil
+	}
 	return s.url, nil
 }
 
@@ -44,7 +49,7 @@ func TestVideoReferenceAssetHandlerDapacaiImageAndAudioAdmission(t *testing.T) {
 	if err := png.Encode(&imageBytes, image.NewRGBA(image.Rect(0, 0, 32, 32))); err != nil {
 		t.Fatal(err)
 	}
-	models := []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "wan-3.0"}
+	models := []string{"seedance-2.0", "seedance-2.0-plus", "seedance-2.5-plus", "seedance-2.5-plus-1", "seedance-2.5-plus-2", "seedance-2.5-plus-3", "seedance-2.5-plus-4", "seedance-2.5-plus-5", "seedance-2.5-plus-6", "seedance-2.5-plus-7", "seedance-2.5-plus-8", "wan-3.0"}
 	for _, model := range models {
 		for _, kind := range []string{"image", "audio"} {
 			t.Run(model+"/"+kind, func(t *testing.T) {
@@ -68,7 +73,7 @@ func TestVideoReferenceAssetHandlerDapacaiImageAndAudioAdmission(t *testing.T) {
 				c.Set(string(middleware.ContextKeyAPIKey), &service.APIKey{ID: 8, UserID: 7})
 				c.Set(string(middleware.ContextKeyUser), middleware.AuthSubject{UserID: 7})
 				h.Upload(c)
-				audioSupported := model == "seedance-2.0-plus" || model == "seedance-2.5-plus" || model == "seedance-2.5-plus-4" || model == "seedance-2.5-plus-6" || model == "seedance-2.5-plus-7"
+				audioSupported := model == "seedance-2.0-plus" || model == "seedance-2.5-plus" || model == "seedance-2.5-plus-4" || model == "seedance-2.5-plus-6" || model == "seedance-2.5-plus-7" || model == "seedance-2.5-plus-8"
 				if kind == "audio" && !audioSupported {
 					if rec.Code != http.StatusBadRequest || blobs.saved != 0 {
 						t.Fatalf("unsupported audio accepted: status=%d saved=%d", rec.Code, blobs.saved)
@@ -88,6 +93,10 @@ func TestVideoReferenceAssetHandlerDapacaiImageAndAudioAdmission(t *testing.T) {
 				wantMIME := map[string]string{"image": "image/png", "audio": "audio/mpeg"}[kind]
 				if err != nil || asset.SourceURL != blobs.url || string(asset.Kind) != kind || asset.EndpointFamily != "dapacai:"+model || blobs.mime != wantMIME {
 					t.Fatalf("upload changed source model/kind/MIME: asset=%+v mime=%s err=%v", asset, blobs.mime, err)
+				}
+				wantExtension := map[string]string{"image": ".png", "audio": ".mp3"}[kind]
+				if filepath.Ext(blobs.key) != wantExtension || asset.StorageKey != blobs.key {
+					t.Fatalf("upload missing verified file format: key=%s asset=%+v", blobs.key, asset)
 				}
 			})
 		}

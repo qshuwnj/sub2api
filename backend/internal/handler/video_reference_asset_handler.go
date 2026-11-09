@@ -104,6 +104,12 @@ func (h *VideoReferenceAssetHandler) Upload(c *gin.Context) {
 	}
 	id := uuid.NewString()
 	key := filepath.ToSlash("video-reference/" + fmt.Sprintf("%d", subject.UserID) + "/" + id)
+	suffix, err := videoReferenceStorageSuffix(model, metadata.MIME)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"message": err.Error()}})
+		return
+	}
+	key += suffix
 	accountID, _ := c.Request.Context().Value(ctxkey.AccountID).(int64)
 	asset := &service.VideoReferenceAsset{
 		ID: id, UserID: subject.UserID, APIKeyID: apiKey.ID, EndpointFamily: family,
