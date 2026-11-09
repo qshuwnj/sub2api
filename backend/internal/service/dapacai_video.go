@@ -291,24 +291,7 @@ func (s *OpenAIGatewayService) ForwardDapacaiVideo(ctx context.Context, c *gin.C
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 || resp.StatusCode < 200 {
-		// Fail closed on redirects too; never forward account credentials to Location.
-		status, message := resp.StatusCode, "Dapacai request failed"
-		switch status {
-		case 400:
-			message = "新上游不接受当前视频参数，请检查模型、时长、比例和参考素材"
-		case 401, 403:
-			message = "新上游账号鉴权失败，请检查该账号的 Key 和模型权限"
-		case 402:
-			message = "新上游账号余额不足"
-		case 404:
-			message = "新上游没有找到这个视频任务"
-		case 503:
-			message = "新上游暂未提供此模型的可用渠道"
-		default:
-			status = http.StatusBadGateway
-		}
-		writeGrokMediaErrorResponse(c, status, "dapacai_upstream_error", message)
-		return nil, errors.New("Dapacai upstream rejected request")
+		return nil, writeDapacaiVideoUpstreamError(c, account, resp, target, token)
 	}
 	result := &OpenAIForwardResult{ResponseID: task, Model: info.Model, BillingModel: info.Model, UpstreamModel: info.Model,
 		VideoResolution: info.Resolution, VideoDurationSeconds: info.DurationSeconds, Duration: time.Since(started), UpstreamEndpoint: "/v1/videos"}
