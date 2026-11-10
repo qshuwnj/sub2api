@@ -626,7 +626,7 @@ func validateCompatibleImagesModel(model string) error {
 // RequiredCapabilityForModel also applies the API-key-only fence when channel
 // mapping introduces a compatible provider model after request parsing.
 func (req *OpenAIImagesRequest) RequiredCapabilityForModel(model string) OpenAIImagesCapability {
-	if model == "gpt-image-2.5-cdn" {
+	if IsDapacaiImageModel(model) {
 		return OpenAIImagesCapabilityAPIKey
 	}
 	if isGeminiCompatibleImageModel(model) || isAtlasCloudImageModel(model) {
@@ -651,7 +651,7 @@ func classifyOpenAIImagesCapability(req *OpenAIImagesRequest) OpenAIImagesCapabi
 	if req == nil {
 		return OpenAIImagesCapabilityNative
 	}
-	if req.Model == "gpt-image-2.5-cdn" {
+	if IsDapacaiImageModel(req.Model) {
 		return OpenAIImagesCapabilityAPIKey
 	}
 	if isGeminiCompatibleImageModel(req.Model) || isAtlasCloudImageModel(req.Model) {
@@ -750,18 +750,18 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 		return nil, err
 	}
 	upstreamModel := account.GetMappedModel(requestModel)
-	if requestModel == "gpt-image-2.5-cdn" || upstreamModel == "gpt-image-2.5-cdn" {
+	if IsDapacaiImageModel(requestModel) || IsDapacaiImageModel(upstreamModel) {
 		if requestModel != upstreamModel || !account.SupportsOpenAIEndpointCapability(OpenAIEndpointCapabilityDapacaiVideo) {
-			return atlasCloudImagesError(c, http.StatusBadRequest, "Use the new Dapacai API-key account with the exact CDN image model")
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Use the Dapacai API-key account with the exact image model")
 		}
 		if parsed.IsEdits() || parsed.N != 1 || parsed.Quality != "" || gjson.GetBytes(body, "resolution").Exists() ||
 			len(parsed.InputImageURLs) > 0 || len(parsed.Uploads) > 0 ||
 			!slices.Contains([]string{"1024x1024", "1536x1024", "1024x1536"}, parsed.Size) {
-			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN supports text-to-image only, one image, and its three native sizes")
+			return atlasCloudImagesError(c, http.StatusBadRequest, "This Dapacai image adapter currently supports text-to-image only, one image, and its three native sizes")
 		}
 		if len([]rune(parsed.Prompt)) == 0 || len([]rune(parsed.Prompt)) > 4000 ||
 			(parsed.ResponseFormat != "" && parsed.ResponseFormat != "url") {
-			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN requires a 1-4000 character prompt and URL output")
+			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai images require a 1-4000 character prompt and URL output")
 		}
 		validOptions := true
 		gjson.ParseBytes(body).ForEach(func(key, _ gjson.Result) bool {
@@ -771,7 +771,7 @@ func (s *OpenAIGatewayService) forwardOpenAIImagesAPIKey(
 			return validOptions
 		})
 		if !validOptions {
-			return atlasCloudImagesError(c, http.StatusBadRequest, "Dapacai CDN does not support reference images or extra generation options")
+			return atlasCloudImagesError(c, http.StatusBadRequest, "This Dapacai image adapter does not support reference images or extra generation options")
 		}
 		key := getAPIKeyFromContext(c)
 		if key == nil || key.Group == nil ||

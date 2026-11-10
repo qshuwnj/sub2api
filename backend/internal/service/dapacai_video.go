@@ -52,6 +52,9 @@ func dapacaiVideoModel(model string) *dapacaiVideoProfile {
 	switch model {
 	case "seedance-2.0":
 		p.durations, p.ratios, p.frames = []int{5, 10, 15}, wide, true
+	case "seedance-2.0-1":
+		p.durations, p.resolutions = durationRange(5, 15), []string{"720p"}
+		p.images, p.audios = 9, 3
 	case "seedance-2.0-plus":
 		p.durations, p.resolutions = []int{5, 10, 15}, []string{"480p", "720p", "1080p"}
 		p.images, p.videos, p.audios = 9, 3, 3

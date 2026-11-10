@@ -626,7 +626,7 @@ func (s *OpenAIGatewayService) RefreshVideoQuoteKey(ctx context.Context, key *AP
 	}
 	eligible := false
 	capability := OpenAIEndpointCapabilityAtlasCloudVideo
-	dapacai := IsDapacaiVideoModel(model) || model == "gpt-image-2.5-cdn"
+	dapacai := IsDapacaiVideoModel(model) || IsDapacaiImageModel(model)
 	if dapacai {
 		capability = OpenAIEndpointCapabilityDapacaiVideo
 	}

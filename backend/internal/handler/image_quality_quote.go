@@ -31,7 +31,7 @@ func (h *OpenAIGatewayHandler) ImageQuote(c *gin.Context) {
 		h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Invalid quote JSON")
 		return
 	}
-	if input.Model == "gpt-image-2.5-cdn" {
+	if service.IsDapacaiImageModel(input.Model) {
 		preview, err := h.gatewayService.PreviewDapacaiImagePrice(c.Request.Context(), key, input, time.Now())
 		if err != nil {
 			h.dapacaiPricePreviewError(c, err)

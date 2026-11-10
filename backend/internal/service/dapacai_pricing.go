@@ -25,7 +25,7 @@ func dapacaiVideoCardPrice(key *APIKey, model, resolution string) (float64, Bill
 		if card.BillingMode != BillingModePerRequest && card.BillingMode != BillingModeVideo {
 			return 0, "", false
 		}
-		if model == "seedance-2.5-plus-8" && card.BillingMode != BillingModePerRequest {
+		if (model == "seedance-2.5-plus-8" || model == "seedance-2.0-1") && card.BillingMode != BillingModePerRequest {
 			return 0, "", false
 		}
 		price := card.PerRequestPrice
@@ -44,8 +44,8 @@ func dapacaiVideoCardPrice(key *APIKey, model, resolution string) (float64, Bill
 		}
 		return *price, card.BillingMode, true
 	}
-	// Plus-8 is a confirmed fixed-job product; never inherit legacy USD/s fallback.
-	if model == "seedance-2.5-plus-8" {
+	// Confirmed fixed-job products must never inherit legacy USD/s fallback.
+	if model == "seedance-2.5-plus-8" || model == "seedance-2.0-1" {
 		return 0, "", false
 	}
 	// Preserve explicitly entered per-second prices from the initial adapter.

@@ -92,7 +92,7 @@ func (s *OpenAIGatewayService) PreviewDapacaiVideoPrice(ctx context.Context, key
 }
 
 func (s *OpenAIGatewayService) PreviewDapacaiImagePrice(ctx context.Context, key *APIKey, req ImageQuoteRequest, now time.Time) (*DapacaiPricePreview, error) {
-	if req.Model != "gpt-image-2.5-cdn" || req.Count < 1 || req.Count > 4 || req.Quality != "none" ||
+	if !IsDapacaiImageModel(req.Model) || req.Count < 1 || req.Count > 4 || req.Quality != "none" ||
 		req.AspectRatio != "" || req.Resolution != "" ||
 		!slices.Contains([]string{"1024x1024", "1536x1024", "1024x1536"}, req.Size) {
 		return nil, fmt.Errorf("unsupported Dapacai image controls")

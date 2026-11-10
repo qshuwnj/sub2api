@@ -22,6 +22,8 @@ func TestDapacaiPricePreviewEndpointsAreAuthenticatedControlOnlyAndFailClosed(t 
 	}{
 		{"video auth", "videos", `{"model":"seedance-2.0","mode":"text","controls":{"duration":5,"ratio":"16:9"}}`, false, 401},
 		{"image auth", "images", `{"model":"gpt-image-2.5-cdn","quality":"none","size":"1024x1024","count":1}`, false, 401},
+		{"image26 requires fresh admission", "images", `{"model":"gpt-image-2.6","quality":"none","size":"1024x1024","count":1}`, true, 503},
+		{"seedance201 requires fresh admission", "videos", `{"model":"seedance-2.0-1","mode":"text","controls":{"duration":15,"ratio":"16:9","resolution":"720p"}}`, true, 503},
 		{"no stale cached video admission", "videos", `{"model":"seedance-2.0","mode":"text","controls":{"duration":5,"ratio":"16:9"}}`, true, 503},
 		{"no stale cached image admission", "images", `{"model":"gpt-image-2.5-cdn","quality":"none","size":"1024x1024","count":1}`, true, 503},
 		{"no video content", "videos", `{"model":"seedance-2.0","mode":"image","controls":{"duration":5,"ratio":"16:9","input":{"media":["private-reference"]}}}`, true, 400},
