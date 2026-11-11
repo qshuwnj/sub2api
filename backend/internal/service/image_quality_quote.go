@@ -75,6 +75,12 @@ func normalizedImageQuoteFromParsed(parsed *OpenAIImagesRequest, count int) (Ima
 			return req, fmt.Errorf("image quote does not include search grounding charges")
 		}
 	}
+	// Sunburst GIF sheets can contain multiple frames; a single-image quote
+	// covers PNG/JPEG/WebP only, not the separate per-sheet billing contract.
+	if strings.HasPrefix(parsed.Model, "openai/gpt-image-2.6-sunburst/") &&
+		gjson.GetBytes(parsed.Body, "output_format").String() == "gif" {
+		return req, fmt.Errorf("image quote does not include GIF sprite sheet charges")
+	}
 	return req.normalized()
 }
 

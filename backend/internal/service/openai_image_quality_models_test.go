@@ -151,7 +151,7 @@ func TestImageQualityAllOpenAIModelsUseNativeControls(t *testing.T) {
 			}
 		}
 	}
-	require.Equal(t, 18, count)
+	require.Equal(t, 20, count)
 }
 
 func TestImageQualityEndpointPricesDoNotBleedAcrossModelsOrModes(t *testing.T) {

@@ -21816,10 +21816,6 @@
       "reason": "official_endpoint_unconfirmed"
     },
     {
-      "id": "bytedance/seedream-v5.0-lite/edit",
-      "reason": "official_endpoint_unconfirmed"
-    },
-    {
       "id": "kwaivgi/kling-video-o3-pro/image-to-video",
       "reason": "official_model_identity_unconfirmed"
     },

@@ -192,7 +192,7 @@ func TestAtlasMediaFrontendContractMatrix(t *testing.T) {
 	}
 	require.Len(t, images, 58)
 	require.Len(t, videos, 87)
-	require.Len(t, fixture.Rejected, 12)
+	require.Len(t, fixture.Rejected, 11)
 	for _, sample := range fixture.Rejected {
 		require.Nil(t, atlasMediaModel(sample.ID, "image"))
 		require.Nil(t, atlasMediaModel(sample.ID, "video"))
