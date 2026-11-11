@@ -292,6 +292,12 @@ func (s *OpenAIGatewayService) ForwardDapacaiVideo(ctx context.Context, c *gin.C
 	if err != nil {
 		return nil, errors.New("Dapacai request interrupted; do not resubmit generation automatically")
 	}
+	if endpoint == DapacaiEndpointVideoContent {
+		resp, err = s.followDapacaiContentRedirect(ctx, account, task, proxy, c.GetHeader("Range"), resp)
+		if err != nil {
+			return nil, err
+		}
+	}
 	defer resp.Body.Close()
 	if resp.StatusCode >= 300 || resp.StatusCode < 200 {
 		return nil, writeDapacaiVideoUpstreamError(c, account, resp, target, token)
@@ -299,7 +305,7 @@ func (s *OpenAIGatewayService) ForwardDapacaiVideo(ctx context.Context, c *gin.C
 	result := &OpenAIForwardResult{ResponseID: task, Model: info.Model, BillingModel: info.Model, UpstreamModel: info.Model,
 		VideoResolution: info.Resolution, VideoDurationSeconds: info.DurationSeconds, Duration: time.Since(started), UpstreamEndpoint: "/v1/videos"}
 	if endpoint == DapacaiEndpointVideoContent {
-		if !strings.HasPrefix(resp.Header.Get("Content-Type"), "video/") && resp.Header.Get("Content-Type") != "application/octet-stream" {
+		if !dapacaiVideoContentType(resp.Header.Get("Content-Type")) {
 			return nil, errors.New("Dapacai returned no playable video content")
 		}
 		err = writeGrokMediaContentResponse(c, resp)

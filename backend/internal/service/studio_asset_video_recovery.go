@@ -320,8 +320,15 @@ func (s *OpenAIGatewayService) openStudioNativeVideoContent(ctx context.Context,
 		cancel()
 		return nil, ErrVideoResultUnavailable
 	}
+	if dapacai {
+		resp, err = s.followDapacaiContentRedirect(ctx, account, v.TaskID, proxy, "", resp)
+		if err != nil {
+			cancel()
+			return nil, ErrVideoResultUnavailable
+		}
+	}
 	if resp.StatusCode != http.StatusOK || resp.ContentLength > 300<<20 ||
-		dapacai && !strings.HasPrefix(resp.Header.Get("Content-Type"), "video/") && resp.Header.Get("Content-Type") != "application/octet-stream" {
+		dapacai && !dapacaiVideoContentType(resp.Header.Get("Content-Type")) {
 		resp.Body.Close()
 		cancel()
 		return nil, ErrVideoResultUnavailable
