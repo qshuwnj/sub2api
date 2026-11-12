@@ -9,10 +9,24 @@ import (
 )
 
 var (
-	ErrGroupNotFound = infraerrors.NotFound("GROUP_NOT_FOUND", "group not found")
-	ErrGroupExists   = infraerrors.Conflict("GROUP_EXISTS", "group name already exists")
-	ErrGroupNotEmpty = infraerrors.Conflict("GROUP_NOT_EMPTY", "group contains accounts")
+	ErrGroupNotFound       = infraerrors.NotFound("GROUP_NOT_FOUND", "group not found")
+	ErrGroupExists         = infraerrors.Conflict("GROUP_EXISTS", "group name already exists")
+	ErrGroupNotEmpty       = infraerrors.Conflict("GROUP_NOT_EMPTY", "group contains accounts")
+	ErrGroupUpdateConflict = infraerrors.Conflict("GROUP_UPDATE_CONFLICT", "group changed while saving; reload before retrying")
 )
+
+// GroupPricingUpdateRepository is an optional optimized writer. Repositories
+// without it retain the existing complete-update contract.
+type GroupPricingUpdateRepository interface {
+	UpdateWithModelPricingSnapshot(context.Context, *Group, []ChannelModelPricing) error
+}
+
+func persistGroupUpdate(ctx context.Context, repo GroupRepository, group *Group, previous []ChannelModelPricing) error {
+	if updater, ok := repo.(GroupPricingUpdateRepository); ok {
+		return updater.UpdateWithModelPricingSnapshot(ctx, group, previous)
+	}
+	return repo.Update(ctx, group)
+}
 
 type GroupRepository interface {
 	Create(ctx context.Context, group *Group) error
@@ -235,7 +249,7 @@ func (s *GroupService) Update(ctx context.Context, id int64, req UpdateGroupRequ
 		group.ImageRateMultiplier = *req.ImageRateMultiplier
 	}
 
-	if err := s.groupRepo.Update(ctx, group); err != nil {
+	if err := persistGroupUpdate(ctx, s.groupRepo, group, group.ModelPricing); err != nil {
 		return nil, fmt.Errorf("update group: %w", err)
 	}
 	if s.authCacheInvalidator != nil {

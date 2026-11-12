@@ -283,10 +283,10 @@ func (r *groupRepository) GetByIDLite(ctx context.Context, id int64) (*service.G
 }
 
 func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) error {
-	modelPricing, err := json.Marshal(groupIn.ModelPricing)
-	if err != nil {
-		return fmt.Errorf("marshal group model pricing: %w", err)
-	}
+	return r.update(ctx, groupIn, true)
+}
+
+func (r *groupRepository) update(ctx context.Context, groupIn *service.Group, writeModelPricing bool) error {
 	builder := r.client.Group.UpdateOneID(groupIn.ID).
 		SetName(groupIn.Name).
 		SetDescription(groupIn.Description).
@@ -315,7 +315,6 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetNillableVideoPrice1080p(groupIn.VideoPrice1080P).
 		SetVideoModelPrices(service.NormalizeVideoModelPrices(groupIn.VideoModelPrices)).
 		SetLongContextPricingEnabled(groupIn.LongContextPricingEnabled).
-		SetModelPricing(modelPricing).
 		SetDefaultValidityDays(groupIn.DefaultValidityDays).
 		SetClaudeCodeOnly(groupIn.ClaudeCodeOnly).
 		SetModelRoutingEnabled(groupIn.ModelRoutingEnabled).
@@ -341,6 +340,14 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 		SetProfitControlEnabled(groupIn.ProfitControlEnabled).
 		SetProfitMinMargin(groupIn.ProfitMinMargin).
 		SetProfitSafetyBuffer(groupIn.ProfitSafetyBuffer)
+
+	if writeModelPricing {
+		modelPricing, err := json.Marshal(groupIn.ModelPricing)
+		if err != nil {
+			return fmt.Errorf("marshal group model pricing: %w", err)
+		}
+		builder = builder.SetModelPricing(modelPricing)
+	}
 
 	// 显式处理可空字段：nil 需要 clear，非 nil 需要 set。
 	if groupIn.DailyLimitUSD != nil {
@@ -443,7 +450,9 @@ func (r *groupRepository) Update(ctx context.Context, groupIn *service.Group) er
 	}
 	builder = builder.SetI18n(i18n)
 
-	updated, err := builder.Save(ctx)
+	// Only the update timestamp is consumed here. Re-reading the complete group
+	// also materializes and transfers every large model-pricing tariff again.
+	updated, err := builder.Select(group.FieldUpdatedAt).Save(ctx)
 	if err != nil {
 		return translatePersistenceError(err, service.ErrGroupNotFound, service.ErrGroupExists)
 	}

@@ -817,6 +817,7 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 	if input.LongContextPricingEnabled != nil {
 		group.LongContextPricingEnabled = *input.LongContextPricingEnabled
 	}
+	previousModelPricing := group.ModelPricing
 	if input.ModelPricing != nil {
 		modelPricing, normalizeErr := normalizeGroupModelPricing(group.Platform, *input.ModelPricing, group.ModelPricing)
 		if normalizeErr != nil {
@@ -1085,7 +1086,7 @@ func (s *adminServiceImpl) UpdateGroup(ctx context.Context, id int64, input *Upd
 		}
 	}
 
-	if err := s.groupRepo.Update(ctx, group); err != nil {
+	if err := persistGroupUpdate(ctx, s.groupRepo, group, previousModelPricing); err != nil {
 		return nil, err
 	}
 
