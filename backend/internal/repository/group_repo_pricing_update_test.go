@@ -124,7 +124,7 @@ func TestSingleChangedGroupPrice(t *testing.T) {
 	}
 }
 
-func TestUpdateGroupUnchangedPricingSkipsJSONBWrite(t *testing.T) {
+func TestUpdateGroupUnchangedPricingSkipsDocumentWrite(t *testing.T) {
 	repo, mock := newGroupPricingTestRepo(t)
 	g := groupPricingTestGroup()
 	previous := []service.ChannelModelPricing{g.ModelPricing[0].Clone(), g.ModelPricing[1].Clone()}
@@ -139,20 +139,20 @@ func TestUpdateGroupUnchangedPricingSkipsJSONBWrite(t *testing.T) {
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestUpdateGroupSinglePricingCardIsAtomicAndNarrow(t *testing.T) {
+func TestUpdateGroupPricingDocumentIsAtomicAndUsesJSONText(t *testing.T) {
 	repo, mock := newGroupPricingTestRepo(t)
 	g := groupPricingTestGroup()
-	// A large unrelated card must never be sent as a SQL argument.
+	// The document remains opaque JSON text rather than a server-side JSONB tree.
 	g.ModelPricing[0].Models = []string{strings.Repeat("unchanged-large-tariff", 100000)}
 	previous := append([]service.ChannelModelPricing(nil), g.ModelPricing...)
 	g.ModelPricing[1] = groupPricingTestCard("changed-model", 3)
-	card, err := json.Marshal(g.ModelPricing[1])
+	pricing, err := json.Marshal(g.ModelPricing)
 	require.NoError(t, err)
-	require.Less(t, len(card), 1024)
+	require.Greater(t, len(pricing), 1_000_000)
 	updated := g.UpdatedAt.Add(time.Second)
 	mock.ExpectBegin()
-	mock.ExpectExec(regexp.QuoteMeta(replaceGroupPricingCardSQL)).
-		WithArgs(`{"1"}`, string(card), g.ID, g.UpdatedAt, 2).
+	mock.ExpectExec(regexp.QuoteMeta(replaceGroupPricingSQL)).
+		WithArgs(string(pricing), g.ID, g.UpdatedAt).
 		WillReturnResult(sqlmock.NewResult(0, 1))
 	expectGroupMetadataUpdate(mock, false, updated)
 	expectGroupPricingOutbox(mock)
@@ -161,10 +161,10 @@ func TestUpdateGroupSinglePricingCardIsAtomicAndNarrow(t *testing.T) {
 	require.NoError(t, repo.UpdateWithModelPricingSnapshot(context.Background(), g, previous))
 	require.Equal(t, updated, g.UpdatedAt)
 	require.NoError(t, mock.ExpectationsWereMet())
-	require.Contains(t, replaceGroupPricingCardSQL, "deleted_at IS NULL")
-	require.Contains(t, replaceGroupPricingCardSQL, "updated_at = $4")
-	require.Contains(t, replaceGroupPricingCardSQL, "jsonb_typeof(model_pricing) = 'array'")
-	require.Contains(t, replaceGroupPricingCardSQL, "jsonb_array_length(model_pricing) = $5")
+	require.Contains(t, replaceGroupPricingSQL, "deleted_at IS NULL")
+	require.Contains(t, replaceGroupPricingSQL, "updated_at = $3")
+	require.Contains(t, replaceGroupPricingSQL, "model_pricing = $1::json")
+	require.NotContains(t, replaceGroupPricingSQL, "jsonb")
 }
 
 func TestUpdateGroupSinglePricingCardFailureRollsBack(t *testing.T) {
@@ -180,7 +180,7 @@ func TestUpdateGroupSinglePricingCardFailureRollsBack(t *testing.T) {
 			if stage == "begin" {
 				begin.WillReturnError(boom)
 			} else {
-				write := mock.ExpectExec(regexp.QuoteMeta(replaceGroupPricingCardSQL))
+				write := mock.ExpectExec(regexp.QuoteMeta(replaceGroupPricingSQL))
 				switch stage {
 				case "write":
 					write.WillReturnError(boom)
@@ -222,7 +222,7 @@ func TestUpdateGroupSinglePricingCardFailureRollsBack(t *testing.T) {
 	}
 }
 
-func TestUpdateGroupPricingStructuralChangesUseFullWrite(t *testing.T) {
+func TestUpdateGroupPricingStructuralChangesUseAtomicJSONWrite(t *testing.T) {
 	for _, change := range []string{"multiple", "added", "removed", "nil", "nil to empty", "zero timestamp"} {
 		t.Run(change, func(t *testing.T) {
 			repo, mock := newGroupPricingTestRepo(t)
@@ -246,9 +246,20 @@ func TestUpdateGroupPricingStructuralChangesUseFullWrite(t *testing.T) {
 			}
 			updated := time.Now().UTC()
 			mock.ExpectBegin()
-			expectGroupMetadataUpdate(mock, true, updated)
-			mock.ExpectCommit()
-			expectGroupPricingOutbox(mock)
+			if change == "zero timestamp" {
+				expectGroupMetadataUpdate(mock, true, updated)
+				mock.ExpectCommit()
+				expectGroupPricingOutbox(mock)
+			} else {
+				pricing, err := json.Marshal(g.ModelPricing)
+				require.NoError(t, err)
+				mock.ExpectExec(regexp.QuoteMeta(replaceGroupPricingSQL)).
+					WithArgs(string(pricing), g.ID, g.UpdatedAt).
+					WillReturnResult(sqlmock.NewResult(0, 1))
+				expectGroupMetadataUpdate(mock, false, updated)
+				expectGroupPricingOutbox(mock)
+				mock.ExpectCommit()
+			}
 			require.NoError(t, repo.UpdateWithModelPricingSnapshot(context.Background(), g, previous))
 			require.Equal(t, updated, g.UpdatedAt)
 			require.NoError(t, mock.ExpectationsWereMet())
@@ -262,7 +273,7 @@ func TestUpdateGroupPricingRejectsInvalidCardBeforeTransaction(t *testing.T) {
 	previous := append([]service.ChannelModelPricing(nil), g.ModelPricing...)
 	g.ModelPricing[1] = groupPricingTestCard("invalid-model", math.NaN())
 	err := repo.UpdateWithModelPricingSnapshot(context.Background(), g, previous)
-	require.ErrorContains(t, err, "marshal group model pricing card")
+	require.ErrorContains(t, err, "marshal group model pricing")
 	require.NoError(t, mock.ExpectationsWereMet())
 }
 

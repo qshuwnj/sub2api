@@ -200,7 +200,7 @@ func (Group) Fields() []ent.Field {
 			Comment("是否按上下文长度应用模型阶梯价格；默认开启以保持官方/渠道长上下文价"),
 		field.JSON("model_pricing", json.RawMessage{}).
 			Optional().
-			SchemaType(map[string]string{dialect.Postgres: "jsonb"}).
+			SchemaType(map[string]string{dialect.Postgres: "json"}).
 			Comment("分组逐模型定价；优先级高于渠道和内置定价"),
 
 		// Claude Code 客户端限制 (added by migration 029)

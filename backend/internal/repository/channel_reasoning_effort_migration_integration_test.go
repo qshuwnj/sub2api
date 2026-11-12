@@ -13,7 +13,10 @@ import (
 func TestMigration239ReasoningEffortMultipliers(t *testing.T) {
 	tx := testTx(t)
 	ctx := context.Background()
-	_, err := tx.ExecContext(ctx, `ALTER TABLE channel_model_pricing DROP COLUMN reasoning_effort_multipliers`)
+	// The historical migration also touches groups, before migration 256.
+	_, err := tx.ExecContext(ctx, `ALTER TABLE groups ALTER COLUMN model_pricing TYPE JSONB USING model_pricing::jsonb`)
+	require.NoError(t, err)
+	_, err = tx.ExecContext(ctx, `ALTER TABLE channel_model_pricing DROP COLUMN reasoning_effort_multipliers`)
 	require.NoError(t, err)
 	_, err = tx.ExecContext(ctx, `ALTER TABLE channel_account_stats_model_pricing DROP COLUMN reasoning_effort_multipliers`)
 	require.NoError(t, err)
@@ -58,6 +61,9 @@ VALUES ($1, '["claude-fable-5-1"]') RETURNING id`, channelID).Scan(&unsetID))
 func TestMigration239GroupReasoningEffortMultipliers(t *testing.T) {
 	tx := testTx(t)
 	ctx := context.Background()
+	// Recreate the historical column type; migration 256 changes it to JSON.
+	_, err := tx.ExecContext(ctx, `ALTER TABLE groups ALTER COLUMN model_pricing TYPE JSONB USING model_pricing::jsonb`)
+	require.NoError(t, err)
 	var groupID int64
 	require.NoError(t, tx.QueryRowContext(ctx, `
 INSERT INTO groups (name, platform, model_pricing)

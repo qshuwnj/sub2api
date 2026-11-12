@@ -5,21 +5,17 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strconv"
 
 	dbent "github.com/Wei-Shaw/sub2api/ent"
 	"github.com/Wei-Shaw/sub2api/internal/service"
-	"github.com/lib/pq"
 )
 
-const replaceGroupPricingCardSQL = `UPDATE groups
-SET model_pricing = jsonb_set(model_pricing, $1::text[], $2::jsonb, false)
-WHERE id = $3 AND updated_at = $4 AND deleted_at IS NULL
-  AND CASE WHEN jsonb_typeof(model_pricing) = 'array'
-      THEN jsonb_array_length(model_pricing) = $5 ELSE false END`
+const replaceGroupPricingSQL = `UPDATE groups
+SET model_pricing = $1::json
+WHERE id = $2 AND updated_at = $3 AND deleted_at IS NULL`
 
-// singleChangedGroupPrice identifies the narrow, common edit without
-// serializing every unchanged tariff. Structural/bulk edits use the full writer.
+// singleChangedGroupPrice compares wire prices without serialization so metadata
+// saves can skip the tariff document. Any pricing change uses the full writer.
 func singleChangedGroupPrice(previous, next []service.ChannelModelPricing) (index int, unchanged bool) {
 	if len(previous) != len(next) || (previous == nil) != (next == nil) {
 		return -1, false
@@ -37,19 +33,20 @@ func singleChangedGroupPrice(previous, next []service.ChannelModelPricing) (inde
 	return index, index < 0
 }
 
-// UpdateWithModelPricingSnapshot preserves untouched pricing, or sends only
-// one changed card to PostgreSQL. It does not make JSONB an in-place disk write.
+// UpdateWithModelPricingSnapshot skips unchanged pricing and atomically replaces
+// changed documents as JSON text. jsonb_set still expands the entire old tariff
+// tree; replacing opaque JSON text avoids that allocation on large tariffs.
 func (r *groupRepository) UpdateWithModelPricingSnapshot(ctx context.Context, groupIn *service.Group, previous []service.ChannelModelPricing) error {
-	index, unchanged := singleChangedGroupPrice(previous, groupIn.ModelPricing)
+	_, unchanged := singleChangedGroupPrice(previous, groupIn.ModelPricing)
 	if unchanged {
 		return r.update(ctx, groupIn, false)
 	}
-	if index < 0 || groupIn.UpdatedAt.IsZero() || r.sql == nil {
+	if groupIn.UpdatedAt.IsZero() || r.sql == nil {
 		return r.Update(ctx, groupIn)
 	}
-	card, err := json.Marshal(groupIn.ModelPricing[index])
+	pricing, err := json.Marshal(groupIn.ModelPricing)
 	if err != nil {
-		return fmt.Errorf("marshal group model pricing card: %w", err)
+		return fmt.Errorf("marshal group model pricing: %w", err)
 	}
 	tx, err := r.client.Tx(ctx)
 	if errors.Is(err, dbent.ErrTxStarted) {
@@ -61,11 +58,10 @@ func (r *groupRepository) UpdateWithModelPricingSnapshot(ctx context.Context, gr
 	}
 	defer func() { _ = tx.Rollback() }()
 
-	result, err := tx.ExecContext(ctx, replaceGroupPricingCardSQL,
-		pq.Array([]string{strconv.Itoa(index)}), string(card),
-		groupIn.ID, groupIn.UpdatedAt, len(previous))
+	result, err := tx.ExecContext(ctx, replaceGroupPricingSQL,
+		string(pricing), groupIn.ID, groupIn.UpdatedAt)
 	if err != nil {
-		return fmt.Errorf("update group model pricing card: %w", err)
+		return fmt.Errorf("update group model pricing: %w", err)
 	}
 	affected, err := result.RowsAffected()
 	if err != nil {
