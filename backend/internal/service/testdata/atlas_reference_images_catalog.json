@@ -1,0 +1,992 @@
+{
+  "models": [
+    "alibaba/wan-3.0-prime/reference-to-video",
+    "alibaba/wan-3.0/reference-to-video",
+    "bytedance/seedance-2.0-fast/reference-to-video",
+    "bytedance/seedance-2.0-mini/reference-to-video",
+    "bytedance/seedance-2.0/reference-to-video",
+    "bytedance/seedance-2.5/reference-to-video",
+    "kwaivgi/kling-v4.0-flash/reference-to-video",
+    "kwaivgi/kling-v4.0/reference-to-video",
+    "minimax/h3-developer/reference-to-video",
+    "minimax/h3-fast/reference-to-video",
+    "minimax/h3-max/reference-to-video",
+    "xai/grok-imagine-video-v1.5-developer/reference-to-video"
+  ],
+  "cells": [
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 101304000,
+      "price": 1.26,
+      "checkedAt": "2026-11-12T05:24:18.012Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 50652000,
+      "price": 0.63,
+      "checkedAt": "2026-11-12T05:24:18.261Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 24602400,
+      "price": 0.306,
+      "checkedAt": "2026-11-12T05:24:18.513Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 40521600,
+      "price": 0.504,
+      "checkedAt": "2026-11-12T05:24:18.771Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 81043200,
+      "price": 1.008,
+      "checkedAt": "2026-11-12T05:24:19.032Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 174242880,
+      "price": 2.1672,
+      "checkedAt": "2026-11-12T05:24:19.278Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": true
+      },
+      "saleMicrocredits": 374622192,
+      "price": 4.65948,
+      "checkedAt": "2026-11-12T05:24:19.521Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 64320000,
+      "price": 0.8,
+      "checkedAt": "2026-11-12T05:24:19.778Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 32160000,
+      "price": 0.4,
+      "checkedAt": "2026-11-12T05:24:20.027Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 16080000,
+      "price": 0.2,
+      "checkedAt": "2026-11-12T05:24:20.284Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 25728000,
+      "price": 0.32,
+      "checkedAt": "2026-11-12T05:24:20.966Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 51456000,
+      "price": 0.64,
+      "checkedAt": "2026-11-12T05:24:21.222Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 110630400,
+      "price": 1.376,
+      "checkedAt": "2026-11-12T05:24:21.464Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "alibaba/wan-3.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true,
+        "enable_thinking": false
+      },
+      "saleMicrocredits": 237855360,
+      "price": 2.9584,
+      "checkedAt": "2026-11-12T05:24:21.724Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "480p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 29183029,
+      "price": 0.362973,
+      "checkedAt": "2026-11-12T05:24:21.986Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 62759838,
+      "price": 0.780595,
+      "checkedAt": "2026-11-12T05:24:22.238Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 52529501,
+      "price": 0.653352,
+      "checkedAt": "2026-11-12T05:24:22.487Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 112967708,
+      "price": 1.405071,
+      "checkedAt": "2026-11-12T05:24:22.740Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1440p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 200831562,
+      "price": 2.497905,
+      "checkedAt": "2026-11-12T05:24:23.005Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "480p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 18239383,
+      "price": 0.226858,
+      "checkedAt": "2026-11-12T05:24:23.254Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 39224909,
+      "price": 0.487872,
+      "checkedAt": "2026-11-12T05:24:23.497Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 32830938,
+      "price": 0.408345,
+      "checkedAt": "2026-11-12T05:24:24.197Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 70604868,
+      "price": 0.87817,
+      "checkedAt": "2026-11-12T05:24:24.467Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0-mini/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1440p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 125519676,
+      "price": 1.56119,
+      "checkedAt": "2026-11-12T05:24:24.731Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "480p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 36478766,
+      "price": 0.453716,
+      "checkedAt": "2026-11-12T05:24:24.987Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 78449818,
+      "price": 0.975744,
+      "checkedAt": "2026-11-12T05:24:25.235Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 65661876,
+      "price": 0.81669,
+      "checkedAt": "2026-11-12T05:24:25.486Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 176512090,
+      "price": 2.195424,
+      "checkedAt": "2026-11-12T05:24:25.737Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 141209656,
+      "price": 1.756339,
+      "checkedAt": "2026-11-12T05:24:25.980Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1440p-SR",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 251039432,
+      "price": 3.122381,
+      "checkedAt": "2026-11-12T05:24:26.235Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "4k",
+        "ratio": "adaptive",
+        "bitrate_mode": "standard",
+        "generate_audio": true,
+        "seed": -1,
+        "watermark": false,
+        "return_last_frame": false
+      },
+      "saleMicrocredits": 394073846,
+      "price": 4.901416,
+      "checkedAt": "2026-11-12T05:24:26.496Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "480p",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 56631750,
+      "price": 0.704375,
+      "checkedAt": "2026-11-12T05:24:26.750Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 122557016,
+      "price": 1.524341,
+      "checkedAt": "2026-11-12T05:24:26.999Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p-sr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 88911787,
+      "price": 1.105868,
+      "checkedAt": "2026-11-12T05:24:27.249Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p-esr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 101937070,
+      "price": 1.267874,
+      "checkedAt": "2026-11-12T05:24:27.498Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 241243577,
+      "price": 3.000542,
+      "checkedAt": "2026-11-12T05:24:28.189Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-sr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 165452024,
+      "price": 2.057861,
+      "checkedAt": "2026-11-12T05:24:28.454Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-esr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 183835565,
+      "price": 2.286512,
+      "checkedAt": "2026-11-12T05:24:28.704Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-esr & 60fps",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 202219105,
+      "price": 2.515163,
+      "checkedAt": "2026-11-12T05:24:28.948Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1440p-sr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 285560378,
+      "price": 3.551746,
+      "checkedAt": "2026-11-12T05:24:29.198Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1440p-esr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 310100147,
+      "price": 3.856967,
+      "checkedAt": "2026-11-12T05:24:29.449Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "bytedance/seedance-2.5/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "4k-esr",
+        "ratio": "adaptive",
+        "generate_audio": true,
+        "watermark": false,
+        "return_last_frame": false,
+        "output_format": "mp4",
+        "draft": false
+      },
+      "saleMicrocredits": 693741772,
+      "price": 8.628629,
+      "checkedAt": "2026-11-12T05:24:29.697Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": true
+    },
+    {
+      "model": "kwaivgi/kling-v4.0-flash/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "720p",
+        "audio_mode": "native"
+      },
+      "saleMicrocredits": 34460244,
+      "price": 0.42861,
+      "checkedAt": "2026-11-12T05:24:29.951Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "720p"
+      },
+      "saleMicrocredits": 57433740,
+      "price": 0.71435,
+      "checkedAt": "2026-11-12T05:24:30.202Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "1080p"
+      },
+      "saleMicrocredits": 85967700,
+      "price": 1.06925,
+      "checkedAt": "2026-11-12T05:24:30.447Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "1080p-esr"
+      },
+      "saleMicrocredits": 73164000,
+      "price": 0.91,
+      "checkedAt": "2026-11-12T05:24:30.697Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "2k-esr"
+      },
+      "saleMicrocredits": 109746000,
+      "price": 1.365,
+      "checkedAt": "2026-11-12T05:24:30.947Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "auto",
+        "resolution": "4k-esr"
+      },
+      "saleMicrocredits": 146328000,
+      "price": 1.82,
+      "checkedAt": "2026-11-12T05:24:31.199Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "480P",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 9648000,
+      "price": 0.12,
+      "checkedAt": "2026-11-12T05:24:31.454Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "768P",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 15436800,
+      "price": 0.192,
+      "checkedAt": "2026-11-12T05:24:31.687Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "1440p-sr",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 28944000,
+      "price": 0.36,
+      "checkedAt": "2026-11-12T05:24:31.936Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "4k-sr",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 39556800,
+      "price": 0.492,
+      "checkedAt": "2026-11-12T05:24:32.196Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-fast/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "480P",
+        "duration": 8,
+        "ratio": "16:9",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 28107840,
+      "price": 0.3496,
+      "checkedAt": "2026-11-12T05:24:32.444Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-max/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "480P",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 30552000,
+      "price": 0.38,
+      "checkedAt": "2026-11-12T05:24:32.696Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "minimax/h3-max/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "resolution": "768P",
+        "duration": 8,
+        "ratio": "adaptive",
+        "prompt_expansion": false
+      },
+      "saleMicrocredits": 48883200,
+      "price": 0.608,
+      "checkedAt": "2026-11-12T05:24:32.949Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "xai/grok-imagine-video-v1.5-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 8,
+        "resolution": "480p",
+        "aspect_ratio": "16:9"
+      },
+      "saleMicrocredits": 18291000,
+      "price": 0.2275,
+      "checkedAt": "2026-11-12T05:24:33.204Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    },
+    {
+      "model": "xai/grok-imagine-video-v1.5-developer/reference-to-video",
+      "mode": "r2v",
+      "controls": {
+        "duration": 8,
+        "resolution": "720p",
+        "aspect_ratio": "16:9"
+      },
+      "saleMicrocredits": 31798200,
+      "price": 0.3955,
+      "checkedAt": "2026-11-12T05:24:33.872Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "supplierEstimated": false
+    }
+  ]
+}

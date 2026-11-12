@@ -45,6 +45,7 @@ type atlasMediaSchema struct {
 type atlasMediaReference struct {
 	Array   bool `json:"array"`
 	DataURI bool `json:"dataURI"`
+	Object  bool `json:"object,omitempty"`
 }
 type atlasMediaDimensions struct {
 	Minimum   int    `json:"minimum"`
@@ -332,6 +333,13 @@ func buildAtlasMediaContractPayload(body []byte, contract *atlasMediaContract, i
 			items, _ = value.([]any)
 		}
 		for _, item := range items {
+			if ref.Object {
+				object, ok := item.(map[string]any)
+				if !ok || object["type"] != "image" {
+					return nil, fmt.Errorf("reference video and audio require a separate duration-billing contract")
+				}
+				item = object["url"]
+			}
 			text, ok := item.(string)
 			if !ok || !atlasMediaReferenceValid(text, ref.DataURI || imageEnvelope) {
 				return nil, fmt.Errorf("invalid public image reference %s", key)
@@ -374,11 +382,39 @@ func buildAtlasMediaVideoPayload(body []byte, contract *atlasMediaContract) (Gro
 		if value, exists := payload[key]; exists {
 			if ref.Array {
 				for _, item := range value.([]any) {
+					if ref.Object {
+						item = item.(map[string]any)["url"]
+					}
 					info.InputImageURLs = append(info.InputImageURLs, item.(string))
 				}
 			} else {
 				info.InputImageURLs = append(info.InputImageURLs, value.(string))
 			}
+		}
+	}
+	if contract.Mode == "r2v" {
+		// Fixed-output tariffs do not cover input video/audio duration or
+		// nested element creation. Reject these before any supplier request.
+		for _, key := range []string{"reference_videos", "reference_audios", "elements", "voice_ids"} {
+			if items, ok := payload[key].([]any); ok && len(items) > 0 {
+				return info, nil, fmt.Errorf("%s requires a separate reference-media billing contract", key)
+			}
+		}
+		for _, key := range []string{"file", "link"} {
+			if _, exists := payload[key]; exists {
+				return info, nil, fmt.Errorf("%s requires a separate document billing contract", key)
+			}
+		}
+		limit := 10
+		if contract.Input.Properties["reference_images"] != nil {
+			limit = contract.Input.Properties["reference_images"].MaxItems
+		} else if contract.Input.Properties["image_urls"] != nil {
+			limit = contract.Input.Properties["image_urls"].MaxItems
+		} else if strings.HasPrefix(contract.ID, "minimax/") {
+			limit = 9
+		}
+		if len(info.InputImageURLs) == 0 || len(info.InputImageURLs) > limit {
+			return info, nil, fmt.Errorf("reference mode requires 1 to %d reference images", limit)
 		}
 	}
 	raw, err := json.Marshal(payload)

@@ -364,11 +364,13 @@ func (req VideoQuoteRequest) normalized() (VideoQuoteRequest, error) {
 		found := false
 		fields := []string{"image", "image_url", "images", "image_urls", "reference_images"}
 		if req.Mode == "r2v" {
-			fields = []string{"reference_images", "reference_videos"}
+			fields = []string{"reference_images", "image_urls", "refers"}
 		}
 		for _, field := range fields {
 			if ref, ok := c.MediaFields[field]; ok {
-				if ref.Array {
+				if ref.Object {
+					body[field] = []any{map[string]any{"url": "https://assets.example/price-schema-check.png", "type": "image"}}
+				} else if ref.Array {
 					body[field] = []any{"https://assets.example/price-schema-check.png"}
 				} else {
 					body[field] = "https://assets.example/price-schema-check.png"
