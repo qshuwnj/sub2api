@@ -47,7 +47,13 @@ func (h *OpenAIGatewayHandler) VideoQuote(c *gin.Context) {
 		return
 	}
 	for _, field := range []string{"prompt", "negative_prompt", "image", "image_url", "images", "image_urls", "reference_images", "reference_videos", "reference_audios", "last_image", "end_image", "video", "audio", "asset_id", "source_url", "total_price", "unit_price"} {
-		if _, exists := input.Controls[field]; exists {
+		if value, exists := input.Controls[field]; exists {
+			// Native Wan audio is a schema-validated boolean, not reference media.
+			if field == "audio" {
+				if _, boolean := value.(bool); boolean {
+					continue
+				}
+			}
 			h.errorResponse(c, http.StatusBadRequest, "invalid_request_error", "Quote controls must not contain content or prices")
 			return
 		}
