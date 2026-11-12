@@ -256,7 +256,13 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		boundLookupAccountID, err = h.gatewayService.ResolveGrokMediaVideoRequestAccount(
 			c.Request.Context(), apiKey.GroupID, requestID, subject.UserID, apiKey.ID,
 		)
-		if err != nil || boundLookupAccountID <= 0 {
+		if err != nil {
+			reqLog.Warn("grok_media.video_lookup_state_unavailable", zap.Error(err))
+			c.Header("Retry-After", "15")
+			h.errorResponse(c, http.StatusServiceUnavailable, "video_state_unavailable", "Video task storage is temporarily unavailable; retry this query, do not resubmit generation")
+			return
+		}
+		if boundLookupAccountID <= 0 {
 			reqLog.Info("grok_media.video_lookup_owner_binding_missing", zap.Error(err))
 			h.errorResponse(c, http.StatusNotFound, "not_found_error", "Video request not found")
 			return
@@ -284,6 +290,14 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 					return
 				}
 			}
+		}
+	}
+	if isGrokVideoCreateEndpoint(endpoint) {
+		if err := h.gatewayService.CheckVideoTaskStorage(c.Request.Context()); err != nil {
+			reqLog.Warn("grok_media.video_create_storage_unavailable", zap.Error(err))
+			c.Header("Retry-After", "15")
+			h.errorResponse(c, http.StatusServiceUnavailable, "video_state_unavailable", "Video task storage is unavailable; no generation was submitted")
+			return
 		}
 	}
 	// Grok 媒体（图片/视频生成与视频查询）按媒体倍率计费，不在 token 利润门
@@ -581,22 +595,8 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		}
 		h.gatewayService.ReportOpenAIAccountScheduleResult(account, grokMediaScheduleModel(account, routingModel, result), true, nil)
 		if isGrokVideoCreateEndpoint(endpoint) && strings.TrimSpace(result.ResponseID) != "" {
-			if err := h.gatewayService.BindGrokMediaVideoRequestAccount(
-				requestCtx, apiKey.GroupID, result.ResponseID, subject.UserID, apiKey.ID, account.ID,
-			); err != nil {
-				reqLog.Warn("grok_media.bind_video_request_account_failed",
-					zap.Int64("account_id", account.ID),
-					zap.String("request_id", result.ResponseID),
-					zap.Error(err),
-				)
-				if endpoint.IsAtlasCloudVideo() || endpoint.IsDapacaiVideo() {
-					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video ownership could not be saved; do not resubmit generation")
-					return
-				}
-			}
 			// Defer billing until status polling observes video.url. Persist create-time
-			// model/duration/resolution so status can still price if upstream omits them.
-			// Retry once: missing pending causes silent underpricing (status omits resolution).
+			// model/duration/resolution together with the owner, never as two cache writes.
 			pending := service.GrokVideoPendingBilling{
 				Model:                requestModel,
 				BillingModel:         firstNonEmptyString(result.BillingModel, requestModel),
@@ -607,24 +607,15 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 				// Wall-clock start for usage duration_ms: create accepted → first done discovery.
 				CreatedAt: videoCreateStartedAt,
 			}
-			if err := h.gatewayService.StoreGrokVideoPendingBilling(requestCtx, result.ResponseID, subject.UserID, apiKey.ID, pending); err != nil {
-				reqLog.Warn("grok_media.store_video_pending_billing_failed_retrying",
+			if err := h.gatewayService.PersistAcceptedVideoTask(requestCtx, apiKey.GroupID, result.ResponseID, subject.UserID, apiKey.ID, account.ID, pending); err != nil {
+				reqLog.Error("grok_media.accepted_video_state_persistence_failed",
 					zap.Int64("account_id", account.ID),
 					zap.String("request_id", result.ResponseID),
 					zap.Error(err),
 				)
-				if err2 := h.gatewayService.StoreGrokVideoPendingBilling(requestCtx, result.ResponseID, subject.UserID, apiKey.ID, pending); err2 != nil {
-					// Response body may already be committed; completion path will fail-closed
-					// when pending is still missing and status cannot price duration.
-					reqLog.Error("grok_media.store_video_pending_billing_failed",
-						zap.Int64("account_id", account.ID),
-						zap.String("request_id", result.ResponseID),
-						zap.Error(err2),
-					)
-					if endpoint.IsAtlasCloudVideo() || endpoint.IsDapacaiVideo() {
-						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video billing state could not be saved; do not resubmit generation")
-						return
-					}
+				if endpoint.IsAtlasCloudVideo() || endpoint.IsDapacaiVideo() {
+					respondAcceptedVideoPersistenceFailure(c, result)
+					return
 				}
 			}
 		}
@@ -730,6 +721,27 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 		)
 		return
 	}
+}
+
+// A paid job was accepted even if its local save failed. Returning a generic
+// 5xx here causes clients to lose the task ID or retry the paid creation.
+func respondAcceptedVideoPersistenceFailure(c *gin.Context, result *service.OpenAIForwardResult) {
+	body := gin.H{}
+	source := result.DapacaiVideoResponse
+	if source == nil {
+		source = result.AtlasCloudVideoResponse
+	}
+	for key, value := range source {
+		body[key] = value
+	}
+	if body["id"] == nil {
+		body["id"] = result.ResponseID
+	}
+	body["persistence_status"] = "unavailable"
+	body["retry_generation"] = false
+	body["persistence_warning"] = "Video was accepted; retain this task ID and retry queries, do not resubmit generation"
+	c.Header("Retry-After", "15")
+	c.JSON(http.StatusAccepted, body)
 }
 
 func (h *OpenAIGatewayHandler) ensureGrokMediaAccountEligibility(ctx context.Context, account *service.Account) (bool, string, error) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"mime"
@@ -327,6 +328,26 @@ func (s *OpenAIGatewayService) ResolveGrokMediaVideoRequestAccount(
 	requestID string,
 	userID, apiKeyID int64,
 ) (int64, error) {
+	requestID = strings.TrimSpace(requestID)
+	if GrokMediaVideoRequestSessionHash(requestID, userID, apiKeyID) == "" {
+		return 0, fmt.Errorf("grok video request binding is invalid")
+	}
+	if repo, ok := s.videoTaskStateRepository(); ok {
+		state, err := repo.LoadVideoTaskState(ctx, requestID, userID, apiKeyID)
+		if err != nil {
+			return 0, err
+		}
+		if state == nil {
+			state, err = s.backfillLegacyVideoTask(ctx, repo, groupID, requestID, userID, apiKeyID)
+			if err != nil {
+				return 0, err
+			}
+		}
+		if state == nil || state.GroupID != derefGroupID(groupID) {
+			return 0, nil
+		}
+		return state.AccountID, nil
+	}
 	if s == nil || s.cache == nil {
 		return 0, fmt.Errorf("grok video request binding cache is unavailable")
 	}
@@ -334,7 +355,11 @@ func (s *OpenAIGatewayService) ResolveGrokMediaVideoRequestAccount(
 	if cacheKey == "" {
 		return 0, fmt.Errorf("grok video request binding is invalid")
 	}
-	return s.cache.GetSessionAccountID(ctx, derefGroupID(groupID), cacheKey)
+	accountID, err := s.cache.GetSessionAccountID(ctx, derefGroupID(groupID), cacheKey)
+	if errors.Is(err, ErrStickySessionNotFound) {
+		return 0, nil
+	}
+	return accountID, err
 }
 
 // SelectGrokMediaVideoRequestAccount only admits the already authenticated
@@ -449,28 +474,16 @@ func (s *OpenAIGatewayService) StoreGrokVideoPendingBilling(
 	userID, apiKeyID int64,
 	pending GrokVideoPendingBilling,
 ) error {
-	if s == nil || s.cache == nil {
-		return fmt.Errorf("grok video pending billing cache is unavailable")
-	}
 	key := grokVideoPendingBillingKey(requestID, userID, apiKeyID)
 	if key == "" {
 		return fmt.Errorf("grok video pending billing key is invalid")
 	}
-	pending.Model = strings.TrimSpace(pending.Model)
-	pending.BillingModel = strings.TrimSpace(pending.BillingModel)
-	pending.UpstreamModel = strings.TrimSpace(pending.UpstreamModel)
-	pending.OriginalModel = strings.TrimSpace(pending.OriginalModel)
-	if pending.VideoResolution != "" {
-		pending.VideoResolution = NormalizeVideoBillingResolutionForModel(pending.BillingModel, pending.VideoResolution)
+	pending = normalizeGrokVideoPendingBilling(pending)
+	if repo, ok := s.videoTaskStateRepository(); ok {
+		return repo.UpdateVideoTaskBilling(ctx, strings.TrimSpace(requestID), userID, apiKeyID, pending)
 	}
-	if pending.VideoDurationSeconds > 0 {
-		pending.VideoDurationSeconds = NormalizeVideoBillingDurationForModel(pending.BillingModel, pending.VideoDurationSeconds)
-	}
-	// Always stamp create-accept time when missing so deferred duration_ms is E2E.
-	if strings.TrimSpace(pending.CreatedAt) == "" {
-		pending.CreatedAt = GrokVideoPendingCreatedAtNow()
-	} else {
-		pending.CreatedAt = strings.TrimSpace(pending.CreatedAt)
+	if s == nil || s.cache == nil {
+		return fmt.Errorf("grok video pending billing cache is unavailable")
 	}
 	payload, err := json.Marshal(pending)
 	if err != nil {
@@ -485,6 +498,16 @@ func (s *OpenAIGatewayService) LoadGrokVideoPendingBilling(
 	requestID string,
 	userID, apiKeyID int64,
 ) (*GrokVideoPendingBilling, error) {
+	if grokVideoPendingBillingKey(requestID, userID, apiKeyID) == "" {
+		return nil, fmt.Errorf("grok video pending billing key is invalid")
+	}
+	if repo, ok := s.videoTaskStateRepository(); ok {
+		state, err := repo.LoadVideoTaskState(ctx, strings.TrimSpace(requestID), userID, apiKeyID)
+		if err != nil || state == nil {
+			return nil, err
+		}
+		return &state.Pending, nil
+	}
 	if s == nil || s.cache == nil {
 		return nil, fmt.Errorf("grok video pending billing cache is unavailable")
 	}
@@ -503,13 +526,27 @@ func (s *OpenAIGatewayService) LoadGrokVideoPendingBilling(
 	return &pending, nil
 }
 
-// ClaimGrokVideoBilling returns true once for a completed video request so status
-// polls do not double-bill. Fail-closed: claim errors are treated as already billed.
+// ClaimGrokVideoBilling admits settlement attempts. Durable jobs rely on SQL
+// usage dedup, not a volatile cache lock, for exactly-once charging.
 func (s *OpenAIGatewayService) ClaimGrokVideoBilling(
 	ctx context.Context,
 	requestID string,
 	userID, apiKeyID int64,
 ) (bool, error) {
+	if _, ok := s.videoTaskStateRepository(); ok {
+		pending, err := s.LoadGrokVideoPendingBilling(ctx, requestID, userID, apiKeyID)
+		if err != nil {
+			return false, err
+		}
+		if pending == nil {
+			return false, ErrVideoTaskStateNotFound
+		}
+		// RecordUsage synchronously applies the stable grok-video:<task> key in
+		// a SQL transaction (including the archive dedup check). Parallel polls
+		// may attempt settlement; only that atomic transaction can charge once.
+		// A Redis claim would reintroduce OOM/lost-lock and crash dependencies.
+		return !pending.Settled, nil
+	}
 	if s == nil || s.cache == nil {
 		return false, fmt.Errorf("grok video billing claim cache is unavailable")
 	}
@@ -532,6 +569,9 @@ func (s *OpenAIGatewayService) ReleaseGrokVideoBilling(
 	requestID string,
 	userID, apiKeyID int64,
 ) error {
+	if _, ok := s.videoTaskStateRepository(); ok {
+		return nil // SQL billing dedup owns settlement; no expendable cache lock.
+	}
 	if s == nil || s.cache == nil {
 		return fmt.Errorf("grok video billing claim cache is unavailable")
 	}
