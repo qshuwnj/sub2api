@@ -14180,5 +14180,583 @@
       "maximum": 2048,
       "separator": "*"
     }
+  },
+  {
+    "id": "alibaba/wan-3.0-prime/text-to-video",
+    "media": "video",
+    "mode": "t2v",
+    "source": "https://static.atlascloud.ai/model/schema/alibaba-wan-3.0-prime-text-to-video.json",
+    "input": {
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "alibaba/wan-3.0-prime/text-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "resolution": {
+          "default": "1080p",
+          "enum": [
+            "1080p",
+            "720p",
+            "480p",
+            "720p-esr",
+            "1080p-esr",
+            "1440p-esr",
+            "4k-esr"
+          ],
+          "type": "string"
+        },
+        "duration": {
+          "default": 5,
+          "enum": [
+            -1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "type": "number"
+        },
+        "ratio": {
+          "default": "adaptive",
+          "enum": [
+            "adaptive",
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16"
+          ],
+          "type": "string"
+        },
+        "audio": {
+          "default": true,
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model",
+        "prompt"
+      ],
+      "type": "object"
+    },
+    "mediaFields": {}
+  },
+  {
+    "id": "alibaba/wan-3.0-prime/image-to-video",
+    "media": "video",
+    "mode": "i2v",
+    "source": "https://static.atlascloud.ai/model/schema/alibaba-wan-3.0-prime-image-to-video.json",
+    "input": {
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "alibaba/wan-3.0-prime/image-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "last_image": {
+          "type": "string"
+        },
+        "resolution": {
+          "default": "1080p",
+          "enum": [
+            "1080p",
+            "720p",
+            "480p",
+            "720p-esr",
+            "1080p-esr",
+            "1440p-esr",
+            "4k-esr"
+          ],
+          "type": "string"
+        },
+        "duration": {
+          "default": 5,
+          "enum": [
+            -1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "type": "number"
+        },
+        "audio": {
+          "default": true,
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model",
+        "prompt",
+        "image"
+      ],
+      "type": "object"
+    },
+    "mediaFields": {
+      "image": {
+        "array": false,
+        "dataURI": false
+      },
+      "last_image": {
+        "array": false,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "alibaba/wan-3.0/text-to-video",
+    "media": "video",
+    "mode": "t2v",
+    "source": "https://static.atlascloud.ai/model/schema/alibaba-wan-3.0-text-to-video.json",
+    "input": {
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "alibaba/wan-3.0/text-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "resolution": {
+          "default": "1080p",
+          "enum": [
+            "1080p",
+            "720p",
+            "480p",
+            "720p-esr",
+            "1080p-esr",
+            "1440p-esr",
+            "4k-esr"
+          ],
+          "type": "string"
+        },
+        "duration": {
+          "default": 5,
+          "enum": [
+            -1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "type": "number"
+        },
+        "ratio": {
+          "default": "adaptive",
+          "enum": [
+            "adaptive",
+            "16:9",
+            "4:3",
+            "1:1",
+            "3:4",
+            "9:16"
+          ],
+          "type": "string"
+        },
+        "audio": {
+          "default": true,
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model",
+        "prompt"
+      ],
+      "type": "object"
+    },
+    "mediaFields": {}
+  },
+  {
+    "id": "alibaba/wan-3.0/image-to-video",
+    "media": "video",
+    "mode": "i2v",
+    "source": "https://static.atlascloud.ai/model/schema/alibaba-wan-3.0-image-to-video.json",
+    "input": {
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "alibaba/wan-3.0/image-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "last_image": {
+          "type": "string"
+        },
+        "resolution": {
+          "default": "1080p",
+          "enum": [
+            "1080p",
+            "720p",
+            "480p",
+            "720p-esr",
+            "1080p-esr",
+            "1440p-esr",
+            "4k-esr"
+          ],
+          "type": "string"
+        },
+        "duration": {
+          "default": 5,
+          "enum": [
+            -1,
+            2,
+            3,
+            4,
+            5,
+            6,
+            7,
+            8,
+            9,
+            10,
+            11,
+            12,
+            13,
+            14,
+            15,
+            16,
+            17,
+            18,
+            19,
+            20,
+            21,
+            22,
+            23,
+            24,
+            25,
+            26,
+            27,
+            28,
+            29,
+            30
+          ],
+          "type": "number"
+        },
+        "audio": {
+          "default": true,
+          "type": "boolean"
+        },
+        "seed": {
+          "type": "integer"
+        }
+      },
+      "required": [
+        "model",
+        "prompt",
+        "image"
+      ],
+      "type": "object"
+    },
+    "mediaFields": {
+      "image": {
+        "array": false,
+        "dataURI": false
+      },
+      "last_image": {
+        "array": false,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "kwaivgi/kling-v4.0-flash/text-to-video",
+    "media": "video",
+    "mode": "t2v",
+    "source": "https://static.atlascloud.ai/model/schema/kwaivgi-kling-v4.0-flash-text-to-video.json",
+    "input": {
+      "type": "object",
+      "required": [
+        "model",
+        "prompt"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "kwaivgi/kling-v4.0-flash/text-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 3,
+          "maximum": 20
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "default": "16:9",
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "21:9"
+          ]
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "720p"
+          ]
+        }
+      }
+    },
+    "mediaFields": {}
+  },
+  {
+    "id": "kwaivgi/kling-v4.0-flash/image-to-video",
+    "media": "video",
+    "mode": "i2v",
+    "source": "https://static.atlascloud.ai/model/schema/kwaivgi-kling-v4.0-flash-image-to-video.json",
+    "input": {
+      "type": "object",
+      "required": [
+        "model",
+        "image"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "kwaivgi/kling-v4.0-flash/image-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 3,
+          "maximum": 20
+        },
+        "resolution": {
+          "type": "string",
+          "default": "720p",
+          "enum": [
+            "720p"
+          ]
+        }
+      }
+    },
+    "mediaFields": {
+      "image": {
+        "array": false,
+        "dataURI": false
+      }
+    }
+  },
+  {
+    "id": "kwaivgi/kling-v4.0/text-to-video",
+    "media": "video",
+    "mode": "t2v",
+    "source": "https://static.atlascloud.ai/model/schema/kwaivgi-kling-v4.0-text-to-video.json",
+    "input": {
+      "type": "object",
+      "required": [
+        "model",
+        "prompt"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "kwaivgi/kling-v4.0/text-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 3,
+          "maximum": 30
+        },
+        "aspect_ratio": {
+          "type": "string",
+          "default": "16:9",
+          "enum": [
+            "16:9",
+            "9:16",
+            "1:1",
+            "21:9"
+          ]
+        },
+        "resolution": {
+          "type": "string",
+          "default": "1080p",
+          "enum": [
+            "720p",
+            "1080p",
+            "1080p-esr",
+            "2k-esr",
+            "4k-esr"
+          ]
+        }
+      }
+    },
+    "mediaFields": {}
+  },
+  {
+    "id": "kwaivgi/kling-v4.0/image-to-video",
+    "media": "video",
+    "mode": "i2v",
+    "source": "https://static.atlascloud.ai/model/schema/kwaivgi-kling-v4.0-image-to-video.json",
+    "input": {
+      "type": "object",
+      "required": [
+        "model",
+        "image"
+      ],
+      "properties": {
+        "model": {
+          "type": "string",
+          "const": "kwaivgi/kling-v4.0/image-to-video"
+        },
+        "prompt": {
+          "type": "string"
+        },
+        "image": {
+          "type": "string"
+        },
+        "middle_images": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 8
+        },
+        "last_image": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "default": 5,
+          "minimum": 3,
+          "maximum": 30
+        },
+        "resolution": {
+          "type": "string",
+          "default": "1080p",
+          "enum": [
+            "720p",
+            "1080p",
+            "1080p-esr",
+            "2k-esr",
+            "4k-esr"
+          ]
+        }
+      }
+    },
+    "mediaFields": {
+      "image": {
+        "array": false,
+        "dataURI": false
+      },
+      "middle_images": {
+        "array": true,
+        "dataURI": false
+      },
+      "last_image": {
+        "array": false,
+        "dataURI": false
+      }
+    }
   }
 ]

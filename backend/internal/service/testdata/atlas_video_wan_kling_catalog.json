@@ -1,0 +1,662 @@
+{
+  "models": [
+    "alibaba/wan-3.0-prime/text-to-video",
+    "alibaba/wan-3.0-prime/image-to-video",
+    "alibaba/wan-3.0/text-to-video",
+    "alibaba/wan-3.0/image-to-video",
+    "kwaivgi/kling-v4.0-flash/text-to-video",
+    "kwaivgi/kling-v4.0-flash/image-to-video",
+    "kwaivgi/kling-v4.0/text-to-video",
+    "kwaivgi/kling-v4.0/image-to-video"
+  ],
+  "cells": [
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 1.26,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:41.531Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 84420000,
+      "saleMicrocredits": 101304000
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.63,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:44.674Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 42210000,
+      "saleMicrocredits": 50652000
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.306,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:47.775Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 20502000,
+      "saleMicrocredits": 24602400
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.504,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:51.509Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 33768000,
+      "saleMicrocredits": 40521600
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 1.008,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:55.286Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 67536000,
+      "saleMicrocredits": 81043200
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 2.1672,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:29:58.854Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 145202400,
+      "saleMicrocredits": 174242880
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 4.65948,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:01.934Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 312185160,
+      "saleMicrocredits": 374622192
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 1.26,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:07.047Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 84420000,
+      "saleMicrocredits": 101304000
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.63,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:14.958Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 42210000,
+      "saleMicrocredits": 50652000
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.306,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:22.205Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 20502000,
+      "saleMicrocredits": 24602400
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.504,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:29.215Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 33768000,
+      "saleMicrocredits": 40521600
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 1.008,
+      "estimated": false,
+      "checkedAt": "2026-11-12T03:30:36.175Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "current_official_calculation",
+      "costMicrocredits": 67536000,
+      "saleMicrocredits": 81043200
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 2.1672,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:16.890Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 145202400,
+      "saleMicrocredits": 174242880
+    },
+    {
+      "model": "alibaba/wan-3.0-prime/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 4.65948,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:17.530Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 312185160,
+      "saleMicrocredits": 374622192
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.8,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:18.152Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 53600000,
+      "saleMicrocredits": 64320000
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.4,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:18.786Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 26800000,
+      "saleMicrocredits": 32160000
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.2,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:19.414Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 13400000,
+      "saleMicrocredits": 16080000
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.32,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:20.041Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 21440000,
+      "saleMicrocredits": 25728000
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 0.64,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:20.677Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 42880000,
+      "saleMicrocredits": 51456000
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 1.376,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:21.307Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 92192000,
+      "saleMicrocredits": 110630400
+    },
+    {
+      "model": "alibaba/wan-3.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "audio": true
+      },
+      "price": 2.9584,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:21.937Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 198212800,
+      "saleMicrocredits": 237855360
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1080p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.8,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:27.029Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 53600000,
+      "saleMicrocredits": 64320000
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "720p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.4,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:27.660Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 26800000,
+      "saleMicrocredits": 32160000
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "480p",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.2,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:28.288Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 13400000,
+      "saleMicrocredits": 16080000
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "720p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.32,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:28.925Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 21440000,
+      "saleMicrocredits": 25728000
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1080p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 0.64,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:29.555Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 42880000,
+      "saleMicrocredits": 51456000
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "1440p-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 1.376,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:30.195Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 92192000,
+      "saleMicrocredits": 110630400
+    },
+    {
+      "model": "alibaba/wan-3.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "resolution": "4k-esr",
+        "duration": 5,
+        "ratio": "adaptive",
+        "audio": true
+      },
+      "price": 2.9584,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:23:30.829Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 198212800,
+      "saleMicrocredits": 237855360
+    },
+    {
+      "model": "kwaivgi/kling-v4.0-flash/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p"
+      },
+      "price": 0.42861,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:39.431Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 28716870,
+      "saleMicrocredits": 34460244
+    },
+    {
+      "model": "kwaivgi/kling-v4.0-flash/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "720p"
+      },
+      "price": 0.42861,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:40.696Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 28716870,
+      "saleMicrocredits": 34460244
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "720p"
+      },
+      "price": 0.71435,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:41.958Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 47861450,
+      "saleMicrocredits": 57433740
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p"
+      },
+      "price": 1.06925,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:42.601Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 71639750,
+      "saleMicrocredits": 85967700
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "1080p-esr"
+      },
+      "price": 0.91,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:43.236Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 60970000,
+      "saleMicrocredits": 73164000
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "2k-esr"
+      },
+      "price": 1.365,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:43.876Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 91455000,
+      "saleMicrocredits": 109746000
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/image-to-video",
+      "mode": "i2v",
+      "controls": {
+        "duration": 5,
+        "resolution": "4k-esr"
+      },
+      "price": 1.82,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:44.515Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 121940000,
+      "saleMicrocredits": 146328000
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "720p"
+      },
+      "price": 0.71435,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:48.301Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 47861450,
+      "saleMicrocredits": 57433740
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "1080p"
+      },
+      "price": 1.06925,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:48.937Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 71639750,
+      "saleMicrocredits": 85967700
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "1080p-esr"
+      },
+      "price": 0.91,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:49.578Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 60970000,
+      "saleMicrocredits": 73164000
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "2k-esr"
+      },
+      "price": 1.365,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:50.200Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 91455000,
+      "saleMicrocredits": 109746000
+    },
+    {
+      "model": "kwaivgi/kling-v4.0/text-to-video",
+      "mode": "t2v",
+      "controls": {
+        "duration": 5,
+        "aspect_ratio": "16:9",
+        "resolution": "4k-esr"
+      },
+      "price": 1.82,
+      "estimated": false,
+      "checkedAt": "2026-11-10T22:29:50.836Z",
+      "source": "https://api.atlascloud.ai/api/v1/model/calculate",
+      "basis": "previous_official_calculation",
+      "costMicrocredits": 121940000,
+      "saleMicrocredits": 146328000
+    }
+  ]
+}

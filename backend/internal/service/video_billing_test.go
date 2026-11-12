@@ -71,7 +71,7 @@ func TestCalculateVideoCostCoversAllAtlasVideoContracts(t *testing.T) {
 		require.Greater(t, cost.TotalCost, 0.0, "missing default video price for %s at %s", model, resolution)
 	}
 	sort.Strings(models)
-	require.Len(t, models, 91)
+	require.Len(t, models, 99)
 }
 
 func TestCalculateVideoCostCoversEveryDeclaredAtlasVideoResolution(t *testing.T) {
