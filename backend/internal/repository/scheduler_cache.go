@@ -963,6 +963,10 @@ func decodeCachedAccount(val any) (*service.Account, error) {
 	default:
 		return nil, fmt.Errorf("unexpected account cache type: %T", val)
 	}
+	payload, err := expandSchedulerAccountPayload(payload)
+	if err != nil {
+		return nil, err
+	}
 	var account service.Account
 	if err := json.Unmarshal(payload, &account); err != nil {
 		return nil, err
@@ -1122,6 +1126,10 @@ func marshalSchedulerCacheAccount(account service.Account) ([]byte, []byte, erro
 	fullPayload, err := json.Marshal(account)
 	if err != nil {
 		return nil, nil, fmt.Errorf("marshal account: %w", err)
+	}
+	fullPayload, err = encodeSchedulerAccountPayload(fullPayload)
+	if err != nil {
+		return nil, nil, fmt.Errorf("encode account cache: %w", err)
 	}
 	metaPayload, err := json.Marshal(buildSchedulerMetadataAccount(account))
 	if err != nil {

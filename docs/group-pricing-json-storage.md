@@ -83,3 +83,18 @@ That reverse cast can use more memory and lock the table; it must be rehearsed
 and separately approved. The migration ledger must be coordinated with the
 chosen binary and forward-repair plan. Do not casually delete migration
 checksums or restore an old backup over newer customer data.
+
+## Scheduler cache memory
+
+Full account snapshots include their associated group tariffs. Large snapshots
+use lossless gzip compression in Redis, while small records and scheduling
+metadata keep their existing JSON representation. No pricing, credential,
+permission, group-binding, or scheduling field is removed. Readers accept
+both existing plain JSON and compressed snapshots. A damaged or oversized
+compressed record returns a cache error and uses the existing database
+fallback; it never produces a partial account. Expanded payloads are bounded
+to 64 MiB, and larger original records retain the plain JSON path.
+
+This does not flush Redis, change its eviction policy, expand a paid plan, or
+alter task recovery. After deployment, verify scheduler outbox progress and
+memory usage before saving new tariff documents.
