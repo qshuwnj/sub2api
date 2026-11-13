@@ -247,9 +247,17 @@ func TestAtlasCloudVideoBillingStateFailureNeverReleasesOutput(t *testing.T) {
 			} else {
 				h.AtlasCloudVideoStatus(c)
 			}
-			require.Equal(t, 503, w.Code, "upstream calls=%d body=%s", upstream.calls, w.Body.String())
+			if scenario == "ownership" || scenario == "snapshot" {
+				require.Equal(t, http.StatusAccepted, w.Code, w.Body.String())
+				require.Contains(t, w.Body.String(), `"id":"atlascloud:task-atlas"`)
+				require.Contains(t, w.Body.String(), `"status":"processing"`)
+				require.Contains(t, w.Body.String(), `"retry_generation":false`)
+				require.Contains(t, w.Body.String(), `"persistence_status":"unavailable"`)
+			} else {
+				require.Equal(t, 503, w.Code, "upstream calls=%d body=%s", upstream.calls, w.Body.String())
+				require.Contains(t, w.Body.String(), "billing_state_unavailable")
+			}
 			require.NotContains(t, w.Body.String(), "paid.mp4")
-			require.Contains(t, w.Body.String(), "billing_state_unavailable")
 			slots.assertReleased(t)
 		})
 	}

@@ -726,17 +726,24 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 // A paid job was accepted even if its local save failed. Returning a generic
 // 5xx here causes clients to lose the task ID or retry the paid creation.
 func respondAcceptedVideoPersistenceFailure(c *gin.Context, result *service.OpenAIForwardResult) {
-	body := gin.H{}
 	source := result.DapacaiVideoResponse
 	if source == nil {
 		source = result.AtlasCloudVideoResponse
 	}
-	for key, value := range source {
-		body[key] = value
+	taskID := result.ResponseID
+	if id, ok := source["id"].(string); ok && strings.TrimSpace(id) != "" {
+		taskID = id
 	}
-	if body["id"] == nil {
-		body["id"] = result.ResponseID
+	status := "processing"
+	if value, ok := source["status"].(string); ok {
+		switch value {
+		case "queued", "pending", "running", "processing":
+			status = value
+		}
 	}
+	// Keep the accepted task recoverable without releasing an unsettled result.
+	// An allowlist also excludes nested provider output URLs and completion data.
+	body := gin.H{"id": taskID, "request_id": taskID, "status": status}
 	body["persistence_status"] = "unavailable"
 	body["retry_generation"] = false
 	body["persistence_warning"] = "Video was accepted; retain this task ID and retry queries, do not resubmit generation"
