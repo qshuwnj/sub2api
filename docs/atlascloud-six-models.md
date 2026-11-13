@@ -48,6 +48,14 @@ are rejected before an upstream request. Responses contain `data[].url`.
 Grok images use `aspect_ratio` and `resolution` (`1k` or `2k`) instead of pixel
 dimensions:
 
+The Grok adapter accepts `n: 1`, `num_images: 1`, or both when they agree.
+It emits only `num_images: 1` to AtlasCloud. Other counts and non-numeric
+values are rejected; a quoted batch of up to four images remains separate
+single-image requests with independent child indexes and settlement.
+Grok quotes and generation use the same schema-backed quality, resolution,
+and aspect-ratio validation. Quote acceptance also validates the actual
+generation envelope, so unsupported options fail before upstream submission.
+
 ```json
 {
   "model": "xai/grok-imagine-image-2.0-developer/text-to-image",

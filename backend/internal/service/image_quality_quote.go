@@ -67,6 +67,9 @@ func normalizedImageQuoteFromParsed(parsed *OpenAIImagesRequest, count int) (Ima
 	req := ImageQuoteRequest{Model: parsed.Model, Quality: parsed.Quality, Size: parsed.Size, Count: count,
 		Resolution:  gjson.GetBytes(parsed.Body, "resolution").String(),
 		AspectRatio: gjson.GetBytes(parsed.Body, "aspect_ratio").String()}
+	if err := validateAtlasCloudSingleImageCount(parsed.Body); err != nil {
+		return req, err
+	}
 	// Studio quotes cover output controls only. Grounding has a separate upstream
 	// charge and must not be enabled behind an accepted output-only tariff.
 	for _, field := range []string{"enable_web_search", "enable_image_search"} {
@@ -485,6 +488,13 @@ func (s *OpenAIGatewayService) AcceptImageQualityQuote(ctx context.Context, key 
 	req, err := normalizedImageQuoteFromParsed(parsed, claims.Request.Count)
 	if err != nil || req != claims.Request || parsed.N != 1 || parsed.Stream || parsed.Multipart || index < 0 || index >= req.Count {
 		return nil, fmt.Errorf("image request differs from the quoted selection")
+	}
+	// Check the actual serializer before accepting the quote. Empty bodies are
+	// internal callers; public generation requests always include their body.
+	if len(parsed.Body) > 0 {
+		if err := ValidateAtlasCloudImageRequest(parsed); err != nil {
+			return nil, err
+		}
 	}
 	_, _, revision, _, err := s.imageQualityTariff(ctx, key, req)
 	if err != nil || revision != claims.Revision {

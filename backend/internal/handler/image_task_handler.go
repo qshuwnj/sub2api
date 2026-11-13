@@ -215,7 +215,7 @@ func (h *AsyncImageHandler) validateRequest(c *gin.Context, platform string, bod
 	if parsed.Stream {
 		return errors.New("streaming image requests cannot be submitted as asynchronous tasks")
 	}
-	return nil
+	return service.ValidateAtlasCloudImageRequest(parsed)
 }
 
 func (h *AsyncImageHandler) executeWithGateway(platform string, c *gin.Context) {

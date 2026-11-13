@@ -36,6 +36,15 @@ func IsAtlasCloudPricedImageModel(model string) bool {
 		IsAtlasCloudGenericImageModel(model) || atlasMediaModel(model, "image") != nil
 }
 
+// Validate before admitting an asynchronous job, without pricing or supplier I/O.
+func ValidateAtlasCloudImageRequest(parsed *OpenAIImagesRequest) error {
+	if parsed == nil || !IsAtlasCloudPricedImageModel(parsed.Model) {
+		return nil
+	}
+	_, err := buildAtlasCloudImagePayload(parsed, parsed.Model)
+	return err
+}
+
 // Admission uses configured customer prices, never a guessed catalog fallback.
 func (s *OpenAIGatewayService) ValidateAtlasCloudImagePricing(ctx context.Context, key *APIKey, parsed *OpenAIImagesRequest, upstreamModel string) error {
 	if parsed == nil || (!IsAtlasCloudPricedImageModel(parsed.Model) && !IsAtlasCloudPricedImageModel(upstreamModel)) {
@@ -161,12 +170,23 @@ func atlasCloudCheckFields(body []byte, fields ...string) error {
 	return nil
 }
 
+// A quoted batch is split into separately billed single-image requests.
+func validateAtlasCloudSingleImageCount(body []byte) error {
+	for _, field := range []string{"n", "num_images"} {
+		if value := gjson.GetBytes(body, field); value.Exists() &&
+			(value.Type != gjson.Number || value.Float() != 1) {
+			return fmt.Errorf("AtlasCloud image adapter requires %s=1", field)
+		}
+	}
+	return nil
+}
+
 func buildAtlasCloudNewImagePayload(parsed *OpenAIImagesRequest, model string) ([]byte, error) {
 	fields := []string{"model", "prompt", "n", "stream", "size", "quality", "response_format"}
 	if model == atlasCloudFlareImageModel {
 		fields = append(fields, "background", "output_format")
 	} else {
-		fields = append(fields, "aspect_ratio", "resolution", "enable_base64_output")
+		fields = append(fields, "aspect_ratio", "resolution", "enable_base64_output", "num_images")
 	}
 	if err := atlasCloudCheckFields(parsed.Body, fields...); err != nil {
 		return nil, err
@@ -176,8 +196,8 @@ func buildAtlasCloudNewImagePayload(parsed *OpenAIImagesRequest, model string) (
 			return nil, fmt.Errorf("%s must be a string", field)
 		}
 	}
-	if n := gjson.GetBytes(parsed.Body, "n"); n.Exists() && (n.Type != gjson.Number || n.Float() != 1) {
-		return nil, fmt.Errorf("AtlasCloud image adapter currently requires n=1")
+	if err := validateAtlasCloudSingleImageCount(parsed.Body); err != nil {
+		return nil, err
 	}
 	payload := map[string]any{"model": model, "prompt": parsed.Prompt}
 	quality := parsed.Quality
@@ -223,25 +243,16 @@ func buildAtlasCloudNewImagePayload(parsed *OpenAIImagesRequest, model string) (
 		if utf8.RuneCountInString(parsed.Prompt) > 8000 {
 			return nil, fmt.Errorf("prompt exceeds 8000 characters")
 		}
-		if quality != "low" && quality != "medium" {
-			return nil, fmt.Errorf("Grok image quality must be low or medium")
-		}
-		if parsed.Size != "" && parsed.Size != "auto" {
-			return nil, fmt.Errorf("Grok images use aspect_ratio and resolution instead of size")
-		}
-		ratio, err := atlasCloudOption(parsed.Body, "aspect_ratio", "1:1",
-			"1:1", "3:4", "4:3", "9:16", "16:9", "2:3", "3:2", "9:19.5", "19.5:9", "9:20", "20:9", "1:2", "2:1")
-		if err != nil {
-			return nil, err
-		}
-		resolution, err := atlasCloudOption(parsed.Body, "resolution", "1k", "1k", "2k")
+		controls := *parsed
+		controls.Model = model
+		selection, err := normalizedImageQuoteFromParsed(&controls, 1)
 		if err != nil {
 			return nil, err
 		}
 		if flag := gjson.GetBytes(parsed.Body, "enable_base64_output"); flag.Exists() && flag.Type != gjson.False {
 			return nil, fmt.Errorf("enable_base64_output must be false")
 		}
-		payload["aspect_ratio"], payload["resolution"], payload["quality"] = ratio, resolution, quality
+		payload["aspect_ratio"], payload["resolution"], payload["quality"] = selection.AspectRatio, selection.Resolution, selection.Quality
 		payload["num_images"], payload["enable_base64_output"] = 1, false
 	}
 	return json.Marshal(payload)
