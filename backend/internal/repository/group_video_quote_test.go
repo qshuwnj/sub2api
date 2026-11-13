@@ -31,15 +31,17 @@ func (videoGroupQueryMatcher) Match(expected, actual string) error {
 
 func TestGroupRepositoryVideoQuoteProjection(t *testing.T) {
 	for _, tc := range []struct {
-		name string
-		data string
-		err  error
-		race bool
+		name    string
+		data    string
+		err     error
+		race    bool
+		invalid bool
 	}{
 		{name: "exact card", data: `[{"platform":"openai","models":["exact/model"],"billing_mode":"per_request"}]`},
 		{name: "model absent", data: `[]`},
 		{name: "concurrent update", race: true},
 		{name: "database failure", err: errors.New("database recovering")},
+		{name: "malformed selected pricing never falls back", data: `[{"models":"invalid"}]`, invalid: true},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			db, mock, err := sqlmock.New(sqlmock.QueryMatcherOption(videoGroupQueryMatcher{}))
@@ -62,7 +64,7 @@ func TestGroupRepositoryVideoQuoteProjection(t *testing.T) {
 				query.WillReturnRows(sqlmock.NewRows([]string{"pricing"}).AddRow([]byte(tc.data)))
 			}
 			got, err := repo.GetByIDForVideoQuote(context.Background(), 24, "exact/model")
-			if tc.err != nil || tc.race {
+			if tc.err != nil || tc.race || tc.invalid {
 				require.Error(t, err)
 				require.Nil(t, got)
 			} else {
