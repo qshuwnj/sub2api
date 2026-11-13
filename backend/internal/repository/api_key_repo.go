@@ -89,6 +89,19 @@ func (r *apiKeyRepository) GetByID(ctx context.Context, id int64) (*service.APIK
 	return apiKeyEntityToService(m), nil
 }
 
+// GetByIDForVideoQuote refreshes key status/quota without loading the group's
+// entire tariff document. Video admission refreshes user/group separately.
+func (r *apiKeyRepository) GetByIDForVideoQuote(ctx context.Context, id int64) (*service.APIKey, error) {
+	m, err := r.activeQuery().Where(apikey.IDEQ(id)).Only(ctx)
+	if err != nil {
+		if dbent.IsNotFound(err) {
+			return nil, service.ErrAPIKeyNotFound
+		}
+		return nil, err
+	}
+	return apiKeyEntityToService(m), nil
+}
+
 // GetKeyAndOwnerID 根据 API Key ID 获取其 key 与所有者（用户）ID。
 // 相比 GetByID，此方法性能更优，因为：
 //   - 使用 Select() 只查询必要字段，减少数据传输量

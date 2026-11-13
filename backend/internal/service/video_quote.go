@@ -583,17 +583,35 @@ func (s *OpenAIGatewayService) RefreshVideoQuoteKey(ctx context.Context, key *AP
 	if !ok {
 		return nil, ErrVideoQuoteUnavailable
 	}
-	fresh, err := reader.GetByID(ctx, key.ID)
-	if err != nil || fresh == nil || fresh.ID != key.ID || fresh.UserID != key.UserID || fresh.GroupID == nil || *fresh.GroupID != *key.GroupID || !fresh.IsActive() ||
+	fresh, err := readFreshVideoQuoteKey(ctx, reader, key.ID)
+	if err != nil {
+		if !errors.Is(err, ErrAPIKeyNotFound) {
+			return nil, errors.Join(ErrVideoQuoteUnavailable, err)
+		}
+		return nil, fmt.Errorf("video API key is unavailable")
+	}
+	if fresh == nil || fresh.ID != key.ID || fresh.UserID != key.UserID || fresh.GroupID == nil || *fresh.GroupID != *key.GroupID || !fresh.IsActive() ||
 		fresh.ExpiresAt != nil && !now.Before(*fresh.ExpiresAt) || fresh.IsQuotaExhausted() {
 		return nil, fmt.Errorf("video API key is inactive, expired, reassigned or exhausted")
 	}
 	user, err := s.userRepo.GetByID(ctx, fresh.UserID)
-	if err != nil || user == nil || user.ID != fresh.UserID || !user.IsActive() || user.DeletedAt != nil {
+	if err != nil {
+		if !errors.Is(err, ErrUserNotFound) {
+			return nil, errors.Join(ErrVideoQuoteUnavailable, err)
+		}
 		return nil, fmt.Errorf("video user is unavailable")
 	}
-	group, err := s.channelService.groupRepo.GetByIDLite(ctx, *fresh.GroupID)
-	if err != nil || group == nil || group.ID != *fresh.GroupID || !group.IsActive() || !user.CanBindGroup(group.ID, group.IsExclusive) ||
+	if user == nil || user.ID != fresh.UserID || !user.IsActive() || user.DeletedAt != nil {
+		return nil, fmt.Errorf("video user is unavailable")
+	}
+	group, err := readFreshVideoQuoteGroup(ctx, s.channelService.groupRepo, *fresh.GroupID, model)
+	if err != nil {
+		if !errors.Is(err, ErrGroupNotFound) {
+			return nil, errors.Join(ErrVideoQuoteUnavailable, err)
+		}
+		return nil, fmt.Errorf("video group is unavailable")
+	}
+	if group == nil || group.ID != *fresh.GroupID || !group.IsActive() || !user.CanBindGroup(group.ID, group.IsExclusive) ||
 		(group.Platform != PlatformOpenAI && group.Platform != PlatformComposite) {
 		return nil, fmt.Errorf("video group is unavailable")
 	}
@@ -658,6 +676,28 @@ func (s *OpenAIGatewayService) RefreshVideoQuoteKey(ctx context.Context, key *AP
 	copy.User = user
 	copy.Group = group
 	return &copy, nil
+}
+
+func readFreshVideoQuoteKey(ctx context.Context, reader interface {
+	GetByID(context.Context, int64) (*APIKey, error)
+}, id int64) (*APIKey, error) {
+	if lean, ok := reader.(interface {
+		GetByIDForVideoQuote(context.Context, int64) (*APIKey, error)
+	}); ok {
+		return lean.GetByIDForVideoQuote(ctx, id)
+	}
+	return reader.GetByID(ctx, id)
+}
+
+func readFreshVideoQuoteGroup(ctx context.Context, reader interface {
+	GetByIDLite(context.Context, int64) (*Group, error)
+}, id int64, model string) (*Group, error) {
+	if lean, ok := reader.(interface {
+		GetByIDForVideoQuote(context.Context, int64, string) (*Group, error)
+	}); ok {
+		return lean.GetByIDForVideoQuote(ctx, id, model)
+	}
+	return reader.GetByIDLite(ctx, id)
 }
 
 func (s *OpenAIGatewayService) videoTariff(ctx context.Context, key *APIKey, req VideoQuoteRequest) (base, total, revision, multiplier string, estimated bool, err error) {
