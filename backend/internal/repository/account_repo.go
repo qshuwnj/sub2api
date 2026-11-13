@@ -3586,12 +3586,23 @@ func (r *accountRepository) loadGroups(ctx context.Context, groupIDs []int64) (m
 		return groupMap, nil
 	}
 
+	// Account group edges supply scheduling/display metadata, not billing
+	// tariffs. Billing reads the API key's group independently.
+	fields := make([]string, 0, len(dbgroup.Columns)-1)
+	for _, field := range dbgroup.Columns {
+		if field != dbgroup.FieldModelPricing {
+			fields = append(fields, field)
+		}
+	}
 	for start := 0; start < len(groupIDs); start += postgresParameterBatchSize {
 		end := start + postgresParameterBatchSize
 		if end > len(groupIDs) {
 			end = len(groupIDs)
 		}
-		groups, err := r.client.Group.Query().Where(dbgroup.IDIn(groupIDs[start:end]...)).All(ctx)
+		groups, err := r.client.Group.Query().
+			Where(dbgroup.IDIn(groupIDs[start:end]...)).
+			Select(fields...).
+			All(ctx)
 		if err != nil {
 			return nil, err
 		}
