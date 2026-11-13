@@ -18,6 +18,9 @@ const (
 	apiKeyCreateCountKeyPrefix = "apikey:create_count:"
 	apiKeyAuthCachePrefix      = "apikey:auth:"
 	authCacheInvalidateChannel = "auth:cache:invalidate"
+	// Large group tariffs remain available through L1/database. Duplicating them
+	// per API key in Redis can evict scheduler, quota and rate-limit state.
+	apiKeyAuthCacheMaxBytes = 1 << 20
 )
 
 // apiKeyRateLimitKey generates the Redis key for API key creation rate limiting.
@@ -101,6 +104,10 @@ func (c *apiKeyCache) SetAuthCache(ctx context.Context, key string, entry *servi
 	payload, err := json.Marshal(entry)
 	if err != nil {
 		return err
+	}
+	if len(payload) > apiKeyAuthCacheMaxBytes {
+		// Do not leave an older cached snapshot behind when a group grows.
+		return c.DeleteAuthCache(ctx, key)
 	}
 	return c.rdb.Set(ctx, apiKeyAuthCacheKey(key), payload, ttl).Err()
 }
