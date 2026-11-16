@@ -10,15 +10,26 @@ import (
 	"strings"
 )
 
-var dapacaiContentPath = regexp.MustCompile(`^/video/[0-9]{4}/(0[1-9]|1[0-2])/task_[A-Za-z0-9_-]+\.mp4$`)
+var dapacaiContentPath = regexp.MustCompile(`^/(dapacai-media/)?video/[0-9]{4}/(0[1-9]|1[0-2])/task_[A-Za-z0-9_-]+\.mp4$`)
 
 func dapacaiContentRedirectURL(raw, task string) (string, error) {
 	id, ok := strings.CutPrefix(task, "dapacai:")
 	u, err := url.Parse(raw)
 	if !ok || !dapacaiTaskID.MatchString(id) || err != nil || u.Scheme != "https" ||
-		u.Host != "dapacaihk-media.oss-cn-hongkong.aliyuncs.com" ||
 		u.User != nil || u.Fragment != "" || u.RawPath != "" ||
 		!dapacaiContentPath.MatchString(u.Path) || !strings.HasSuffix(u.Path, "/"+id+".mp4") {
+		return "", errors.New("Dapacai returned an unsupported video download destination")
+	}
+	switch u.Host {
+	case "dapacaihk-media.oss-cn-hongkong.aliyuncs.com":
+		if !strings.HasPrefix(u.Path, "/video/") {
+			return "", errors.New("Dapacai returned an unsupported video download destination")
+		}
+	case "media.dapacai.com":
+		if !strings.HasPrefix(u.Path, "/dapacai-media/video/") {
+			return "", errors.New("Dapacai returned an unsupported video download destination")
+		}
+	default:
 		return "", errors.New("Dapacai returned an unsupported video download destination")
 	}
 	return u.String(), nil
@@ -29,7 +40,7 @@ func dapacaiVideoContentType(raw string) bool {
 	return err == nil && (strings.HasPrefix(mediaType, "video/") || mediaType == "application/octet-stream")
 }
 
-// Only the verified task-specific OSS destination is followed, without supplier
+// Only verified task-specific media destinations are followed, without supplier
 // credentials. Keep automatic redirects disabled and reject private DNS results.
 // Direct downloads and native-content archival share this security boundary.
 func (s *OpenAIGatewayService) followDapacaiContentRedirect(ctx context.Context, account *Account, task, proxy, byteRange string, resp *http.Response) (*http.Response, error) {
