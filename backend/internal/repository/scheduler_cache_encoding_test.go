@@ -38,6 +38,10 @@ func TestSchedulerAccountCompressionRoundTrip(t *testing.T) {
 		require.NoError(t, err)
 		require.Equal(t, want, got)
 	}
+	// The upstream snapshot-reuse path calls this decoder directly.
+	got, err := decodeCachedAccountPayload(string(full))
+	require.NoError(t, err)
+	require.Equal(t, want, got)
 }
 
 func TestSchedulerAccountCompressionRejectsDamagedPayload(t *testing.T) {

@@ -994,6 +994,8 @@ var ProviderSet = wire.NewSet(
 	ProvideChannelMonitorV2Aggregator,
 	NewChannelMonitorRequestTemplateService,
 	ProvideUserPlatformQuotaUsageFlusher,
+	NewUsageBillingLaneCombiner,
+	ProvideUsageBillingRepository,
 )
 
 // ProvideVideoReferenceAssetService binds the durable repository to the
@@ -1001,6 +1003,11 @@ var ProviderSet = wire.NewSet(
 // runtime command wrapper is explicit and test replacements remain injectable.
 func ProvideVideoReferenceAssetService(repo VideoReferenceAssetRepository) *VideoReferenceAssetService {
 	return NewVideoReferenceAssetServiceWithRepository(repo, NewVideoReferenceFFProbe(nil))
+}
+
+// ProvideUsageBillingRepository 以按用户合并结算的通道作为各服务使用的计费仓储。
+func ProvideUsageBillingRepository(lanes *UsageBillingLaneCombiner) UsageBillingRepository {
+	return lanes
 }
 
 // ProvideUserPlatformQuotaUsageFlusher 创建并启动 UserPlatformQuotaUsageFlusher。

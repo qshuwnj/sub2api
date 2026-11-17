@@ -130,6 +130,6 @@ func writeDapacaiVideoUpstreamError(c *gin.Context, account *Account, resp *http
 	})
 	// Preserve the HTTP mapping and single-submission behavior, including redirects.
 	// Client responses contain only allowlisted explanations, never supplier text.
-	writeGrokMediaErrorResponse(c, status, "dapacai_upstream_error", message)
+	writeGrokMediaErrorResponse(c, status, "dapacai_upstream_error", message, "")
 	return fmt.Errorf("Dapacai upstream rejected request: status=%d code=%s", resp.StatusCode, failure.Code)
 }
