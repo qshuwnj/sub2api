@@ -630,6 +630,13 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 			if result.VideoCount > 0 {
 				receipt, receiptErr := h.gatewayService.LookupVideoChargeReceipt(requestCtx,
 					service.VideoAttemptOwner{UserID: subject.UserID, APIKeyID: apiKey.ID}, taskID)
+				if receiptErr != nil && !errors.Is(receiptErr, service.ErrVideoResultNotFound) {
+					reqLog.Warn("dapacai.video_charge_receipt_lookup_failed",
+						zap.String("video_task_id", taskID), zap.Error(receiptErr))
+					c.Header("Retry-After", "15")
+					h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video charge receipt is unavailable; retry status, do not resubmit")
+					return
+				}
 				if receiptErr != nil || receipt == nil {
 					pending, err := h.gatewayService.LoadGrokVideoPendingBilling(requestCtx, taskID, subject.UserID, apiKey.ID)
 					if err != nil || pending == nil || !service.IsDapacaiVideoModel(pending.BillingModel) {
@@ -642,6 +649,10 @@ func (h *OpenAIGatewayHandler) handleGrokMedia(c *gin.Context, endpoint service.
 					}
 					billResult := prepareGrokVideoCompletionBilling(requestCtx, h, reqLog, apiKey, subject, taskID, result)
 					if billResult == nil || recordGrokMediaUsage(c, h, reqLog, apiKey, subject, subscription, account, billResult, billResult.Model, body, taskID) != nil {
+						reqLog.Warn("dapacai.video_settlement_pending",
+							zap.String("video_task_id", taskID),
+							zap.Bool("billing_prepared", billResult != nil))
+						c.Header("Retry-After", "15")
 						h.errorResponse(c, http.StatusServiceUnavailable, "billing_state_unavailable", "Video settlement is unavailable; retry status, do not resubmit")
 						return
 					}

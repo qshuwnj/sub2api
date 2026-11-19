@@ -98,3 +98,34 @@ func TestVideoChargeReceiptIncludesNativeTokenBilledSeedance(t *testing.T) {
 	require.Equal(t, "1.2500000000", receipt.Amount)
 	require.NoError(t, mock.ExpectationsWereMet())
 }
+
+func TestVideoReceiptAndTaskStateSurviveProductionBillingWiring(t *testing.T) {
+	db, mock, err := sqlmock.New()
+	require.NoError(t, err)
+	defer db.Close()
+	lanes := service.NewUsageBillingLaneCombiner(NewUsageBillingRepository(nil, db))
+	defer lanes.Stop()
+	wired := service.ProvideUsageBillingRepository(lanes)
+	reader, ok := wired.(service.VideoChargeReceiptReader)
+	require.True(t, ok, "production's billing wrapper must retain the SQL receipt reader")
+	stateRepo, ok := wired.(service.VideoTaskStateRepository)
+	require.True(t, ok, "production's billing wrapper must retain durable video task storage")
+	owner := service.VideoAttemptOwner{UserID: 16, APIKeyID: 20}
+	captured := time.Date(2026, 11, 19, 10, 3, 9, 0, time.UTC)
+	mock.ExpectQuery(`(?s)FROM usage_logs u.*u.user_id = \$2.*u.api_key_id = \$3.*usage_billing_dedup`).
+		WithArgs("grok-video:dapacai:paid", owner.UserID, owner.APIKeyID).
+		WillReturnRows(sqlmock.NewRows([]string{"id", "request_id", "actual_cost", "created_at"}).
+			AddRow(42, "grok-video:dapacai:paid", "1.5600000000", captured))
+	receipt, err := reader.FindVideoChargeReceipt(context.Background(), owner, "dapacai:paid")
+	require.NoError(t, err)
+	require.Equal(t, "1.5600000000", receipt.Amount)
+	mock.ExpectQuery(`WHERE request_id=\$1 AND user_id=\$2 AND api_key_id=\$3`).
+		WithArgs("dapacai:paid", owner.UserID, owner.APIKeyID).
+		WillReturnRows(sqlmock.NewRows([]string{"group_id", "account_id", "pending_billing", "settled"}).
+			AddRow(73, 72, []byte(`{"model":"seedance-2.0","billing_model":"seedance-2.0"}`), false))
+	state, err := stateRepo.LoadVideoTaskState(context.Background(), "dapacai:paid", owner.UserID, owner.APIKeyID)
+	require.NoError(t, err)
+	require.EqualValues(t, 72, state.AccountID)
+	require.Equal(t, "seedance-2.0", state.Pending.BillingModel)
+	require.NoError(t, mock.ExpectationsWereMet(), "read-only recovery must not execute another debit")
+}

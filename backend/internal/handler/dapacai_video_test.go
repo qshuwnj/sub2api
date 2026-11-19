@@ -23,10 +23,14 @@ import (
 
 type dapacaiBillingRepo struct {
 	atlasCloudBillingRepo
-	fixedJob bool
+	fixedJob   bool
+	receiptErr error
 }
 
 func (r *dapacaiBillingRepo) FindVideoChargeReceipt(_ context.Context, owner service.VideoAttemptOwner, task string) (*service.VideoChargeReceipt, error) {
+	if r.receiptErr != nil {
+		return nil, r.receiptErr
+	}
 	if !r.committed || owner.UserID != 10 || owner.APIKeyID != 20 || task != "dapacai:task_owned" {
 		return nil, service.ErrVideoResultNotFound
 	}
@@ -39,7 +43,7 @@ func (r *dapacaiBillingRepo) FindVideoChargeReceipt(_ context.Context, owner ser
 
 func TestDapacaiCompletionRequiresCommittedReceiptAndBillsOnce(t *testing.T) {
 	for _, fixedJob := range []bool{false, true} {
-		for _, scenario := range []string{"settles once", "paid without pending", "unpaid without pending", "settlement failure"} {
+		for _, scenario := range []string{"settles once", "paid without pending", "unpaid without pending", "settlement failure", "receipt lookup failure"} {
 			t.Run(fmt.Sprintf("%s/fixed=%t", scenario, fixedJob), func(t *testing.T) {
 				repo := &dapacaiBillingRepo{fixedJob: fixedJob}
 				h, slots, bindings, upstream := newGrokMediaSlotHandlerWithBilling(t, false, false, repo,
@@ -72,6 +76,9 @@ func TestDapacaiCompletionRequiresCommittedReceiptAndBillsOnce(t *testing.T) {
 						h.DapacaiVideoGeneration(c)
 					} else {
 						h.DapacaiVideoStatus(c)
+						if scenario == "receipt lookup failure" {
+							require.Equal(t, "15", w.Header().Get("Retry-After"))
+						}
 					}
 					if w.Code >= 400 {
 						for _, entry := range logs.All() {
@@ -96,12 +103,18 @@ func TestDapacaiCompletionRequiresCommittedReceiptAndBillsOnce(t *testing.T) {
 					bindings.pending = nil
 				case "settlement failure":
 					repo.fail = errors.New("mock settlement unavailable")
+				case "receipt lookup failure":
+					repo.committed = true
+					repo.receiptErr = errors.New("mock receipt database unavailable")
 				}
 				code, body = run(false)
-				if scenario == "unpaid without pending" || scenario == "settlement failure" {
+				if scenario == "unpaid without pending" || scenario == "settlement failure" || scenario == "receipt lookup failure" {
 					require.Equal(t, 503, code, body)
 					require.NotContains(t, body, `"status":"completed"`)
 					require.Empty(t, bindings.billed, "failed settlement releases its claim")
+					if scenario == "receipt lookup failure" {
+						require.Empty(t, repo.commands, "a receipt read error must not trigger another settlement")
+					}
 				} else {
 					require.Equal(t, 200, code, body)
 					expected := 0.5
