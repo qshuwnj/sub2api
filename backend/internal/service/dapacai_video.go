@@ -99,15 +99,20 @@ var dapacaiTaskID = regexp.MustCompile(`^task_[A-Za-z0-9_-]{1,110}$`)
 var dapacaiMediaName = regexp.MustCompile(`^[A-Za-z0-9_-]{1,64}$`)
 var dapacaiIPLiteral = regexp.MustCompile(`^[0-9.]+$`)
 
+func ValidDapacaiVideoTaskID(task string) bool {
+	id, ok := strings.CutPrefix(task, "dapacai:")
+	return ok && dapacaiTaskID.MatchString(id)
+}
+
 func dapacaiCompletedStatus(body []byte, task string) bool {
 	return gjson.GetBytes(body, "status").String() == "completed" && "dapacai:"+gjson.GetBytes(body, "id").String() == task
 }
 
 func dapacaiVideoURL(task string, content bool) (string, error) {
-	id, ok := strings.CutPrefix(task, "dapacai:")
-	if !ok || !dapacaiTaskID.MatchString(id) {
+	if !ValidDapacaiVideoTaskID(task) {
 		return "", errors.New("invalid Dapacai task ID")
 	}
+	id := strings.TrimPrefix(task, "dapacai:")
 	target := "https://api.dapacai.com/v1/videos/" + id
 	if content {
 		target += "/content"

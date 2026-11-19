@@ -178,9 +178,10 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 		c.Request = c.Request.WithContext(ctx)
 		billingInfoRequest := c.Request.URL.Path == "/v1/sub2api/billing"
 		studioAssetRequest := isStudioAssetMetadataRequest(c.Request.Method, c.Request.URL.Path)
-		// Library operations are non-billable, but never authorize an expired key.
+		dapacaiStatusRequest := isDapacaiVideoStatusRead(c.Request.Method, c.Request.URL.Path)
+		// Library and Dapacai status reads never authorize an expired key.
 		// Check before SimpleMode and the legacy read-only billing exceptions.
-		if studioAssetRequest && (apiKey.Status == service.StatusAPIKeyExpired || apiKey.IsExpired()) {
+		if (studioAssetRequest || dapacaiStatusRequest) && (apiKey.Status == service.StatusAPIKeyExpired || apiKey.IsExpired()) {
 			AbortWithError(c, http.StatusForbidden, "API_KEY_EXPIRED", "API key has expired")
 			return
 		}
@@ -188,7 +189,7 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 		// authenticated key and must remain available after the completed
 		// generation consumes the key's remaining balance.
 		skipBilling := c.Request.URL.Path == "/v1/usage" || billingInfoRequest || isAsyncImageTaskRead(c.Request.Method, c.Request.URL.Path) ||
-			isVideoAttemptRead(c.Request.Method, c.Request.URL.Path) || studioAssetRequest
+			isVideoAttemptRead(c.Request.Method, c.Request.URL.Path) || studioAssetRequest || dapacaiStatusRequest
 		if !skipBilling && isNativeVideoCreatePath(c.Request.Method, c.Request.URL.Path) && service.ValidVideoAttemptID(c.GetHeader("Idempotency-Key")) {
 			body, err := pkghttputil.ReadRequestBodyWithPrealloc(c.Request)
 			if err != nil {
@@ -437,6 +438,20 @@ func isVideoAttemptRead(method, path string) bool {
 		return strings.HasPrefix(parts[2], "atlascloud:") && !strings.ContainsAny(parts[2], `\%`)
 	}
 	return len(parts) == 2 && parts[0] == "videos" && strings.HasPrefix(parts[1], "atlascloud:") && !strings.ContainsAny(parts[1], `\%`)
+}
+
+// Only the native read-only status route bypasses new-generation billing.
+// The handler still verifies the exact user/key/group task binding.
+func isDapacaiVideoStatusRead(method, path string) bool {
+	if method != http.MethodGet {
+		return false
+	}
+	for _, root := range []string{"/v1/videos/", "/videos/"} {
+		if task, ok := strings.CutPrefix(path, root); ok {
+			return service.ValidDapacaiVideoTaskID(task)
+		}
+	}
+	return false
 }
 
 // GetAPIKeyFromContext 从上下文中获取API key
