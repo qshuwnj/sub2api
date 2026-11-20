@@ -202,6 +202,14 @@ func apiKeyAuthWithSubscription(apiKeyService *service.APIKeyService, subscripti
 				return
 			}
 			requestmodel.ResetRequestBody(c.Request, body)
+			// Owned retries bypass later admission middleware, but not v0.2.24's
+			// duplicate-field rejection. Check before authorizing that bypass.
+			if field, conflict := requestmodel.ConflictingField(c.GetHeader("Content-Type"), body); conflict {
+				MarkIngressRejected(c, IngressRejectConflictingRequestFields)
+				writeGatewayInvalidRequest(c, http.StatusBadRequest, fmt.Sprintf("Request body declares field %.64q more than once", field))
+				c.Abort()
+				return
+			}
 			model := gjson.GetBytes(body, "model")
 			if gjson.ValidBytes(body) && gjson.ParseBytes(body).IsObject() && model.Type == gjson.String {
 				skipBilling, err = apiKeyService.CanRecoverVideoAttempt(c.Request.Context(), apiKey, c.GetHeader("Idempotency-Key"), model.String())

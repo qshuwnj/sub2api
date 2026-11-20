@@ -122,3 +122,59 @@ func TestVideoAttemptRecoveryAuthenticationBoundary(t *testing.T) {
 		})
 	}
 }
+
+func TestVideoAttemptRecoveryRejectsConflictingFieldsBeforeLookup(t *testing.T) {
+	cases := []struct {
+		name, contentType, body string
+	}{
+		{"model", "application/json", `{"model":"google/veo3.1/text-to-video","model":"other"}`},
+		{"identical model", "application/json", `{"model":"google/veo3.1/text-to-video","model":"google/veo3.1/text-to-video"}`},
+		{"case variant", "application/json", `{"model":"google/veo3.1/text-to-video","Model":"other"}`},
+		{"escaped name", "application/json", `{"model":"google/veo3.1/text-to-video","mo\u0064el":"other"}`},
+		{"nested", "application/json", `{"model":"google/veo3.1/text-to-video","options":{"duration":5,"duration":10}}`},
+		{"BOM and misleading type", "multipart/form-data; boundary=test", "\xef\xbb\xbf" + `{"model":"google/veo3.1/text-to-video","model":"other"}`},
+		{"multipart", "multipart/form-data; boundary=test", "--test\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\ngoogle/veo3.1/text-to-video\r\n--test\r\nContent-Disposition: form-data; name=\"model\"\r\n\r\nother\r\n--test--\r\n"},
+	}
+	for _, mode := range []string{config.RunModeStandard, config.RunModeSimple} {
+		for _, path := range []string{"/v1/videos/generations", "/videos/generations"} {
+			for _, tc := range cases {
+				t.Run(mode+path+"/"+tc.name, func(t *testing.T) {
+					gin.SetMode(gin.TestMode)
+					group := &service.Group{ID: 42, Status: service.StatusActive, Hydrated: true, Platform: service.PlatformOpenAI}
+					key := &service.APIKey{ID: 100, UserID: 7, Key: "test-key", Group: group, GroupID: &group.ID,
+						User:   &service.User{ID: 7, Status: service.StatusActive},
+						Status: service.StatusAPIKeyQuotaExhausted, Quota: 1, QuotaUsed: 1}
+					repo := &stubApiKeyRepo{getByKey: func(context.Context, string) (*service.APIKey, error) {
+						copy := *key
+						return &copy, nil
+					}}
+					cfg := &config.Config{RunMode: mode}
+					keys := service.NewAPIKeyService(repo, nil, nil, nil, nil, nil, cfg)
+					lookups := 0
+					keys.SetVideoAttemptRecoveryLookup(func(_ context.Context, _ service.VideoAttemptOwner, id string) (*service.VideoAttempt, error) {
+						lookups++
+						return &service.VideoAttempt{ID: id, UserID: 7, APIKeyID: 100,
+							Selection: service.VideoQuoteRequest{Model: "google/veo3.1/text-to-video"}}, nil
+					})
+					router := gin.New()
+					router.Use(RequestBodyLimit(512), gin.HandlerFunc(NewAPIKeyAuthMiddleware(keys, nil, cfg)))
+					reached := false
+					router.POST(path, func(c *gin.Context) {
+						reached = true
+						c.Status(http.StatusNoContent)
+					})
+					req := httptest.NewRequest(http.MethodPost, path, strings.NewReader(tc.body))
+					req.Header.Set("X-API-Key", "test-key")
+					req.Header.Set("Idempotency-Key", "attempt")
+					req.Header.Set("Content-Type", tc.contentType)
+					w := httptest.NewRecorder()
+					router.ServeHTTP(w, req)
+					require.Equal(t, http.StatusBadRequest, w.Code, w.Body.String())
+					require.Contains(t, w.Body.String(), "more than once")
+					require.Zero(t, lookups, "ambiguous input must not authorize a recovery")
+					require.False(t, reached, "ambiguous input must not reach recovery or generation")
+				})
+			}
+		}
+	}
+}
