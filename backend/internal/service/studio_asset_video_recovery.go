@@ -227,10 +227,10 @@ func (s *OpenAIGatewayService) loadStudioNativeVideoStatus(ctx context.Context, 
 	if account.IsGrokOAuth() && isGrokCLIProxyTarget(target) {
 		applyGrokCLIHeaders(req.Header)
 	}
-	account.ApplyHeaderOverrides(req.Header)
-	req.Header.Del("X-Studio-Library")
-	req.Header.Del("X-Video-Quote")
-	req.Header.Del("Idempotency-Key")
+	account.ApplyHeaderOverrides(withoutHeaderOverrideRequestScope(req.Context()), req.Header)
+	deleteHeaderAllForms(req.Header, "x-studio-library")
+	deleteHeaderAllForms(req.Header, "x-video-quote")
+	deleteHeaderAllForms(req.Header, "idempotency-key")
 	proxy := ""
 	if account.ProxyID != nil && account.Proxy != nil {
 		proxy = account.Proxy.URL()
@@ -306,10 +306,10 @@ func (s *OpenAIGatewayService) openStudioNativeVideoContent(ctx context.Context,
 		if account.IsGrokOAuth() && isGrokCLIProxyTarget(target) {
 			applyGrokCLIHeaders(req.Header)
 		}
-		account.ApplyHeaderOverrides(req.Header)
-		req.Header.Del("X-Studio-Library")
-		req.Header.Del("X-Video-Quote")
-		req.Header.Del("Idempotency-Key")
+		account.ApplyHeaderOverrides(withoutHeaderOverrideRequestScope(req.Context()), req.Header)
+		deleteHeaderAllForms(req.Header, "x-studio-library")
+		deleteHeaderAllForms(req.Header, "x-video-quote")
+		deleteHeaderAllForms(req.Header, "idempotency-key")
 	}
 	proxy := ""
 	if account.ProxyID != nil && account.Proxy != nil {

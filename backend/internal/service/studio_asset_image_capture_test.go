@@ -568,7 +568,7 @@ func TestStudioAssetImageRawAPIKeyStripsOptInAfterHeaderOverrides(t *testing.T) 
 	}}
 	request, err := (&OpenAIGatewayService{cfg: &config.Config{}}).buildOpenAIImagesRequest(context.Background(), c, account, []byte(`{}`), "application/json", "fixture", openAIImagesEditsEndpoint)
 	require.NoError(t, err)
-	require.Empty(t, request.Header.Get("X-Studio-Library"))
+	require.Empty(t, headerValuesFold(request.Header, "x-studio-library"))
 }
 
 type studioImageBillingRepository struct {
